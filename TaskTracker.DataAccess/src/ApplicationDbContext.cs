@@ -8,10 +8,11 @@ namespace TaskTracker.DataAccess.src
     /// </summary>
     public class ApplicationDbContext : DbContext
     {
-        public DbSet<User> Users { get; set; } = null!;
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
-            optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=tasktracker;Username=postgres;Password=admin");
         }
+
+        public DbSet<User> Users { get; set; } = null!;
+
     }
 }
