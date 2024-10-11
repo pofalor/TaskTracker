@@ -1,37 +1,33 @@
-﻿namespace TaskTracker.Core.DataAccess.src.BaseClasses.impl
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace TaskTracker.Core.DataAccess.src.BaseClasses.impl
 {
-    public abstract class PersistentEntity<TKey> : IPersistentEntity where TKey : IEquatable<TKey>
+    public abstract class PersistentEntity
     {
         /// <summary>
         /// Идентификатор
         /// </summary>
-        public required TKey Id { get; set; }
+        public int Id { get; set; }
 
         /// <summary>
         /// Дата создания
         /// </summary>
-        public DateTime CreatedAt { get; set; }
+        public DateTime ObjectCreateDate { get; set; }
 
         /// <summary>
         /// Дата последнего изменения
         /// </summary>
-        public DateTime UpdatedAt { get; set; }
+        public DateTime ObjectEditDate { get; set; }
 
         /// <summary>
         /// Версия объекта
         /// </summary>
-        public int Version { get; set; }
+        [Timestamp]
+        public byte[] Version { get; set; } = null!;
 
         /// <summary>
         /// Поле означающее удалена сущность или нет
         /// </summary>
         public bool IsDeleted { get; set; }
-
-        /// <inheritdoc />
-        object IPersistentEntity.Id
-        {
-            get { return Id; }
-            set { Id = (TKey)value; }
-        }
     }
 }

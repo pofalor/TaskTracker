@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TaskTracker.Core.src.Entities;
+using TaskTracker.DataAccess.src.EntityConfiguration;
 
 namespace TaskTracker.DataAccess.src
 {
@@ -11,8 +12,12 @@ namespace TaskTracker.DataAccess.src
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
         }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.ApplyConfiguration(new UserConfiguration());
+        }
 
-        public DbSet<User> Users { get; set; } = null!;
+        //public DbSet<User> Users { get; set; } = null!;
 
     }
 }
