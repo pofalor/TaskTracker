@@ -6,4 +6,18 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="13.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TaskTracker.Utils\TaskTracker.Utils.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="src\Models\PostRequests\" />
+    <Folder Include="src\Models\Filters\" />
+  </ItemGroup>
+
 </Project>

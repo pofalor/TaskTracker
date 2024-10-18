@@ -3,11 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35303.130
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskTracker.Web.Api", "TaskTracker\TaskTracker.Web.Api.csproj", "{2F10561A-428B-462F-AE7E-ACD2E81C0E22}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TaskTracker.Web.Api", "TaskTracker\TaskTracker.Web.Api.csproj", "{2F10561A-428B-462F-AE7E-ACD2E81C0E22}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskTracker.DataAccess", "TaskTracker.DataAccess\TaskTracker.DataAccess.csproj", "{54FCCE20-FDED-4167-A85B-9EBB5F13312E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TaskTracker.DataAccess", "TaskTracker.DataAccess\TaskTracker.DataAccess.csproj", "{54FCCE20-FDED-4167-A85B-9EBB5F13312E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskTracker.Core", "TaskTracker.Core\TaskTracker.Core.csproj", "{09A5B32C-0056-4A06-982C-84272AA320FC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TaskTracker.Core", "TaskTracker.Core\TaskTracker.Core.csproj", "{09A5B32C-0056-4A06-982C-84272AA320FC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskTracker.Utils", "TaskTracker.Utils\TaskTracker.Utils.csproj", "{3EF5376A-843B-4983-B4D7-640EB2B202DE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{09A5B32C-0056-4A06-982C-84272AA320FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{09A5B32C-0056-4A06-982C-84272AA320FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{09A5B32C-0056-4A06-982C-84272AA320FC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3EF5376A-843B-4983-B4D7-640EB2B202DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3EF5376A-843B-4983-B4D7-640EB2B202DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3EF5376A-843B-4983-B4D7-640EB2B202DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3EF5376A-843B-4983-B4D7-640EB2B202DE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

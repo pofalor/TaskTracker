@@ -4,11 +4,10 @@ using TaskTracker.DataAccess.src;
 
 namespace TaskTracker.Web.Api.Ef
 {
-    // ReSharper disable once UnusedMember.Global
-    public class AppDbContextDesignTimeFactory : IDesignTimeDbContextFactory<ApplicationDbContext>
+    public class IdentityDbContextDesignTimeFactory : IDesignTimeDbContextFactory<ApplicationIdentityDbContext>
     {
         /// <inheritdoc />
-        public ApplicationDbContext CreateDbContext(string[] args)
+        public ApplicationIdentityDbContext CreateDbContext(string[] args)
         {
             var configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
@@ -16,13 +15,13 @@ namespace TaskTracker.Web.Api.Ef
                 .Build();
 
             // получаем строку подключения из файла appsettings.json
-            string connectionString = configuration.GetConnectionString("DefaultConnection") 
+            string connectionString = configuration.GetConnectionString("DefaultConnection")
                 ?? "Host=localhost;Port=5434;Database=tasktracker;Username=postgres;Password=admin";
 
-            var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
+            var optionsBuilder = new DbContextOptionsBuilder<ApplicationIdentityDbContext>();
 
             optionsBuilder.UseNpgsql(connectionString, opts => opts.CommandTimeout((int)TimeSpan.FromMinutes(10).TotalSeconds));
-            return new ApplicationDbContext(optionsBuilder.Options);
+            return new ApplicationIdentityDbContext(optionsBuilder.Options);
         }
     }
 }

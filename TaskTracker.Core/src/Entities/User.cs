@@ -1,4 +1,4 @@
-﻿using TaskTracker.Core.DataAccess.src.BaseClasses.impl;
+﻿using TaskTracker.Core.src.DataAccess.BaseClasses;
 
 namespace TaskTracker.Core.src.Entities
 {

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace TaskTracker.Core.DataAccess.src.BaseClasses.impl
+namespace TaskTracker.Core.src.DataAccess.BaseClasses
 {
     public abstract class PersistentEntity
     {
