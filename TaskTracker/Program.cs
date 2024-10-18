@@ -9,6 +9,7 @@ using System.Text;
 using TaskTracker.Core.src.ConfigSectionModels;
 using TaskTracker.Core.src.Constants;
 using TaskTracker.Core.src.Context;
+using TaskTracker.Core.src.DataAccess;
 using TaskTracker.DataAccess.src;
 
 var builder = WebApplication.CreateBuilder(args);

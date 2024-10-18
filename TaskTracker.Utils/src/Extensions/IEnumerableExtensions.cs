@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TaskTracker.Utils.src.Extensions
 {
-    public static class EnumerableExtensions
+    public static class IEnumerableExtensions
     {
         public static void Foreach<T>(this IEnumerable<T> enumerable, Action<T> action)
         {

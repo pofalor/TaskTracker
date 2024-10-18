@@ -42,7 +42,7 @@ namespace TaskTracker.Core.src.Models.Filters
             }
         }
         public bool IsAdmin { get; set; }
-        public int CryptoUserId { get; set; }
+        public int UserId { get; set; }
 
         public DateTime? AddDaysToBeginDate(int days)
         {

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using TaskTracker.Core.src.DataAccess;
 using TaskTracker.DataAccess.src;
 
 namespace TaskTracker.Web.Api.Ef
