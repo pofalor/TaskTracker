@@ -4,7 +4,10 @@ using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using System.Runtime.InteropServices;
+using System.Security.Principal;
 using System.Text;
 using TaskTracker.Core.src.ConfigSectionModels;
 using TaskTracker.Core.src.Constants;
@@ -30,13 +33,14 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString(AppConfigurationConstants.DbConnectionName));
 });
 
-var identityConfiguration = builder.Configuration
-    .GetValue<IdentityConfiguration>(IdentityConfiguration.IdentitySectionInConfig);
+var identityConfiguration = builder.Configuration.GetSection(IdentityConfiguration.IdentitySectionInConfig)
+.Get<IdentityConfiguration>();
 
-if(identityConfiguration is null)
+if (identityConfiguration is null)
 {
-    //TODO: насрать в логи
-    throw new InvalidOperationException("Identity configuration not correct.");
+    var mes = "Identity configuration not correct.";
+    Console.WriteLine(mes);
+    throw new InvalidOperationException(mes);
 }
 
 builder.Services
@@ -81,6 +85,7 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseStatusCodePages();
 
 app.MapControllerRoute(
     name: "default",

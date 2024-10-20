@@ -47,7 +47,7 @@ namespace TaskTracker.Core.src.Services.Impl
 
             try
             {
-                IdentityConfig = config.GetValue<IdentityConfiguration>(IdentityConfiguration.IdentitySectionInConfig)
+                IdentityConfig = config.GetSection(IdentityConfiguration.IdentitySectionInConfig).Get<IdentityConfiguration>()
                 ?? throw new InvalidOperationException($"Cannot get {IdentityConfiguration.IdentitySectionInConfig} section from config. " +
                 $"Value is null.");
             }

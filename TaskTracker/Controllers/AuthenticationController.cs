@@ -10,7 +10,7 @@ using TaskTracker.Web.Api.Responses;
 
 namespace TaskTracker.Web.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/auth")]
     [ApiController]
     public class AuthenticationController : BaseApiController
     {

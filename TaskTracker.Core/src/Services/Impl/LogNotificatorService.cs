@@ -18,7 +18,7 @@ namespace TaskTracker.Core.src.Services.Impl
 
             try
             {
-                TelegramConfig = config.GetValue<TelegramSettingsConfiguration>(TelegramSettingsConfiguration.TelegramSectionInConfig)
+                TelegramConfig = config.GetSection(TelegramSettingsConfiguration.TelegramSectionInConfig).Get<TelegramSettingsConfiguration>()
                 ?? throw new InvalidOperationException($"Cannot get {TelegramSettingsConfiguration.TelegramSectionInConfig} section from config. " +
                 $"Value is null.");
             }
