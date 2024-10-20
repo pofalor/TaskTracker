@@ -5,8 +5,9 @@ namespace TaskTracker.Controllers.BaseControllers
     /// <summary>
     /// Базовый контроллер
     /// </summary>
+    [ApiController]
     [Route("api/[controller]")]
-    public abstract class BaseApiController : Controller
+    public abstract class BaseApiController : ControllerBase
     {
     }
 }

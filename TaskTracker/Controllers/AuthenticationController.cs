@@ -22,7 +22,8 @@ namespace TaskTracker.Web.Api.Controllers
             _authenticationService = authenticationService;
         }
 
-        [HttpPost("register")]
+        [HttpPost]
+        [Route("register")]
         public async Task<DataResponse<bool>> Register(CreateUserPostRequest user)
         {
             var result = new DataResponse<bool>();
