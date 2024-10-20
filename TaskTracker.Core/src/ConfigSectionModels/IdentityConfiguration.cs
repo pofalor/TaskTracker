@@ -13,6 +13,11 @@
         public string TokenIssuer { get; set; } = string.Empty;
 
         /// <summary>
+        /// Кому выдали токен(по умолчанию - фронт)
+        /// </summary>
+        public string TokenAudience { get; set; } = string.Empty;
+
+        /// <summary>
         /// Ключ токена, по которому выполняется шифрование
         /// </summary>
         public string TokenSecret { get; set; } = string.Empty;

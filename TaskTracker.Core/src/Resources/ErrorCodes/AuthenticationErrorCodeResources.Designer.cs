@@ -61,6 +61,15 @@ namespace TaskTracker.Core.src.Resources.ErrorCodes {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Failed to log in.
+        /// </summary>
+        internal static string AuthError {
+            get {
+                return ResourceManager.GetString("AuthError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Error creating user.
         /// </summary>
         internal static string ErrorCreatingUser {

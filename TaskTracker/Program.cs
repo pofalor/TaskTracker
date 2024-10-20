@@ -10,7 +10,7 @@ using TaskTracker.Core.src.ConfigSectionModels;
 using TaskTracker.Core.src.Constants;
 using TaskTracker.Core.src.Context;
 using TaskTracker.Core.src.DataAccess;
-using TaskTracker.DataAccess.src;
+using TaskTracker.Core.src.Installers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -51,13 +51,18 @@ builder.Services
             ValidateIssuer = true,
             //кто выдаёт токен
             ValidIssuer = identityConfiguration.TokenIssuer,
+            ValidateAudience = true,
+            //кому выдают токен
+            ValidAudience = identityConfiguration.TokenAudience,
             ValidateLifetime = true,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(identityConfiguration.TokenSecret)),
             ValidateIssuerSigningKey = true,
         };
     });
 
-builder.Services.AddAutoMapper(typeof(AutoMappingProfile));
+builder.Services
+    .AddAutoMapper(typeof(AutoMappingProfile))
+    .AddCore();
 
 var app = builder.Build();
 

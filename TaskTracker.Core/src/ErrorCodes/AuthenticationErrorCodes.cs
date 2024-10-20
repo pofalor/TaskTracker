@@ -40,5 +40,11 @@ namespace TaskTracker.Core.src.ErrorCodes
         /// </summary>
         [ErrorMessage(typeof(AuthenticationErrorCodeResources), nameof(InvalidEmailOrPassword))]
         InvalidEmailOrPassword = InvalidEmail + 1,
+
+        /// <summary>
+        /// Не удалось выполнить вход.
+        /// </summary>
+        [ErrorMessage(typeof(AuthenticationErrorCodeResources), nameof(AuthError))]
+        AuthError = InvalidEmailOrPassword + 1,
     }
 }
