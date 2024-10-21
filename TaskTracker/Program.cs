@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using NLog;
@@ -12,6 +14,8 @@ using System;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using TaskTracker.Core.src.ConfigSectionModels;
 using TaskTracker.Core.src.Constants;
 using TaskTracker.Core.src.Context;
@@ -20,6 +24,9 @@ using TaskTracker.Core.src.Installers;
 
 var logger = NLog.LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
 logger.Debug("Init main");
+
+const string AllowAllCorsPolicy = "AllowAll";
+const string AllowOnlyFrontCors = "AllowFront";
 
 try
 {
@@ -83,6 +90,29 @@ try
 
     builder.Host.UseNLog();
 
+    builder.Services
+        .AddCors(options =>
+        {
+            options.AddPolicy(AllowAllCorsPolicy, builder =>
+            {
+                builder
+                    .AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader();
+            });
+            options.AddPolicy(AllowOnlyFrontCors, builder =>
+            {
+                builder
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .WithOrigins(
+                    identityConfiguration.TokenAudience
+                    )
+                    .AllowCredentials();
+            });
+        });
+
+
     var app = builder.Build();
 
     // Configure the HTTP request pipeline.
@@ -98,6 +128,8 @@ try
 
     app.UseRouting();
 
+    var corsPolicy = app.Environment.IsDevelopment() ? AllowAllCorsPolicy : AllowOnlyFrontCors;
+    app.UseCors(corsPolicy);
     app.UseAuthentication();
     app.UseAuthorization();
     app.UseStatusCodePages();
