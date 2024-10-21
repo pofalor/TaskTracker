@@ -12,7 +12,7 @@ namespace TaskTracker.Core.src.DataAccess.EntityConfiguration
             builder.Property("Id").HasColumnName("id");
             builder.Property(x => x.ObjectCreateDate).HasColumnName("object_create_date").IsRequired();
             builder.Property(x => x.ObjectEditDate).HasColumnName("object_edit_date").IsRequired();
-            builder.Property(x => x.Version).HasColumnName("version").IsRequired().IsConcurrencyToken();
+            builder.Property(x => x.Version).HasColumnName("version").IsRowVersion();
             builder.Property(x => x.IsDeleted).HasColumnName("is_deleted").IsRequired().HasDefaultValue(false);
         }
     }

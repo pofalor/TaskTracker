@@ -23,7 +23,7 @@ namespace TaskTracker.Web.Api.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<DataResponse<bool>> Register([FromForm] CreateUserPostRequest user)
+        public async Task<DataResponse<bool>> Register(CreateUserPostRequest user)
         {
             var result = new DataResponse<bool>();
             try
@@ -38,7 +38,7 @@ namespace TaskTracker.Web.Api.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "{ClassName} {MethodName}(){NewLine}. Msg: {Message}{StackTrace}{InnerException}",
+                _logger.LogError(ex, "{ClassName} {MethodName}().{NewLine} Msg: {Message}{StackTrace}{InnerException}",
                    nameof(AuthenticationController), nameof(Register), Environment.NewLine,
                    ex.Message, ex.StackTrace, ex.InnerException?.Message);
                 return result.WithError(AuthenticationErrorCodes.ErrorCreatingUser);
@@ -58,7 +58,7 @@ namespace TaskTracker.Web.Api.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "{ClassName} {MethodName}(){NewLine}. Msg: {Message}{StackTrace}{InnerException}",
+                _logger.LogError(ex, "{ClassName} {MethodName}().{NewLine} Msg: {Message}{StackTrace}{InnerException}",
                    nameof(AuthenticationController), nameof(AuthUser), Environment.NewLine,
                    ex.Message, ex.StackTrace, ex.InnerException?.Message);
                 return result.WithError(AuthenticationErrorCodes.AuthError);

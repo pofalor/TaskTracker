@@ -36,7 +36,7 @@ namespace TaskTracker.Core.src.Services.Impl
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "{ClassName} {MethodName}(){NewLine}. Msg: {Message}{StackTrace}{InnerException}",
+                _logger.LogError(ex, "{ClassName} {MethodName}().{NewLine} Msg: {Message}{StackTrace}{InnerException}",
                     nameof(BaseService<T, F>), nameof(GetAll), Environment.NewLine,
                     ex.Message, ex.StackTrace, ex.InnerException?.Message);
                 return result.WithError(BaseErrorCodes.GetItemsError);
@@ -55,7 +55,7 @@ namespace TaskTracker.Core.src.Services.Impl
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "{ClassName} {MethodName}(){NewLine}. Msg: {Message}{StackTrace}{InnerException}",
+                _logger.LogError(ex, "{ClassName} {MethodName}().{NewLine} Msg: {Message}{StackTrace}{InnerException}",
                     nameof(BaseService<T, F>), nameof(FiltrationItem), Environment.NewLine,
                     ex.Message, ex.StackTrace, ex.InnerException?.Message);
                 return dataToFilter;
@@ -78,7 +78,7 @@ namespace TaskTracker.Core.src.Services.Impl
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "{ClassName} {MethodName}(){NewLine}. Msg: {Message}{StackTrace}{InnerException}",
+                _logger.LogError(ex, "{ClassName} {MethodName}().{NewLine} Msg: {Message}{StackTrace}{InnerException}",
                     nameof(BaseService<T, F>), nameof(GetByFilter), Environment.NewLine,
                     ex.Message, ex.StackTrace, ex.InnerException?.Message);
                 return result.WithError(BaseErrorCodes.GetItemsError);
@@ -102,7 +102,7 @@ namespace TaskTracker.Core.src.Services.Impl
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "{ClassName} {MethodName}(){NewLine}. Msg: {Message}{StackTrace}{InnerException}",
+                _logger.LogError(ex, "{ClassName} {MethodName}().{NewLine} Msg: {Message}{StackTrace}{InnerException}",
                    nameof(BaseService<T, F>), nameof(GetById), Environment.NewLine,
                    ex.Message, ex.StackTrace, ex.InnerException?.Message);
                 return result.WithError(BaseErrorCodes.GetItemError);
@@ -130,7 +130,7 @@ namespace TaskTracker.Core.src.Services.Impl
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "{ClassName} {MethodName}(){NewLine}. Msg: {Message}{StackTrace}{InnerException}",
+                _logger.LogError(ex, "{ClassName} {MethodName}().{NewLine} Msg: {Message}{StackTrace}{InnerException}",
                    nameof(BaseService<T, F>), nameof(DeleteById), Environment.NewLine,
                    ex.Message, ex.StackTrace, ex.InnerException?.Message);
                 return result.WithError(BaseErrorCodes.DeleteItemError);
@@ -149,7 +149,7 @@ namespace TaskTracker.Core.src.Services.Impl
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "{ClassName} {MethodName}(){NewLine}. Msg: {Message}{StackTrace}{InnerException}",
+                _logger.LogError(ex, "{ClassName} {MethodName}().{NewLine} Msg: {Message}{StackTrace}{InnerException}",
                    nameof(BaseService<T, F>), nameof(CreateOrEdit), Environment.NewLine,
                    ex.Message, ex.StackTrace, ex.InnerException?.Message);
                 return result.WithError(BaseErrorCodes.CreateItemError);

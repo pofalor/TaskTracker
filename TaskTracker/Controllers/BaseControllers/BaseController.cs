@@ -60,7 +60,7 @@ namespace TaskTracker.Web.Api.Controllers.BaseControllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "{ControllerName} {MethodName}(){NewLine}. Msg: {Message}{StackTrace}{InnerException}",
+                _logger.LogError(ex, "{ControllerName} {MethodName}().{NewLine} Msg: {Message}{StackTrace}{InnerException}",
                     //TODO: протестить
                     nameof(BaseController<T, M, R, F>), nameof(CheckRoles), Environment.NewLine, 
                     ex.Message, ex.StackTrace, ex.InnerException?.Message);
@@ -89,7 +89,7 @@ namespace TaskTracker.Web.Api.Controllers.BaseControllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "{ControllerName} {MethodName}(){NewLine}. Msg: {Message}{StackTrace}{InnerException}",
+                _logger.LogError(ex, "{ControllerName} {MethodName}().{NewLine} Msg: {Message}{StackTrace}{InnerException}",
                     nameof(BaseController<T, M, R, F>), nameof(GetAll), Environment.NewLine, 
                     ex.Message, ex.StackTrace, ex.InnerException?.Message);
                 return response.WithError(BaseErrorCodes.GetItemsError);
@@ -130,7 +130,7 @@ namespace TaskTracker.Web.Api.Controllers.BaseControllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "{ControllerName} {MethodName}(){NewLine}. Msg: {Message}{StackTrace}{InnerException}",
+                _logger.LogError(ex, "{ControllerName} {MethodName}().{NewLine} Msg: {Message}{StackTrace}{InnerException}",
                     nameof(BaseController<T, M, R, F>), nameof(GetByFilter), Environment.NewLine,
                     ex.Message, ex.StackTrace, ex.InnerException?.Message);
                 return response.WithError(BaseErrorCodes.GetItemsError);
@@ -164,7 +164,7 @@ namespace TaskTracker.Web.Api.Controllers.BaseControllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "{ControllerName} {MethodName}(){NewLine}. Msg: {Message}{StackTrace}{InnerException}",
+                _logger.LogError(ex, "{ControllerName} {MethodName}().{NewLine} Msg: {Message}{StackTrace}{InnerException}",
                     nameof(BaseController<T, M, R, F>), nameof(GetById), Environment.NewLine,
                     ex.Message, ex.StackTrace, ex.InnerException?.Message);
                 return response.WithError(BaseErrorCodes.GetItemError);
@@ -198,7 +198,7 @@ namespace TaskTracker.Web.Api.Controllers.BaseControllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "{ControllerName} {MethodName}(){NewLine}. Msg: {Message}{StackTrace}{InnerException}",
+                _logger.LogError(ex, "{ControllerName} {MethodName}().{NewLine} Msg: {Message}{StackTrace}{InnerException}",
                     nameof(BaseController<T, M, R, F>), nameof(DeleteById), Environment.NewLine,
                     ex.Message, ex.StackTrace, ex.InnerException?.Message);
                 return response.WithError(BaseErrorCodes.DeleteItemError);
@@ -232,7 +232,7 @@ namespace TaskTracker.Web.Api.Controllers.BaseControllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "{ControllerName} {MethodName}(){NewLine}. Msg: {Message}{StackTrace}{InnerException}",
+                _logger.LogError(ex, "{ControllerName} {MethodName}().{NewLine} Msg: {Message}{StackTrace}{InnerException}",
                     nameof(BaseController<T, M, R, F>), nameof(CreateOrEdit), Environment.NewLine,
                     ex.Message, ex.StackTrace, ex.InnerException?.Message);
                 return response.WithError(BaseErrorCodes.CreateItemError);

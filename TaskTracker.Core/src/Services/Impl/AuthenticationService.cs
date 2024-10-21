@@ -97,7 +97,6 @@ namespace TaskTracker.Core.src.Services.Impl
 
                     if (!creationResult.Succeeded)
                     {
-                        //TODO: протестить
                         await transaction.RollbackAsync();
                         return result.WithError(AuthenticationErrorCodes.ErrorCreatingUser);
                     }
@@ -116,9 +115,7 @@ namespace TaskTracker.Core.src.Services.Impl
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "{ClassName} {MethodName}(){NewLine}. Msg: {Message}{StackTrace}{InnerException}",
-                    nameof(AuthenticationService), nameof(RegisterNewUser), Environment.NewLine,
-                    ex.Message, ex.StackTrace, ex.InnerException?.Message);
+                _logger.LogError(ex, "Error while creating user.");
                 return result.WithError(AuthenticationErrorCodes.ErrorCreatingUser);
             }
         }
@@ -198,7 +195,7 @@ namespace TaskTracker.Core.src.Services.Impl
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "{ClassName} {MethodName}(){NewLine}. Msg: {Message}{StackTrace}{InnerException}",
+                _logger.LogError(ex, "{ClassName} {MethodName}().{NewLine} Msg: {Message}{StackTrace}{InnerException}",
                     nameof(AuthenticationService), nameof(Authenticate), Environment.NewLine,
                     ex.Message, ex.StackTrace, ex.InnerException?.Message);
                 return result.WithError(AuthenticationErrorCodes.InvalidEmailOrPassword);

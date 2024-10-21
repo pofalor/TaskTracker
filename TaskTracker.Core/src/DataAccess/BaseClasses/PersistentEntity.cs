@@ -22,8 +22,7 @@ namespace TaskTracker.Core.src.DataAccess.BaseClasses
         /// <summary>
         /// Версия объекта
         /// </summary>
-        [Timestamp]
-        public byte[] Version { get; set; } = null!;
+        public byte[]? Version { get; set; } = null!;
 
         /// <summary>
         /// Поле означающее удалена сущность или нет
