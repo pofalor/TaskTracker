@@ -91,23 +91,29 @@ namespace TaskTracker.Core.src.Services.Impl
 
                 using (var transaction = await _dbContext.Database.BeginTransactionAsync())
                 {
-                    var identityUser = _mapper.Map<IdentityUser>(user);
-
-                    var creationResult = await _userManager.CreateAsync(identityUser, user.Password);
-
-                    if (!creationResult.Succeeded)
+                    using(var transactionIdentity = await _identityDbContext.Database.BeginTransactionAsync())
                     {
-                        await transaction.RollbackAsync();
-                        return result.WithError(AuthenticationErrorCodes.ErrorCreatingUser);
+                        var identityUser = _mapper.Map<IdentityUser>(user);
+
+                        var creationResult = await _userManager.CreateAsync(identityUser, user.Password);
+
+                        if (!creationResult.Succeeded)
+                        {
+                            await transaction.RollbackAsync();
+                            await transactionIdentity.RollbackAsync();
+                            return result.WithError(AuthenticationErrorCodes.ErrorCreatingUser);
+                        }
+
+                        var newUser = _mapper.Map<User>(user);
+                        newUser.UserId = identityUser.Id;
+
+                        await _dbContext.AddAsync(newUser);
+                        await _dbContext.SaveChangesAsync();
+
+                        await _userManager.AddToRoleAsync(identityUser, Permissions.UserRole);
+
+                        await transactionIdentity.CommitAsync();
                     }
-
-                    var newUser = _mapper.Map<User>(user);
-                    newUser.UserId = identityUser.Id;
-
-                    await _dbContext.AddAsync(newUser);
-                    await _dbContext.SaveChangesAsync();
-
-                    await _userManager.AddToRoleAsync(identityUser, Permissions.UserRole);
 
                     await transaction.CommitAsync();
                 }
