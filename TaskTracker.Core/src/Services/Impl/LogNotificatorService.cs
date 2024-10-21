@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Logging;
 using TaskTracker.Core.src.ConfigSectionModels;
 using TaskTracker.Core.src.DataResult;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace TaskTracker.Core.src.Services.Impl
 {
@@ -24,8 +23,8 @@ namespace TaskTracker.Core.src.Services.Impl
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "{ClassName} fatal error! " +
-                    "Msg: {Message}", nameof(LogNotificatorService), ex.Message);
+                _logger.LogError(ex, "{ClassName} fatal error getting value from config!{NewLine}", 
+                    nameof(LogNotificatorService), Environment.NewLine);
                 throw;
             }
         }
@@ -42,9 +41,8 @@ namespace TaskTracker.Core.src.Services.Impl
                 }
                 catch (Exception e)
                 {
-                    _logger.LogError(e, "{ServiceName} {MethodName}: " +
-                        "Cannot send message to tg admin => [tgId = {AdminId}]", 
-                        nameof(LogNotificatorService), nameof(SendTelegramAdmin), adminId);
+                    _logger.LogError(e, "Cannot send message to tg admin => [{Parameter} = {AdminId}]{NewLine}", 
+                        nameof(adminId), adminId, Environment.NewLine);
                 }
             }
             return result.WithData(resp);
@@ -86,8 +84,7 @@ namespace TaskTracker.Core.src.Services.Impl
             }
             catch (Exception ex)
             {
-                string mes = $"{nameof(LogNotificatorService)} {nameof(SendBotTelegramAsync)}: " +
-                    $"Cannot send message to tg => [tgId = {userId}]";
+                string mes = $"Cannot send message to tg => [{nameof(userId)} = {userId}]";
                 _logger.LogError(ex, mes);
                 return result.WithError(mes);
             }

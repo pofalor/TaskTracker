@@ -53,8 +53,8 @@ namespace TaskTracker.Core.src.Services.Impl
             }
             catch (Exception ex) 
             {
-                _logger.LogError(ex, "{ClassName} fatal error! " +
-                    "Msg: {Message}", nameof(AuthenticationService), ex.Message);
+                _logger.LogError(ex, "{ClassName} fatal error getting value from config!{NewLine}", 
+                    nameof(AuthenticationService), Environment.NewLine);
                 throw;
             }
             
@@ -121,7 +121,8 @@ namespace TaskTracker.Core.src.Services.Impl
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error while creating user.");
+                _logger.LogError(ex, "Error while creating user.{NewLine}{Parameter}: {User}{NewLine2}", 
+                    Environment.NewLine, nameof(user), user?.ToJson(), Environment.NewLine);
                 return result.WithError(AuthenticationErrorCodes.ErrorCreatingUser);
             }
         }
@@ -201,9 +202,8 @@ namespace TaskTracker.Core.src.Services.Impl
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "{ClassName} {MethodName}().{NewLine} Msg: {Message}{StackTrace}{InnerException}",
-                    nameof(AuthenticationService), nameof(Authenticate), Environment.NewLine,
-                    ex.Message, ex.StackTrace, ex.InnerException?.Message);
+                _logger.LogError(ex, "Authentication error.{NewLine}{Parameter}: {User}{NewLine2}", 
+                    Environment.NewLine, nameof(user), user?.ToJson(), Environment.NewLine);
                 return result.WithError(AuthenticationErrorCodes.InvalidEmailOrPassword);
             }
         }

@@ -36,9 +36,7 @@ namespace TaskTracker.Core.src.Services.Impl
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "{ClassName} {MethodName}().{NewLine} Msg: {Message}{StackTrace}{InnerException}",
-                    nameof(BaseService<T, F>), nameof(GetAll), Environment.NewLine,
-                    ex.Message, ex.StackTrace, ex.InnerException?.Message);
+                _logger.LogError(ex, "Error getting all elements.{NewLine}", Environment.NewLine);
                 return result.WithError(BaseErrorCodes.GetItemsError);
             }
         }
@@ -55,9 +53,8 @@ namespace TaskTracker.Core.src.Services.Impl
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "{ClassName} {MethodName}().{NewLine} Msg: {Message}{StackTrace}{InnerException}",
-                    nameof(BaseService<T, F>), nameof(FiltrationItem), Environment.NewLine,
-                    ex.Message, ex.StackTrace, ex.InnerException?.Message);
+                _logger.LogError(ex, "Error filtering element.{NewLine}{Parameter}:{Filter}{NewLine2}",
+                    Environment.NewLine, nameof(filter), filter?.ToJson(), Environment.NewLine);
                 return dataToFilter;
             }
         }
@@ -78,9 +75,8 @@ namespace TaskTracker.Core.src.Services.Impl
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "{ClassName} {MethodName}().{NewLine} Msg: {Message}{StackTrace}{InnerException}",
-                    nameof(BaseService<T, F>), nameof(GetByFilter), Environment.NewLine,
-                    ex.Message, ex.StackTrace, ex.InnerException?.Message);
+                _logger.LogError(ex, "Error getting element by filter.{NewLine}{Parameter}:{Filter}{NewLine2}",
+                    Environment.NewLine, nameof(filter), filter?.ToJson(), Environment.NewLine);
                 return result.WithError(BaseErrorCodes.GetItemsError);
             }
         }
@@ -102,9 +98,8 @@ namespace TaskTracker.Core.src.Services.Impl
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "{ClassName} {MethodName}().{NewLine} Msg: {Message}{StackTrace}{InnerException}",
-                   nameof(BaseService<T, F>), nameof(GetById), Environment.NewLine,
-                   ex.Message, ex.StackTrace, ex.InnerException?.Message);
+                _logger.LogError(ex, "Error getting element by id.{NewLine}{Parameter}:{Id}{NewLine2}",
+                   Environment.NewLine, nameof(id), id.ToString(), Environment.NewLine);
                 return result.WithError(BaseErrorCodes.GetItemError);
             }
         }
@@ -130,9 +125,8 @@ namespace TaskTracker.Core.src.Services.Impl
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "{ClassName} {MethodName}().{NewLine} Msg: {Message}{StackTrace}{InnerException}",
-                   nameof(BaseService<T, F>), nameof(DeleteById), Environment.NewLine,
-                   ex.Message, ex.StackTrace, ex.InnerException?.Message);
+                _logger.LogError(ex, "Error deleting element by id.{NewLine}{Parameter}:{Id}{NewLine2}",
+                   Environment.NewLine, nameof(Id), Id.ToString(), Environment.NewLine);
                 return result.WithError(BaseErrorCodes.DeleteItemError);
             }
         }
@@ -149,9 +143,8 @@ namespace TaskTracker.Core.src.Services.Impl
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "{ClassName} {MethodName}().{NewLine} Msg: {Message}{StackTrace}{InnerException}",
-                   nameof(BaseService<T, F>), nameof(CreateOrEdit), Environment.NewLine,
-                   ex.Message, ex.StackTrace, ex.InnerException?.Message);
+                _logger.LogError(ex, "Error adding or changing.{NewLine}{Parameter}:{Request}{NewLine2}",
+                   Environment.NewLine, nameof(request), request?.ToJson(), Environment.NewLine);
                 return result.WithError(BaseErrorCodes.CreateItemError);
             }
         }

@@ -60,10 +60,8 @@ namespace TaskTracker.Web.Api.Controllers.BaseControllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "{ControllerName} {MethodName}().{NewLine} Msg: {Message}{StackTrace}{InnerException}",
-                    //TODO: протестить
-                    nameof(BaseController<T, M, R, F>), nameof(CheckRoles), Environment.NewLine, 
-                    ex.Message, ex.StackTrace, ex.InnerException?.Message);
+                _logger.LogError(ex, "Error checking roles.{NewLine}{Parameter}: {MethodName}{NewLine2}",
+                    Environment.NewLine, nameof(methodName), methodName, Environment.NewLine);
                 return false;
             }
         }
@@ -89,9 +87,7 @@ namespace TaskTracker.Web.Api.Controllers.BaseControllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "{ControllerName} {MethodName}().{NewLine} Msg: {Message}{StackTrace}{InnerException}",
-                    nameof(BaseController<T, M, R, F>), nameof(GetAll), Environment.NewLine, 
-                    ex.Message, ex.StackTrace, ex.InnerException?.Message);
+                _logger.LogError(ex, "Error while sending request to get all elements.{NewLine}", Environment.NewLine);
                 return response.WithError(BaseErrorCodes.GetItemsError);
             }
         }
@@ -130,9 +126,8 @@ namespace TaskTracker.Web.Api.Controllers.BaseControllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "{ControllerName} {MethodName}().{NewLine} Msg: {Message}{StackTrace}{InnerException}",
-                    nameof(BaseController<T, M, R, F>), nameof(GetByFilter), Environment.NewLine,
-                    ex.Message, ex.StackTrace, ex.InnerException?.Message);
+                _logger.LogError(ex, "Error while sending request to get element by filter.{NewLine}{Parameter}:{Filter}{NewLine2}",
+                    Environment.NewLine, nameof(filter), filter.ToJson(), Environment.NewLine);
                 return response.WithError(BaseErrorCodes.GetItemsError);
             }
         }
@@ -164,9 +159,8 @@ namespace TaskTracker.Web.Api.Controllers.BaseControllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "{ControllerName} {MethodName}().{NewLine} Msg: {Message}{StackTrace}{InnerException}",
-                    nameof(BaseController<T, M, R, F>), nameof(GetById), Environment.NewLine,
-                    ex.Message, ex.StackTrace, ex.InnerException?.Message);
+                _logger.LogError(ex, "Error while sedning request to get element by id.{NewLine}{Parameter}:{ItemId}{NewLine2}",
+                   Environment.NewLine, nameof(itemId), itemId.ToString(), Environment.NewLine);
                 return response.WithError(BaseErrorCodes.GetItemError);
             }
         }
@@ -198,9 +192,8 @@ namespace TaskTracker.Web.Api.Controllers.BaseControllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "{ControllerName} {MethodName}().{NewLine} Msg: {Message}{StackTrace}{InnerException}",
-                    nameof(BaseController<T, M, R, F>), nameof(DeleteById), Environment.NewLine,
-                    ex.Message, ex.StackTrace, ex.InnerException?.Message);
+                _logger.LogError(ex, "Error while sending request to delete element by id.{NewLine}{Parameter}:{ItemId}{NewLine2}",
+                   Environment.NewLine, nameof(itemId), itemId.ToString(), Environment.NewLine);
                 return response.WithError(BaseErrorCodes.DeleteItemError);
             }
         }
@@ -232,9 +225,8 @@ namespace TaskTracker.Web.Api.Controllers.BaseControllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "{ControllerName} {MethodName}().{NewLine} Msg: {Message}{StackTrace}{InnerException}",
-                    nameof(BaseController<T, M, R, F>), nameof(CreateOrEdit), Environment.NewLine,
-                    ex.Message, ex.StackTrace, ex.InnerException?.Message);
+                _logger.LogError(ex, "Error while sending request to add or change element.{NewLine}{Parameter}:{Request}{NewLine2}",
+                   Environment.NewLine, nameof(request), request?.ToJson(), Environment.NewLine);
                 return response.WithError(BaseErrorCodes.CreateItemError);
             }
         }

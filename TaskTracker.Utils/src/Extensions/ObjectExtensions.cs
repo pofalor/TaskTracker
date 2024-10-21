@@ -1,4 +1,7 @@
-﻿namespace TaskTracker.Utils.src.Extensions
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
+
+namespace TaskTracker.Utils.src.Extensions
 {
     public static class ObjectExtensions
     {
@@ -27,6 +30,16 @@
             }
 
             return defaultValue;
+        }
+
+        /// <summary>
+        /// Преобразовать переданный объект в строку содержащую json
+        /// </summary>
+        /// <param name="obj">Объект</param>
+        /// <returns>Строка, содержащая json</returns>
+        public static string ToJson(this object obj)
+        {
+            return JsonSerializer.Serialize(obj);
         }
     }
 }

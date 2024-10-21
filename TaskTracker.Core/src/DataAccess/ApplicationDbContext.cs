@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using TaskTracker.Core.src.DataAccess.BaseClasses;
 using TaskTracker.Core.src.DataAccess.EntityConfiguration;
+using TaskTracker.Utils.src.Extensions;
 
 namespace TaskTracker.Core.src.DataAccess
 {
@@ -14,6 +16,53 @@ namespace TaskTracker.Core.src.DataAccess
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfiguration(new UserConfiguration());
+        }
+
+        public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            UpdatePersistentEntitiesData();
+
+            return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+        }
+
+        /// <inheritdoc />
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken))
+        {
+            UpdatePersistentEntitiesData();
+
+            return base.SaveChangesAsync(cancellationToken);
+        }
+
+        /// <inheritdoc />
+        public override int SaveChanges()
+        {
+            UpdatePersistentEntitiesData();
+
+            return base.SaveChanges();
+        }
+
+        private void UpdatePersistentEntitiesData()
+        {
+            var addedEntries = ChangeTracker
+                .Entries<PersistentEntity>()
+                .Where(x => x.State == EntityState.Added);
+
+            var now = DateTime.UtcNow;
+
+            addedEntries.Foreach(entry =>
+            {
+                entry.Entity.ObjectCreateDate = now;
+                entry.Entity.ObjectEditDate = now;
+            });
+
+            var updateEntries = ChangeTracker
+                .Entries<PersistentEntity>()
+                .Where(x => x.State == EntityState.Modified);
+
+            updateEntries.Foreach(entry =>
+            {
+                entry.Entity.ObjectEditDate = now;
+            });
         }
     }
 }

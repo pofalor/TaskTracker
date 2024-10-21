@@ -5,6 +5,7 @@ using TaskTracker.Core.src.ErrorCodes;
 using TaskTracker.Core.src.Models.PostRequests;
 using TaskTracker.Core.src.Models.ResponseModels;
 using TaskTracker.Core.src.Services;
+using TaskTracker.Utils.src.Extensions;
 using TaskTracker.Web.Api.Extensions;
 using TaskTracker.Web.Api.Responses;
 
@@ -38,9 +39,8 @@ namespace TaskTracker.Web.Api.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "{ClassName} {MethodName}().{NewLine} Msg: {Message}{StackTrace}{InnerException}",
-                   nameof(AuthenticationController), nameof(Register), Environment.NewLine,
-                   ex.Message, ex.StackTrace, ex.InnerException?.Message);
+                _logger.LogError(ex, "Error while sending request to create new user.{NewLine}{Parameter}: {User}{NewLine2}",
+                    Environment.NewLine, nameof(user), user?.ToJson(), Environment.NewLine);
                 return result.WithError(AuthenticationErrorCodes.ErrorCreatingUser);
             }
         }
@@ -58,9 +58,8 @@ namespace TaskTracker.Web.Api.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "{ClassName} {MethodName}().{NewLine} Msg: {Message}{StackTrace}{InnerException}",
-                   nameof(AuthenticationController), nameof(AuthUser), Environment.NewLine,
-                   ex.Message, ex.StackTrace, ex.InnerException?.Message);
+                _logger.LogError(ex, "Error while sending request to authenticate.{NewLine}{Parameter}: {User}{NewLine2}",
+                    Environment.NewLine, nameof(user), user?.ToJson(), Environment.NewLine);
                 return result.WithError(AuthenticationErrorCodes.AuthError);
             }
         }
