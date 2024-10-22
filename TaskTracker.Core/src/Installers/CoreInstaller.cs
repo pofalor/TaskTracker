@@ -20,6 +20,7 @@ namespace TaskTracker.Core.src.Installers
         {
             services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddScoped<ILogNotificatorService, LogNotificatorService>();
+            services.AddScoped<ISosService, SosService>();
 
             return services;
         }

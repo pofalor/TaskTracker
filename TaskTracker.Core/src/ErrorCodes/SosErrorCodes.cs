@@ -1,0 +1,32 @@
+﻿using TaskTracker.Core.src.Constants;
+using TaskTracker.Core.src.Resources.ErrorCodes;
+
+namespace TaskTracker.Core.src.ErrorCodes
+{
+    public enum SosErrorCodes
+    {
+        /// <summary>
+        /// Пришло пустое имя роли
+        /// </summary>
+        [ErrorMessage(typeof(SosErrorCodeResources), nameof(RoleNameNullError))]
+        RoleNameNullError = AuthenticationErrorCodes.UserAlreadyExists + ErrorConstants.EnumErrorCodeCount,
+
+        /// <summary>
+        /// Такая роль уже существует
+        /// </summary>
+        [ErrorMessage(typeof(SosErrorCodeResources), nameof(RoleAlreadyExists))]
+        RoleAlreadyExists = RoleNameNullError + 1,
+
+        /// <summary>
+        /// Ошибка при создании роли
+        /// </summary>
+        [ErrorMessage(typeof(SosErrorCodeResources), nameof(RoleCreationError))]
+        RoleCreationError = RoleAlreadyExists + 1,
+
+        /// <summary>
+        /// Неправильный токен
+        /// </summary>
+        [ErrorMessage(typeof(SosErrorCodeResources), nameof(InvalidToken))]
+        InvalidToken = RoleCreationError + 1,
+    }
+}

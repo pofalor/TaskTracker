@@ -35,7 +35,7 @@ namespace TaskTracker.Web.Api.Controllers
                    return result.WithData(response.Data);
                 }
                     
-                return result.WithError(AuthenticationErrorCodes.ErrorCreatingUser);
+                return result.WithError(response.Errors[0]);
             }
             catch (Exception ex)
             {
@@ -54,7 +54,7 @@ namespace TaskTracker.Web.Api.Controllers
                 var response = await _authenticationService.Authenticate(user);
                 if (response.Success)
                     return result.WithData(response.Data);
-                return result.WithError(AuthenticationErrorCodes.AuthError);
+                return result.WithError(response.Errors[0]);
             }
             catch (Exception ex)
             {
