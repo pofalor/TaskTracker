@@ -15,6 +15,7 @@ namespace TaskTracker.Core.src.DataAccess.EntityConfiguration
             builder.Property(p => p.FirstName).HasColumnName("first_name");
             builder.Property(p => p.LastName).HasColumnName("last_name");
             builder.Property(p => p.Country).HasColumnName("country");
+            builder.Property(p => p.NickName).HasColumnName("nick_name");
         }
     }
 }

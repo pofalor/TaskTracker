@@ -15,5 +15,9 @@ namespace TaskTracker.Core.src.Entities
         public string UserId { get; set; } = null!;
 
         public int? Country { get; set; }
+
+        public string NickName { get; set; } = string.Empty;
+
+        public ICollection<WorkSpace> WorkSpaces { get; } = [];
     }
 }
