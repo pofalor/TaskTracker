@@ -1,4 +1,5 @@
-﻿using TaskTracker.Core.src.DataAccess.BaseClasses;
+﻿using Microsoft.AspNetCore.Identity;
+using TaskTracker.Core.src.DataAccess.BaseClasses;
 
 namespace TaskTracker.Core.src.Entities
 {
@@ -12,12 +13,11 @@ namespace TaskTracker.Core.src.Entities
         /// </summary>
         public string Email { get; set; } = null!;
 
+        public IdentityUser IdentityUser { get; set; } = null!;
         public string UserId { get; set; } = null!;
 
         public int? Country { get; set; }
 
         public string NickName { get; set; } = string.Empty;
-
-        public ICollection<WorkSpace> WorkSpaces { get; } = [];
     }
 }

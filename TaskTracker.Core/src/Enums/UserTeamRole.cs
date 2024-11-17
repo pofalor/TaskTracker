@@ -5,15 +5,20 @@
         //для фильтрации
         All = -1,
 
-        Developer = 0,
+        /// <summary>
+        /// Роль не задана
+        /// </summary>
+        NotSet = 0,
 
-        Tester = 1,
+        Developer = 1,
 
-        Director = 2,
+        Tester = 2,
+
+        Director = 3,
 
         /// <summary>
         /// Project manager
         /// </summary>
-        ProjectMgr = 3
+        ProjectMgr = 4
     }
 }
