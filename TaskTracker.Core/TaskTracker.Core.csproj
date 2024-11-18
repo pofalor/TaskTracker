@@ -30,10 +30,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="src\Models\Filters\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Compile Update="src\Resources\ErrorCodes\AuthenticationErrorCodeResources.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>

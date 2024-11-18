@@ -143,8 +143,7 @@ namespace TaskTracker.Core.src.Services.Impl
                     return result.WithError(AuthenticationErrorCodes.InvalidEmailOrPassword);
                 }
                 
-                var identityUser = await _identityDbContext
-                    .Set<IdentityUser>()
+                var identityUser = await _identityDbContext.Set<IdentityUser>()
                     .AsNoTracking()
                     .Where(x=> x.Id == userFromDb.UserId)
                     .SingleAsync();
