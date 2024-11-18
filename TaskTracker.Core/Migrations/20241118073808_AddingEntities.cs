@@ -20,31 +20,6 @@ namespace TaskTracker.Core.Migrations
                 defaultValue: "");
 
             migrationBuilder.CreateTable(
-                name: "IdentityUser",
-                columns: table => new
-                {
-                    Id = table.Column<string>(type: "text", nullable: false),
-                    UserName = table.Column<string>(type: "text", nullable: true),
-                    NormalizedUserName = table.Column<string>(type: "text", nullable: true),
-                    Email = table.Column<string>(type: "text", nullable: true),
-                    NormalizedEmail = table.Column<string>(type: "text", nullable: true),
-                    EmailConfirmed = table.Column<bool>(type: "boolean", nullable: false),
-                    PasswordHash = table.Column<string>(type: "text", nullable: true),
-                    SecurityStamp = table.Column<string>(type: "text", nullable: true),
-                    ConcurrencyStamp = table.Column<string>(type: "text", nullable: true),
-                    PhoneNumber = table.Column<string>(type: "text", nullable: true),
-                    PhoneNumberConfirmed = table.Column<bool>(type: "boolean", nullable: false),
-                    TwoFactorEnabled = table.Column<bool>(type: "boolean", nullable: false),
-                    LockoutEnd = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
-                    LockoutEnabled = table.Column<bool>(type: "boolean", nullable: false),
-                    AccessFailedCount = table.Column<int>(type: "integer", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_IdentityUser", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "WorkSpace",
                 columns: table => new
                 {
@@ -82,7 +57,7 @@ namespace TaskTracker.Core.Migrations
                     name = table.Column<string>(type: "text", nullable: false),
                     description = table.Column<string>(type: "text", nullable: true),
                     code = table.Column<string>(type: "text", nullable: false),
-                    start_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValue: new DateTime(2024, 11, 17, 19, 29, 59, 357, DateTimeKind.Utc).AddTicks(3938)),
+                    start_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValue: new DateTime(2024, 11, 18, 7, 38, 8, 436, DateTimeKind.Utc).AddTicks(8580)),
                     end_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     AuthorId = table.Column<int>(type: "integer", nullable: false),
                     ProjectMgrId = table.Column<int>(type: "integer", nullable: false),
@@ -230,12 +205,6 @@ namespace TaskTracker.Core.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_User_UserId",
-                table: "User",
-                column: "UserId",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "index",
                 table: "Issue",
                 column: "Index",
@@ -300,26 +269,11 @@ namespace TaskTracker.Core.Migrations
                 name: "IX_WorkSpaceMember_WorkSpaceId",
                 table: "WorkSpaceMember",
                 column: "WorkSpaceId");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_User_IdentityUser_UserId",
-                table: "User",
-                column: "UserId",
-                principalTable: "IdentityUser",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_User_IdentityUser_UserId",
-                table: "User");
-
-            migrationBuilder.DropTable(
-                name: "IdentityUser");
-
             migrationBuilder.DropTable(
                 name: "TimeTracking");
 
@@ -334,10 +288,6 @@ namespace TaskTracker.Core.Migrations
 
             migrationBuilder.DropTable(
                 name: "WorkSpace");
-
-            migrationBuilder.DropIndex(
-                name: "IX_User_UserId",
-                table: "User");
 
             migrationBuilder.DropColumn(
                 name: "nick_name",

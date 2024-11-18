@@ -13,7 +13,6 @@ namespace TaskTracker.Core.src.Entities
         /// </summary>
         public string Email { get; set; } = null!;
 
-        public IdentityUser IdentityUser { get; set; } = null!;
         public string UserId { get; set; } = null!;
 
         public int? Country { get; set; }

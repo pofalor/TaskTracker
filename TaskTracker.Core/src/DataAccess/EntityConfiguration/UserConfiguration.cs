@@ -12,7 +12,7 @@ namespace TaskTracker.Core.src.DataAccess.EntityConfiguration
             base.Configure(builder);
             builder.ToTable("User");
             builder.Property(p => p.Email).HasColumnName("email").IsRequired();
-            builder.HasOne(p => p.IdentityUser).WithOne().HasForeignKey<User>(p => p.UserId).IsRequired();
+            builder.Property(p => p.UserId).HasColumnName("UserId").IsRequired();
             builder.Property(p => p.FirstName).HasColumnName("first_name");
             builder.Property(p => p.LastName).HasColumnName("last_name");
             builder.Property(p => p.Country).HasColumnName("country");

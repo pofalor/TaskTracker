@@ -145,6 +145,7 @@ namespace TaskTracker.Core.src.Services.Impl
                 
                 var identityUser = await _identityDbContext
                     .Set<IdentityUser>()
+                    .AsNoTracking()
                     .Where(x=> x.Id == userFromDb.UserId)
                     .SingleAsync();
 
@@ -178,8 +179,13 @@ namespace TaskTracker.Core.src.Services.Impl
                 {
                     claims.Add(new Claim(claim.ClaimType, claim.ClaimValue));
                 }
-                
-                await _signInManager.SignInWithClaimsAsync(identityUser, true, claims);
+
+                var res = await _signInManager.CheckPasswordSignInAsync(identityUser, user.Password, true);
+
+                if (!res.Succeeded)
+                {
+                    return result.WithError(AuthenticationErrorCodes.InvalidEmailOrPassword);
+                }
 
                 claims.Add(new Claim(JwtRegisteredClaimNames.AuthTime, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString()));
                 claims.Add(new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString(DateFormatConstants.IsoString)));
