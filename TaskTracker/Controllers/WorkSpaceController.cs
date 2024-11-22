@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using TaskTracker.Controllers.BaseControllers;
 
 namespace TaskTracker.Web.Api.Controllers
 {
     [Route("api/workspace")]
-    [ProtectedApiController]
-    public class WorkSpaceController
+    public class WorkSpaceController : ProtectedApiController
     {
 
     }

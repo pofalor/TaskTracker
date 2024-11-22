@@ -1,9 +1,10 @@
 import { Injectable, OnInit, NgZone } from '@angular/core';
 import { Router } from '@angular/router';
-import { TokenService, Credentials } from "./token.service";
-import { tap } from 'rxjs/internal/operators/tap';
+import { TokenService } from "./token.service";
 import { AuthData } from '../interfaces/auth-data'
 import { ApiService } from './api.service';
+import { firstValueFrom, map } from 'rxjs';
+import { AuthenticatePostRequest } from '../model/postRequests/authenticatePostRequest';
 
 
 @Injectable({
@@ -12,18 +13,16 @@ import { ApiService } from './api.service';
 export class AuthService implements OnInit {
 
   private static _authData: any;
-  public userData: any;
-  public showLoader: boolean = false;
 
   constructor(
     private tokenService: TokenService,
     public router: Router,
     public ngZone: NgZone,
     private api: ApiService,
-    public eventService: EventService,
-    private cryptoUserService: CryptoUserService,
-    private statsService: StatsService,
-    private userService: UserService
+    // public eventService: EventService,
+    // private cryptoUserService: CryptoUserService,
+    // private statsService: StatsService,
+    // private userService: UserService
   ) {
 
   }
@@ -31,65 +30,57 @@ export class AuthService implements OnInit {
   ngOnInit(): void { }
 
   get authData() {
-    if (!AuthService._authData && localStorage.getItem("auth")) {
-      AuthService._authData = JSON.parse(localStorage.getItem("auth"));
+    var authVal = localStorage.getItem("auth");
+    if (!AuthService._authData && localStorage.getItem("auth") && !!authVal) {
+      AuthService._authData = JSON.parse(authVal);
     }
 
-    let cookAuth = !!localStorage.getItem("auth") ? JSON.parse(localStorage.getItem("auth")) as AuthData : null;
-    if (!!AuthService._authData && (!cookAuth || AuthService._authData.refreshToken != cookAuth.refreshToken ||
-      AuthService._authData.accessToken != cookAuth.accessToken)) {
-
+    let authData = !!localStorage.getItem("auth") && !!authVal ? JSON.parse(authVal) as AuthData : null;
+    if (!!AuthService._authData && (!authData || AuthService._authData.accessToken != authData.accessToken)) {
       this.SignOut();
-      // return;
     }
     return AuthService._authData;
   }
 
-  set authData(newAuth: AuthData) {
-
+  set authData(newAuth: AuthData | null) {
     var t = this;
     if (!newAuth) {
       localStorage.removeItem("auth");
     } else {
-      // t.cookieService.set("auth", JSON.stringify(newAuth), newAuth["expiresAt"], "/",
-      // "",false, "Lax");
       localStorage.setItem("auth", JSON.stringify(newAuth));
     }
     AuthService._authData = newAuth;
   }
 
   //sign in function
-  SignIn(credentials: Credentials) {
-    return this.tokenService
-      .createToken(credentials)
-      .pipe(tap((data) => {
-        //const expiresAt = moment().add(data["expires_in"], "s").toDate();
-        const tokenObj: AuthData = {
-          accessToken: data["access_token"],
-          refreshToken: data["refresh_token"],
-          //expiresAt
-        };
-        localStorage.setItem("accessToken", tokenObj.accessToken);
-        this.authData = tokenObj;
-        //this.initRefresh();
-      })).toPromise();
+  async SignIn(credentials: AuthenticatePostRequest) {
+    var result = this.tokenService.createToken(credentials);
+    var response = await firstValueFrom(result);
+    if(!!response.errors && response.errors.some(x=> x)){
+      var error = response.errors[0];
+      throw new Error(error.message);
     }
+    if(!response.data?.token){
+      throw new Error("Received empty token.");
+    }
+    const tokenObj: AuthData = {
+      accessToken: response.data?.token ?? "",
+    };
+    localStorage.setItem("accessToken", tokenObj.accessToken);
+    this.authData = tokenObj;
+  }
 
   // Sign out
   SignOut() {
-    this.router.routeReuseStrategy.shouldReuseRoute = function () {
-      return false;
-    };
-
     window.stop();
-    this.showLoader = false;
-    AuthService._authData = undefined;
-    this.cryptoUserService.clear();
-    this.userService.clear();
-    this.statsService.clear();
-    this.eventService.logout();
-    //localStorage.clear(); //сбрасывает язык в localStorage (по дефолту 'en')
-    this.router.navigate(['/auth/login']);
+    this.authData = null;
+    //TODO: сделать clear сервисов
+    // this.cryptoUserService.clear();
+    // this.userService.clear();
+    // this.statsService.clear();
+    // this.eventService.logout();
+    localStorage.clear(); //сбрасывает язык в localStorage (по дефолту 'en')
+    this.router.navigate(['/login']);
   }
 
   get isLoggedIn(): boolean {
