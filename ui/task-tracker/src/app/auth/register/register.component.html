@@ -1,5 +1,68 @@
-<p>register works!</p>
-<div class="">
-    {{"Already have an account"}}?
-    <a class="c-green" href="javascript:void(0)" routerLink="/login">{{"Sign In"}}</a>
+<div class="auth-bg">
+    <div class="authentication-box">
+        <div class="card" style="max-width: 500px;">
+            <div class="card-body">
+                <h1 class="text-center">{{"Register"}}</h1>
+                <form class="custom-form" [formGroup]="registerForm">
+                    <!--ЭМЕЙЛ-->
+                    <div class="form-group pt-5">
+                        <input id="email-input-field" type="email" class="form-control" formControlName="email"
+                            placeholder="Email" required="" autofocus="" />
+                        <!-- <div *ngIf="elemIsInvalid(registerForm.controls.email)" class="text text-danger mt-1">
+                        {{ textErrorStr(registerForm.controls.email, emailPattern) | lang }}
+                        </div> -->
+                    </div>
+                    <!--ПАРОЛЬ-->
+                    <div class="form-group pt-3">
+                        <input placeholder="Password" [type]="'password'" class="form-control"
+                            formControlName="password" />
+                        <!-- <div *ngIf="elemIsInvalid(registerForm.controls.password)" class="text text-danger mt-1">
+                        {{ textErrorStr(registerForm.controls.password) | lang }}
+                        </div> -->
+                    </div>
+                    <!--ПОДТВЕРЖДЕНИЕ ПАРОЛЯ-->
+                    <div class="form-group pt-3">
+                        <input id="passwordConfirm-input-field" class="form-control" type="password"
+                            formControlName="passwordConfirm" placeholder="Password Confirmation">
+                        <!-- <div *ngIf="elemIsInvalid(regForm.controls.passwordConfirm)" class="text text-danger mt-1">
+                            {{textErrorStr(regForm.controls.passwordConfirm)}}
+                        </div> -->
+                    </div>
+                    <!--ФАМИЛИЯ-->
+                    <div class="form-group pt-3">
+                        <input id="lastname-input-field" class="form-control" type="text" formControlName="lastname"
+                            placeholder="Lastname">
+                        <!-- <div *ngIf="elemIsInvalid(regForm.controls.lastname)" class="text text-danger mt-1">
+                            {{textErrorField(lastname, namePattern)| lang}}
+                        </div> -->
+                    </div>
+                    <!--ИМЯ-->
+                    <div class="form-group pt-3">
+                        <input id="firstname-input-field" class="form-control" type="text" formControlName="firstname"
+                            placeholder="Firstname">
+                        <!-- <div *ngIf="elemIsInvalid(regForm.controls.firstname)" class="text text-danger mt-1">
+                            {{textErrorField(firstname, namePattern)| lang}}
+                        </div> -->
+                    </div>
+                    <!--СТРАНА РЕГИСТРАЦИИ-->
+                    <div class="form-group pt-3">
+                        <input id="country-input-field" class="form-control" type="text" formControlName="country"
+                            placeholder="Country of registration">
+                        <!-- <div *ngIf="elemIsInvalid(regForm.controls.country)" class="text text-danger mt-1">
+                            {{textErrorField(country, namePattern)| lang}}
+                        </div> -->
+                    </div>
+                    <div class="form-group pt-3">
+                        <button id="login-button" class="btn btn-primary w-100" (click)="register()">
+                            {{"Register"}}
+                        </button>
+                    </div>
+                    <div class="pt-3 text-center">
+                        {{"Already have an account"}}?
+                        <a href="javascript:void(0)" routerLink="/login">{{"Sign In"}}</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>

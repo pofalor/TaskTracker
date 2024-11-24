@@ -1,8 +1,9 @@
 import { UntypedFormGroup } from '@angular/forms';
 import { NgbModalRef, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { environment } from '../../../environments/environment';
-import { ConfirmModalComponent } from '../component/modals/confirm/confirm.modal.component';
+import { ConfirmModalComponent } from '../components/modals/confirm/confirm.modal.component';
 import { ModalInfoModel } from '../model/onlyFrontModels/modalInfo.model';
+import { LoaderComponent } from '../components/loader/loader.component';
 
 const apiUrl = environment.apiUrl;
 
@@ -276,5 +277,9 @@ export abstract class BaseComponent {
   public mathRound(value: number, precision = 0) {
     let multiplier = Math.pow(10, precision);
     return Math.round(value * multiplier) / multiplier;
+  }
+
+  public setLoading(needLoad: boolean){
+    LoaderComponent.setLoading(needLoad);
   }
 }

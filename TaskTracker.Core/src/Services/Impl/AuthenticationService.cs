@@ -186,6 +186,8 @@ namespace TaskTracker.Core.src.Services.Impl
                     return result.WithError(AuthenticationErrorCodes.InvalidEmailOrPassword);
                 }
 
+                await _signInManager.SignInWithClaimsAsync(identityUser, false, claims);
+
                 claims.Add(new Claim(JwtRegisteredClaimNames.AuthTime, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString()));
                 claims.Add(new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString(DateFormatConstants.IsoString)));
                 claims.Add(new Claim(JwtRegisteredClaimNames.Sub, userFromDb.Id.ToString()));

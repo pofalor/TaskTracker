@@ -23,7 +23,6 @@ export class LoginComponent extends BaseComponent {
     private fb: FormBuilder,
     private router: Router,
     private modalService: NgbModal,
-    private ngZone: NgZone,
   ) {
     super(modalService);
 
@@ -39,6 +38,7 @@ export class LoginComponent extends BaseComponent {
       t.markFormGroupTouchedAndDirty(t.loginForm);
       return;
     }
+    t.setLoading(true);
 
     var loginCred: AuthenticatePostRequest = {
       email: t.loginForm.get('email')?.value,
@@ -59,6 +59,10 @@ export class LoginComponent extends BaseComponent {
         else {
           t.errorText = 'System error. Please contact technical support.';
         }
+      })
+      .finally(() => {
+        t.setLoading(false);
+        localStorage.removeItem("Uuid");
       });
   }
 }

@@ -1,4 +1,13 @@
 .auth-bg {
-    background: url(../../../../public/assets/images/login-background.jpg);
-    background-position: center;
+    background: center / 100% no-repeat url(../../../../public//assets/images/login-background.jpg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 50px 100px;
+}
+
+.authentication-box {
+    min-width: 400px;
+    margin: auto;
 }
