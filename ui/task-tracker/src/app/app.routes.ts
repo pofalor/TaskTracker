@@ -1,13 +1,15 @@
 import { Routes } from '@angular/router';
-import { RegisterComponent } from './auth/register/register.component';
-import { LoginComponent } from './auth/login/login.component';
-import { AllOrganisationsComponent } from './components/all-organisations/all-organisations.component';
+import { UserGuard } from './shared/guards/user.guard';
 
 export const routes: Routes = [
     { path: "", redirectTo: 'login', pathMatch: 'full' },
-    { path: 'login', component: LoginComponent },
-    { path: "register", component: RegisterComponent },
-    { path: "organisations", component: AllOrganisationsComponent },
+    { path: 'login', loadComponent: () => import('./auth/login/login.component').then(c => c.LoginComponent) },
+    { path: "register", loadComponent: () => import('./auth/register/register.component').then(c => c.RegisterComponent)  },
+    { 
+        path: "organisations", 
+        loadComponent: () => import('./components/all-organisations/all-organisations.component').then(c => c.AllOrganisationsComponent),
+        canActivate: [UserGuard],
+    },
 
     { path: "**", redirectTo: 'organisations' },
 ];

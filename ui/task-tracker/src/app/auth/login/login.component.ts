@@ -6,6 +6,7 @@ import { BaseComponent } from '../../shared/base/base.component';
 import { AuthService } from '../../shared/services/auth.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AuthenticatePostRequest } from '../../shared/model/postRequests/authenticatePostRequest';
+import { UserService } from '../../shared/services/user.service';
 
 @Component({
   selector: 'app-login',
@@ -23,6 +24,7 @@ export class LoginComponent extends BaseComponent {
     private fb: FormBuilder,
     private router: Router,
     private modalService: NgbModal,
+    private userService: UserService
   ) {
     super(modalService);
 
@@ -47,6 +49,7 @@ export class LoginComponent extends BaseComponent {
     
     await t.authService.SignIn(loginCred)
       .then(() => {
+        t.userService.init();
         t.router.navigateByUrl('/dashboard');
       })
       .catch((e) => {

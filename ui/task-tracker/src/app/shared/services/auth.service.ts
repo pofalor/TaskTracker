@@ -5,6 +5,7 @@ import { AuthData } from '../interfaces/auth-data'
 import { ApiService } from './api.service';
 import { firstValueFrom, map } from 'rxjs';
 import { AuthenticatePostRequest } from '../model/postRequests/authenticatePostRequest';
+import { UserService } from './user.service';
 
 
 @Injectable({
@@ -22,7 +23,7 @@ export class AuthService implements OnInit {
     // public eventService: EventService,
     // private cryptoUserService: CryptoUserService,
     // private statsService: StatsService,
-    // private userService: UserService
+    private userService: UserService
   ) {
 
   }
@@ -76,7 +77,7 @@ export class AuthService implements OnInit {
     this.authData = null;
     //TODO: сделать clear сервисов
     // this.cryptoUserService.clear();
-    // this.userService.clear();
+    this.userService.clear();
     // this.statsService.clear();
     // this.eventService.logout();
     localStorage.clear(); //сбрасывает язык в localStorage (по дефолту 'en')

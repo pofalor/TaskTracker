@@ -55,7 +55,7 @@ export class ApiService {
     if (accessToken) {
 
       return {
-        "Authorization": `Bearer ${accessToken}`,
+        "AuthorizationPolicy": `Bearer ${accessToken}`,
         "Content-Type": "application/json",
         "Localization": localStorage.getItem("localization") ?? "en",
       };
