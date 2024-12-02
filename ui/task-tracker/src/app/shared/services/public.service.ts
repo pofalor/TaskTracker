@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { ApiService } from './api.service';
-import { AuthenticatePostRequest } from '../model/postRequests/authenticatePostRequest';
 import { IResponse } from '../interfaces/response';
 import { lastValueFrom } from 'rxjs';
+import { CreateUserPostRequest } from '../model/postRequests/createUserPostRequest';
 
-const accountApiUrl = 'api/Account/';
+const authApiUrl = 'api/auth/';
 
 @Injectable({
   providedIn: 'root'
@@ -13,8 +13,8 @@ export class PublicService {
 
   constructor(private api: ApiService) { }
 
-  public async register(registerPostRequest: AuthenticatePostRequest): Promise<IResponse<boolean>> {
-    var res = this.api.postAnonym<boolean>(accountApiUrl + 'register', registerPostRequest);
+  public async register(registerPostRequest: CreateUserPostRequest): Promise<IResponse<boolean>> {
+    var res = this.api.postAnonym<boolean>(authApiUrl + 'register', registerPostRequest);
     return await lastValueFrom(res);
   }
 }

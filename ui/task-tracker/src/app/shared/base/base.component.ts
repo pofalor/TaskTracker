@@ -11,9 +11,7 @@ export abstract class BaseComponent {
   public promocodeValuePattern = /^[A-Z0-9]{1,10}$/;
   public confirmCodePattern = '[0-9]{6}';
   public confirm2FAPattern = /^[0-9]{6}$/;
-  public ethAddressPattern = /^0x[a-fA-F0-9]{40}$/;
   public floatNumberPattern = /^-?(0|[1-9]\d*)([.,]\d+)?$/;
-  public linkPattern = '(https://){1}([\\da-z.-]+)\\.([a-z.]{2,6})[/\\w .-]*/?';
   public letterPattern = /^[äöüÄÖÜßáéúőóüöíÁÉÚŐÓÜÖÍa-zA-Zа-яёА-Я-\s]+$/;
   public emailPattern = /^[_a-z0-9-\+-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,})$/i;
   public namePattern = /^[A-ZА-ЯЁ]+([- ][A-ZА-ЯЁ]+)*$/i; // todo: переделать чтобы нельзя было писать aBOba
@@ -281,5 +279,26 @@ export abstract class BaseComponent {
 
   public setLoading(needLoad: boolean){
     LoaderComponent.setLoading(needLoad);
+  }
+
+  public textErrorStr(elem: any, namepattern: RegExp | null = null) {
+    if (this.elemIsInvalid(elem)) {
+      var customError = Object.getOwnPropertyNames(elem.errors);
+      return elem.errors.required ? "All fields are required" :
+        elem.errors.min != undefined ? "Minimum" + ' ' + elem.errors.min.min :
+        elem.errors.maxlength != undefined ? ("Maximum length " + elem.errors.maxlength.requiredLength) :
+        elem.errors.minlength != undefined ? ("Minimum length " + elem.errors.minlength.requiredLength) :
+        elem.errors.pattern != undefined && namepattern != null && namepattern == this.latinAndNumberPattern ? "Only latin characters and numbers" :
+        elem.errors.pattern != undefined && namepattern != null && namepattern == this.youTubeLinkPattern ? "Enter the link in the format:'https://youtube.com/embed/pXRviuL6vMY'" :
+        elem.errors.pattern != undefined && namepattern != null && namepattern == this.youTubeLinkPattern2 ? "Enter the link in the format:'https://www.youtube.com/watch?v=pXRviuL6vMY'" :
+        elem.errors.pattern != undefined && namepattern != null && namepattern == this.emailPattern ? "Field filled in incorrectly" :
+        elem.errors.pattern != undefined && namepattern != null && namepattern == this.namePattern ? "Field filled in incorrectly" :
+        elem.errors.pattern != undefined && namepattern != null && namepattern == this.floatNumberPattern ? "Required format '0.0'" :
+        elem.errors.email != undefined ? "Field filled in incorrectly" :
+        elem.errors.mismatch != undefined ? "Password mismatch" :
+        !!customError && customError.length>0 ? customError[0] :
+              "";
+    }
+    return "";
   }
 }

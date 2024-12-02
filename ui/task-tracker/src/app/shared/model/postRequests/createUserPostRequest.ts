@@ -1,4 +1,4 @@
-export class AuthenticatePostRequest {
+export class CreateUserPostRequest {
     lastName!: string;
     firstName! : string;
     email! : string;

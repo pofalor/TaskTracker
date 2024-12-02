@@ -3,8 +3,13 @@ import { Component } from '@angular/core';
 import { Router, RouterLink, RouterOutlet } from '@angular/router';
 import { BaseComponent } from '../../shared/base/base.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { AuthService } from '../../shared/services/auth.service';
+import { ValidationUtils } from '../../shared/utils/validationUtils';
+import { PublicService } from '../../shared/services/public.service';
+import { AuthenticatePostRequest } from '../../shared/model/postRequests/authenticatePostRequest';
+import { CreateUserPostRequest } from '../../shared/model/postRequests/createUserPostRequest';
+import { ListCountry } from '../../shared/constants/country';
 
 @Component({
   selector: 'app-register',
@@ -15,12 +20,15 @@ import { AuthService } from '../../shared/services/auth.service';
 })
 export class RegisterComponent extends BaseComponent {
   public registerForm: FormGroup;
+  public countryList: any[] = ListCountry;
+  selectedCountry: any;
 
   constructor(
     public authService: AuthService,
     private fb: FormBuilder,
     private router: Router,
     private modalService: NgbModal,
+    private publicService: PublicService
   ) {
     super(modalService);
 
@@ -34,36 +42,40 @@ export class RegisterComponent extends BaseComponent {
     });
   }
 
-  // passwordMatchValidator(g: FormGroup) {
-  //   var password = g.get('password');
-  //   if(!!password && password.dirty && !password.untouched)
-  //   {
-  //     var isValidPassword = ValidationUtils.validatePassword(password.value);
-  //     if(!isValidPassword.isValid)
-  //     {
-  //       let obj = {};
-  //       obj[isValidPassword.errorText] = true;
-  //       password.setErrors(obj);
-  //     }
-  //   }
+  get email() { return this.registerForm.get('email'); }
+  get password() { return this.registerForm.get('password'); }
+  get passwordConfirm() { return this.registerForm.get('passwordConfirm'); }
+  get firstname() { return this.registerForm.get('firstname'); }
+  get lastname() { return this.registerForm.get('lastname'); }
+  get country() { return this.registerForm.get('country');}
 
-  //   var passwordConfirm = g.get('passwordConfirm');
-  //   if(passwordConfirm.dirty && !passwordConfirm.untouched)
-  //   {
-  //     if (!passwordConfirm.value) {
-  //       return;
-  //     }
+  passwordMatchValidator(g: FormGroup) {
+    var password = g.get('password');
+    if (!!password && password.dirty && !password.untouched) {
+      var isValidPassword = ValidationUtils.validatePassword(password.value);
+      if (!isValidPassword.isValid) {
+        let obj: ValidationErrors = {};
+        obj[isValidPassword.errorText] = true;
+        password.setErrors(obj);
+      }
+    }
 
-  //     var isValidPasswordConfirm = ValidationUtils.validatePasswordConfirmation(password.value, passwordConfirm.value);
-  //     if(!isValidPasswordConfirm.isValid)
-  //     {
-  //       let obj = {};
-  //       obj[isValidPasswordConfirm.errorText] = true;
-  //       passwordConfirm.setErrors(obj);
-  //     }
-  //   }
+    var passwordConfirm = g.get('passwordConfirm');
+    if (!!password && !!passwordConfirm && passwordConfirm.dirty && !passwordConfirm.untouched) {
+      if (!passwordConfirm.value) {
+        return;
+      }
 
-  public register() {
+      var isValidPasswordConfirm = ValidationUtils.validatePasswordConfirmation(password.value, passwordConfirm.value);
+      if (!isValidPasswordConfirm.isValid) {
+        let obj: ValidationErrors = {};
+        obj[isValidPasswordConfirm.errorText] = true;
+        passwordConfirm.setErrors(obj);
+      }
+    }
+  }
+
+  public async register() {
     var t = this;
     if (t.registerForm.invalid) {
       t.markFormGroupTouchedAndDirty(t.registerForm)
@@ -72,38 +84,32 @@ export class RegisterComponent extends BaseComponent {
 
     t.setLoading(true);
 
-    // t.publicService.register({
-    //   contact: t.email.value,
-    //   password: t.password.value,
-    //   confirmPassword: t.passwordConfirm.value,
-    //   captcha: (<any>window).recaptcha_code,
-    //   refUser: t.refUser,
-    //   localization: t.currentUserLang,
-    //   lastName: t.lastname.value,
-    //   firstName: t.firstname.value,
-    //   companyName: t.companyName.value,
-    //   registryNumber: t.registryNumber.value,
-    //   registryDate: t.registryDate.value,
-    //   registryCountry: t.registryCountry.value,
-    //   mailingLanguage: t.selectedMailLang,
-    //   legalAddress: t.legalAddress.value,
-    //   TIN: t.TIN.value,
-    //   nameOfRepresentative: t.nameOfRepresentative.value,
-    //   userType: t.userType
-    // }).then((resp: any) => {
-    //   t.authService.SignIn({email: t.email.value,  password: t.password.value})
-    //     .then(() => {
-    //       t.showSuccess(t.translate.instant("Registration completed successfully") + ". " + t.translate.instant("Activation link has has been sent to your e-mail") + ": " + t.email.value, t.translate.instant("Success"));
-    //       t.setLoading(false);
-    //       t.router.navigate(['/auth/login']);
-    //     }).catch((ex) => {
-    //       t.setLoading(false);
-    //       var test = ex;
-    //     });
-    // }).catch((e) => {
-    //   t.showResponseError(e);
-    //   t.setLoading(false);
-    // });
-    //t.setLoading(false);
+    var createUserReq: CreateUserPostRequest = {
+      firstName: t.firstname?.value,
+      lastName: t.lastname?.value,
+      email: t.email?.value,
+      password: t.password?.value,
+      country: t.country?.value,
+    };
+
+    await t.publicService.register(createUserReq)
+    .then((resp: any) => {
+      var authModel : AuthenticatePostRequest = { email: t.email?.value, password: t.password?.value };
+      t.authService.SignIn(authModel)
+        .then(() => {
+          t.showSuccess(("Registration completed successfully"), "Success");
+          t.setLoading(false);
+          t.router.navigate(['/organisations']);
+        }).catch((ex) => {
+          t.setLoading(false);
+          t.showResponseError(ex);
+        });
+    })
+    .catch((e) => {
+      t.showResponseError(e);
+    })
+    .finally(() => {
+      t.setLoading(false);
+    });
   }
 }

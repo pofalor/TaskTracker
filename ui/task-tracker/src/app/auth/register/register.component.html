@@ -8,49 +8,58 @@
                     <div class="form-group pt-5">
                         <input id="email-input-field" type="email" class="form-control" formControlName="email"
                             placeholder="Email" required="" autofocus="" />
-                        <!-- <div *ngIf="elemIsInvalid(registerForm.controls.email)" class="text text-danger mt-1">
-                        {{ textErrorStr(registerForm.controls.email, emailPattern) | lang }}
-                        </div> -->
+                        <div *ngIf="elemIsInvalid(registerForm.get('email'))" class="text text-danger mt-1">
+                        {{ textErrorStr(registerForm.get('email'), emailPattern) }}
+                        </div>
                     </div>
                     <!--ПАРОЛЬ-->
                     <div class="form-group pt-3">
                         <input placeholder="Password" [type]="'password'" class="form-control"
                             formControlName="password" />
-                        <!-- <div *ngIf="elemIsInvalid(registerForm.controls.password)" class="text text-danger mt-1">
-                        {{ textErrorStr(registerForm.controls.password) | lang }}
-                        </div> -->
+                        <div *ngIf="elemIsInvalid(registerForm.get('password'))" class="text text-danger mt-1">
+                        {{ textErrorStr(registerForm.get('password')) }}
+                        </div>
                     </div>
                     <!--ПОДТВЕРЖДЕНИЕ ПАРОЛЯ-->
                     <div class="form-group pt-3">
                         <input id="passwordConfirm-input-field" class="form-control" type="password"
                             formControlName="passwordConfirm" placeholder="Password Confirmation">
-                        <!-- <div *ngIf="elemIsInvalid(regForm.controls.passwordConfirm)" class="text text-danger mt-1">
-                            {{textErrorStr(regForm.controls.passwordConfirm)}}
-                        </div> -->
+                        <div *ngIf="elemIsInvalid(registerForm.get('passwordConfirm'))" class="text text-danger mt-1">
+                            {{textErrorStr(registerForm.get('passwordConfirm'))}}
+                        </div>
                     </div>
                     <!--ФАМИЛИЯ-->
                     <div class="form-group pt-3">
                         <input id="lastname-input-field" class="form-control" type="text" formControlName="lastname"
                             placeholder="Lastname">
-                        <!-- <div *ngIf="elemIsInvalid(regForm.controls.lastname)" class="text text-danger mt-1">
-                            {{textErrorField(lastname, namePattern)| lang}}
-                        </div> -->
+                        <div *ngIf="elemIsInvalid(registerForm.get('lastname'))" class="text text-danger mt-1">
+                            {{textErrorStr(lastname, namePattern)}}
+                        </div>
                     </div>
                     <!--ИМЯ-->
                     <div class="form-group pt-3">
                         <input id="firstname-input-field" class="form-control" type="text" formControlName="firstname"
                             placeholder="Firstname">
-                        <!-- <div *ngIf="elemIsInvalid(regForm.controls.firstname)" class="text text-danger mt-1">
-                            {{textErrorField(firstname, namePattern)| lang}}
-                        </div> -->
+                        <div *ngIf="elemIsInvalid(registerForm.get('firstname'))" class="text text-danger mt-1">
+                            {{textErrorStr(firstname, namePattern)}}
+                        </div>
                     </div>
                     <!--СТРАНА РЕГИСТРАЦИИ-->
                     <div class="form-group pt-3">
-                        <input id="country-input-field" class="form-control" type="text" formControlName="country"
-                            placeholder="Country of registration">
-                        <!-- <div *ngIf="elemIsInvalid(regForm.controls.country)" class="text text-danger mt-1">
-                            {{textErrorField(country, namePattern)| lang}}
-                        </div> -->
+                        <ng-select
+                          class="form-control br-10"
+                          [(ngModel)]="selectedCountry"
+                          id="country-input-field"
+                          formControlName="country"
+                          placeholder="Country of registration"
+                        >
+                          <ng-option *ngFor="let country of countryList" class="br-10"
+                            [value]="country.value">{{ country.name }}
+                          </ng-option>
+                        </ng-select>
+                        <div *ngIf="elemIsInvalid(registerForm.get('country'))" class="text text-danger mt-1">
+                            {{textErrorStr(country, namePattern)}}
+                        </div>
                     </div>
                     <div class="form-group pt-3">
                         <button id="login-button" class="btn btn-primary w-100" (click)="register()">
