@@ -12,11 +12,10 @@ import { CreateUserPostRequest } from '../../shared/model/postRequests/createUse
 import { ListCountry } from '../../shared/constants/country';
 
 @Component({
-  selector: 'app-register',
-  standalone: true,
-  imports: [CommonModule, RouterOutlet, RouterLink, ReactiveFormsModule],
-  templateUrl: './register.component.html',
-  styleUrl: './register.component.scss'
+    selector: 'app-register',
+    imports: [CommonModule, RouterLink, ReactiveFormsModule],
+    templateUrl: './register.component.html',
+    styleUrl: './register.component.scss'
 })
 export class RegisterComponent extends BaseComponent {
   public registerForm: FormGroup;
@@ -38,7 +37,10 @@ export class RegisterComponent extends BaseComponent {
       passwordConfirm: ['', Validators.required],
       firstname: ['', [Validators.required, Validators.pattern(this.namePattern)]],
       lastname: ['', [Validators.required, Validators.pattern(this.namePattern)]],
-      country: ['Russia', [Validators.required, Validators.maxLength(20), Validators.pattern(this.namePattern)]],
+      country: ['', [Validators.required, Validators.min(0), Validators.max(279)]],
+    },
+    {
+      validator: this.passwordMatchValidator
     });
   }
 
@@ -75,6 +77,11 @@ export class RegisterComponent extends BaseComponent {
     }
   }
 
+  public onSelectedCountry(event:any){
+    this.selectedCountry = event.value;
+    this.country?.setValue(this.selectedCountry);
+  }
+
   public async register() {
     var t = this;
     if (t.registerForm.invalid) {
@@ -89,7 +96,7 @@ export class RegisterComponent extends BaseComponent {
       lastName: t.lastname?.value,
       email: t.email?.value,
       password: t.password?.value,
-      country: t.country?.value,
+      country: t.selectedCountry,
     };
 
     await t.publicService.register(createUserReq)

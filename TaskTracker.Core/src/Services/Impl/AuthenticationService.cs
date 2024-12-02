@@ -101,7 +101,7 @@ namespace TaskTracker.Core.src.Services.Impl
                         {
                             await transaction.RollbackAsync();
                             await transactionIdentity.RollbackAsync();
-                            return result.WithError(AuthenticationErrorCodes.ErrorCreatingUser);
+                            return result.WithError(creationResult.Errors.First().Description);
                         }
 
                         var newUser = _mapper.Map<User>(user);

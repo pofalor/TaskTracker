@@ -80,6 +80,13 @@ export class ValidationUtils {
             };
         }
 
+        if (/^[\w\-\s]+$/.test(password)) {
+            return {
+                isValid: false,
+                errorText: "Password must contain at least one alphanumeric character"
+            };
+        }
+
         return {
             isValid: true,
             errorText: ""

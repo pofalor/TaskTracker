@@ -9,11 +9,10 @@ import { AuthenticatePostRequest } from '../../shared/model/postRequests/authent
 import { UserService } from '../../shared/services/user.service';
 
 @Component({
-  selector: 'app-login',
-  standalone: true,
-  imports: [CommonModule, RouterOutlet, RouterLink, ReactiveFormsModule],
-  templateUrl: './login.component.html',
-  styleUrl: './login.component.scss'
+    selector: 'app-login',
+    imports: [CommonModule, RouterLink, ReactiveFormsModule],
+    templateUrl: './login.component.html',
+    styleUrl: './login.component.scss'
 })
 export class LoginComponent extends BaseComponent {
   public loginForm: FormGroup;

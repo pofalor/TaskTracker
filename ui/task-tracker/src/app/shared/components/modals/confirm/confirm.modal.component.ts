@@ -4,11 +4,10 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
 
 @Component({
-  selector: 'app-confirm',
-  standalone: true,
-  imports: [CommonModule],
-  templateUrl: './confirm.modal.component.html',
-  styleUrl: './confirm.modal.component.scss'
+    selector: 'app-confirm',
+    imports: [CommonModule],
+    templateUrl: './confirm.modal.component.html',
+    styleUrl: './confirm.modal.component.scss'
 })
 export class ConfirmModalComponent {
   @Input() title: string = '';

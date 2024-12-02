@@ -46,7 +46,11 @@
                     </div>
                     <!--СТРАНА РЕГИСТРАЦИИ-->
                     <div class="form-group pt-3">
-                        <ng-select
+                        <select (change)="onSelectedCountry($event.target)" class="form-control selectpicker" 
+                        id="country-input-field" data-live-search="true" [value]="selectedCountry">
+                            <option *ngFor="let country of countryList" [value]="country.value">{{country.name}}</option>
+                        </select>
+                        <!-- <ng-select
                           class="form-control br-10"
                           [(ngModel)]="selectedCountry"
                           id="country-input-field"
@@ -56,7 +60,7 @@
                           <ng-option *ngFor="let country of countryList" class="br-10"
                             [value]="country.value">{{ country.name }}
                           </ng-option>
-                        </ng-select>
+                        </ng-select> -->
                         <div *ngIf="elemIsInvalid(registerForm.get('country'))" class="text text-danger mt-1">
                             {{textErrorStr(country, namePattern)}}
                         </div>

@@ -41,7 +41,7 @@ namespace TaskTracker.Web.Api.Controllers
             {
                 _logger.LogError(ex, "Error while sending request to create new user.{NewLine}{Parameter}: {User}{NewLine2}",
                     Environment.NewLine, nameof(user), user?.ToJson(), Environment.NewLine);
-                return result.WithError(AuthenticationErrorCodes.ErrorCreatingUser);
+                return result.WithError(500, "Error while creating user");
             }
         }
 
