@@ -49,11 +49,11 @@ export class LoginComponent extends BaseComponent {
     await t.authService.SignIn(loginCred)
       .then(() => {
         t.userService.init();
-        t.router.navigateByUrl('/dashboard');
+        t.router.navigateByUrl('/organisations');
       })
       .catch((e) => {
-        if (!!e.error && !!e.error.error) {
-          t.errorText = e.error.error_description;
+        if (!!e.error && !!e.error.errors && !!e.error.errors[0].message) {
+          t.errorText = e.error.errors[0].message;
         }
         else if(!!e.message){
           t.errorText = e.message;
@@ -64,7 +64,7 @@ export class LoginComponent extends BaseComponent {
       })
       .finally(() => {
         t.setLoading(false);
-        localStorage.removeItem("Uuid");
+        localStorage?.removeItem("Uuid");
       });
   }
 }

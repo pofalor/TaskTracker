@@ -11,7 +11,7 @@ using TaskTracker.Core.src.Models.ResponseModels;
 
 namespace TaskTracker.Core.src.Services.Impl
 {
-    public class UserService : BaseService<User, BaseFilter>
+    public class UserService : BaseService<User, BaseFilter>, IUserService
     {
         private readonly ApplicationDbContext _dbContext;
         private readonly ILogger<UserService> _logger;

@@ -14,11 +14,11 @@ namespace TaskTracker.Web.Api.Controllers
     [Route("api/user")]
     public class UserController : ProtectedApiController
     {
-        private readonly ILogger _logger;
-        private readonly UserService _userService;
+        private readonly ILogger<UserController> _logger;
+        private readonly IUserService _userService;
         private readonly IMapper _mapper;
 
-        public UserController(ILogger logger, UserService userService,
+        public UserController(ILogger<UserController> logger, IUserService userService,
             IMapper mapper)
         {
             _logger = logger;
@@ -31,11 +31,6 @@ namespace TaskTracker.Web.Api.Controllers
         public async Task<DataResponse<UserModel>> GetUser()
         {
             var response = new DataResponse<UserModel>();
-
-            if (!ModelState.IsValid)
-            {
-                return response.AddModelStateError(ModelState);
-            }
 
             try
             {

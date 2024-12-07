@@ -10,6 +10,7 @@ import { PublicService } from '../../shared/services/public.service';
 import { AuthenticatePostRequest } from '../../shared/model/postRequests/authenticatePostRequest';
 import { CreateUserPostRequest } from '../../shared/model/postRequests/createUserPostRequest';
 import { ListCountry } from '../../shared/constants/country';
+import { UserService } from '../../shared/services/user.service';
 
 @Component({
     selector: 'app-register',
@@ -27,7 +28,8 @@ export class RegisterComponent extends BaseComponent {
     private fb: FormBuilder,
     private router: Router,
     private modalService: NgbModal,
-    private publicService: PublicService
+    private publicService: PublicService,
+    private userService: UserService
   ) {
     super(modalService);
 
@@ -104,8 +106,9 @@ export class RegisterComponent extends BaseComponent {
       var authModel : AuthenticatePostRequest = { email: t.email?.value, password: t.password?.value };
       t.authService.SignIn(authModel)
         .then(() => {
-          t.showSuccess(("Registration completed successfully"), "Success");
+          t.userService.init();
           t.setLoading(false);
+          t.showSuccess("Registration completed successfully", "Success");
           t.router.navigate(['/organisations']);
         }).catch((ex) => {
           t.setLoading(false);

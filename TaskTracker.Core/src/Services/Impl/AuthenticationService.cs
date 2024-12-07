@@ -1,12 +1,10 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using TaskTracker.Core.src.ConfigSectionModels;
@@ -148,37 +146,6 @@ namespace TaskTracker.Core.src.Services.Impl
                     .Where(x=> x.Id == userFromDb.UserId)
                     .SingleAsync();
 
-                var claims = new List<Claim>
-                {
-                    new(ClaimTypes.Name, userFromDb.Email),
-                    new(CustomClaimNames.UserId, userFromDb.Id.ToString()),
-                };
-
-                var roles = await _identityDbContext.Set<IdentityUserRole<string>>()
-                    .AsNoTracking()
-                    .Where(x => x.UserId == userFromDb.UserId)
-                    .Join(
-                        _identityDbContext.Set<IdentityRole>(),
-                        ur => ur.RoleId,
-                        r => r.Id,
-                        (ur, r) => r)
-                    .ToArrayAsync();
-
-                foreach (var role in roles)
-                {
-                    claims.Add(new Claim(ClaimTypes.Role, role.Name));
-                }
-
-                var userClaims = await _identityDbContext.Set<IdentityUserClaim<string>>()
-                    .AsNoTracking()
-                    .Where(x => x.UserId == userFromDb.UserId)
-                    .ToArrayAsync();
-
-                foreach (var claim in userClaims)
-                {
-                    claims.Add(new Claim(claim.ClaimType, claim.ClaimValue));
-                }
-
                 var res = await _signInManager.CheckPasswordSignInAsync(identityUser, user.Password, true);
 
                 if (!res.Succeeded)
@@ -186,23 +153,9 @@ namespace TaskTracker.Core.src.Services.Impl
                     return result.WithError(AuthenticationErrorCodes.InvalidEmailOrPassword);
                 }
 
-                await _signInManager.SignInWithClaimsAsync(identityUser, false, claims);
-
-                claims.Add(new Claim(JwtRegisteredClaimNames.AuthTime, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString()));
-                claims.Add(new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString(DateFormatConstants.IsoString)));
-                claims.Add(new Claim(JwtRegisteredClaimNames.Sub, userFromDb.Id.ToString()));
-
-                var jwt = new JwtSecurityToken(
-                    issuer: IdentityConfig.TokenIssuer,
-                    audience: IdentityConfig.TokenAudience,
-                    claims: claims,
-                    expires: DateTime.UtcNow.Add(TimeSpan.FromDays(7)),
-                    signingCredentials: new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(IdentityConfig.TokenSecret)), 
-                    SecurityAlgorithms.HmacSha256));
-
                 var authorizationModel = new AuthorizationModel
                 {
-                    Token = new JwtSecurityTokenHandler().WriteToken(jwt)
+                    Token = await GenerateJwtAsync(userFromDb, identityUser)
                 };
 
                 return result.WithData(authorizationModel);
@@ -213,6 +166,62 @@ namespace TaskTracker.Core.src.Services.Impl
                     Environment.NewLine, nameof(user), user?.ToJson(), Environment.NewLine);
                 return result.WithError(AuthenticationErrorCodes.InvalidEmailOrPassword);
             }
+        }
+
+        private async Task<string> GenerateJwtAsync(User userFromDb, IdentityUser identityUser)
+        {
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(IdentityConfig.TokenSecret));
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+            var claims = new List<Claim>
+            {
+                new(CustomClaimNames.UserId, userFromDb.Id.ToString()),
+            };
+
+            var roles = await _identityDbContext.Set<IdentityUserRole<string>>()
+                .AsNoTracking()
+                .Where(x => x.UserId == userFromDb.UserId)
+                .Join(
+                    _identityDbContext.Set<IdentityRole>(),
+                    ur => ur.RoleId,
+                    r => r.Id,
+                    (ur, r) => r)
+                .ToArrayAsync();
+
+            foreach (var role in roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role.Name));
+            }
+
+            var userClaims = await _identityDbContext.Set<IdentityUserClaim<string>>()
+                .AsNoTracking()
+                .Where(x => x.UserId == userFromDb.UserId)
+                .ToArrayAsync();
+
+            foreach (var claim in userClaims)
+            {
+                claims.Add(new Claim(claim.ClaimType, claim.ClaimValue));
+            }
+
+            claims.Add(new Claim(JwtRegisteredClaimNames.Sub, identityUser.Id));
+            claims.Add(new Claim(JwtRegisteredClaimNames.AuthTime, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString()));
+            claims.Add(new Claim(JwtRegisteredClaimNames.Email, userFromDb.Email));
+            claims.Add(new Claim(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString()));
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(claims),
+                Expires = DateTime.UtcNow.AddDays(1),
+                SigningCredentials = credentials,
+                Issuer = IdentityConfig.TokenIssuer,
+                Audience = IdentityConfig.TokenAudience
+            };
+            
+            var handler = new JsonWebTokenHandler();
+
+            string token = handler.CreateToken(tokenDescriptor);
+
+            return token;
         }
 
     }

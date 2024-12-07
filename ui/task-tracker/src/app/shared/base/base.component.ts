@@ -90,10 +90,8 @@ export abstract class BaseComponent {
     var t = this;
 
     t.modalRefBase = t.modalServiceBase.open(ConfirmModalComponent, {
-      backdropClass: 'light-white-backdrop',
       centered: true,
-      size: 'md',
-      windowClass: 'super-modal-delete-users very-nice-shadow',
+      size: 'md'
     });
 
     //информативный блок
@@ -146,8 +144,8 @@ export abstract class BaseComponent {
 
   //упрощенное представление модалки с подтверждением действия
   protected showConfirm(
-    title: string,
     message: string,
+    title: string,
     showDeclineButton: boolean = false,
     confirmButtonText: string = '',
   ): Promise<any> {
@@ -198,7 +196,7 @@ export abstract class BaseComponent {
   }
 
   getCurrentLocalization() {
-    return localStorage.getItem('localization') ?? 'en';
+    return localStorage?.getItem('localization') ?? 'en';
   }
 
   public isValid(text: string, pattern: RegExp, isTouched: boolean = false) {
@@ -219,26 +217,6 @@ export abstract class BaseComponent {
 
   public openFileInNewTab(fileUrl: string) {
     window.open(apiUrl + fileUrl, '_blank');
-  }
-
-  public showAgreementModal(): Promise<any> {
-    let t = this;
-    t.modalRefBase = t.modalServiceBase.open(ConfirmModalComponent, {
-      backdropClass: 'light-white-backdrop',
-      backdrop: 'static',
-      centered: true,
-      size: 'md',
-      windowClass: 'super-modal-delete-users very-nice-shadow',
-    });
-
-    t.modalRefBase.componentInstance.showTitle = false;
-    t.modalRefBase.componentInstance.showDeclineButton = false;
-    t.modalRefBase.componentInstance.description =
-      "By clicking 'agree', you confirm your agreement with the terms of use of our platform that allow anyone, regardless of citizenship, purchasing TTA tokens through the platform. By expressing your agreement with our terms, you also confirm that you are not the resident of the United States of America, or, if you are the resident of the United States of America, you will not use our platform for purchasing TTA tokens.";
-    t.modalRefBase.componentInstance.buttonConfirm = 'Agree';
-    return t.modalRefBase.result.then((result: any) => {
-      return result;
-    });
   }
 
   public paste(input: { value: string; }) {

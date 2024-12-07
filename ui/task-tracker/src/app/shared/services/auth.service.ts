@@ -31,12 +31,12 @@ export class AuthService implements OnInit {
   ngOnInit(): void { }
 
   get authData() {
-    var authVal = localStorage.getItem("auth");
-    if (!AuthService._authData && localStorage.getItem("auth") && !!authVal) {
+    var authVal = typeof window !== 'undefined' ? localStorage?.getItem("auth") : null;
+    if (!AuthService._authData && !!authVal) {
       AuthService._authData = JSON.parse(authVal);
     }
 
-    let authData = !!localStorage.getItem("auth") && !!authVal ? JSON.parse(authVal) as AuthData : null;
+    let authData = !!authVal ? JSON.parse(authVal) as AuthData : null;
     if (!!AuthService._authData && (!authData || AuthService._authData.accessToken != authData.accessToken)) {
       this.SignOut();
     }
@@ -45,10 +45,12 @@ export class AuthService implements OnInit {
 
   set authData(newAuth: AuthData | null) {
     var t = this;
-    if (!newAuth) {
-      localStorage.removeItem("auth");
-    } else {
-      localStorage.setItem("auth", JSON.stringify(newAuth));
+    if(!!localStorage){
+      if (!newAuth) {
+        localStorage.removeItem("auth");
+      } else {
+        localStorage.setItem("auth", JSON.stringify(newAuth));
+      }
     }
     AuthService._authData = newAuth;
   }

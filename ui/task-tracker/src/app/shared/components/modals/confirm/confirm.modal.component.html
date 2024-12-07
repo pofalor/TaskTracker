@@ -1,41 +1,41 @@
-<div class="block-container mx-auto max-w-400 modal-width">
-    <div class="row mb-3 t-center" *ngIf="showTitle">
-      <div class="col text-uppercase f-20 f-w-700 t-center">{{ title }}</div>
+<div class="mx-auto">
+    <div class="row mb-3 mt-3 text-center" *ngIf="showTitle">
+      <div class="col text-uppercase f-22 f-w-700">{{ title }}</div>
     </div>
     <div class="col">
       <div class="col">
         <div class="row mb-3 text-center text-break" [hidden]="!descriptionHTML">
-          <label [innerHtml]="descriptionHTML" class="c-white f-16"></label>
+          <label [innerHtml]="descriptionHTML" class="c-white f-18"></label>
         </div>
         <hr />
         <div class="row justify-content-center text-center">
-          <div *ngIf="showDeclineButton" class="col">
+          <div *ngIf="showDeclineButton" class="col mb-3">
             <button
               data-target="#modal-confirm"
               data-toggle="modal"
-              class="btn btn-outline-info w-100"
+              class="btn btn-outline-info button-width"
               type="button"
               (click)="isConfirm(false)"
             >
               {{ buttonDecline }}
             </button>
           </div>
-          <div *ngIf="showConfirmButton" class="col">
+          <div *ngIf="showConfirmButton" class="col mb-3">
             <button
               data-target="#modal-confirm"
               data-toggle="modal"
-              class="btn btn-primary w-100"
+              class="btn btn-primary button-width"
               type="button"
               (click)="isConfirm(true)"
             >
               {{ buttonConfirm }}
             </button>
           </div>
-          <div *ngIf="showErrorButton" class="col">
+          <div *ngIf="showErrorButton" class="col mb-3">
             <button
               data-target="#modal-confirm"
               data-toggle="modal"
-              class="btn btn-danger"
+              class="btn btn-danger button-width"
               type="button"
               (click)="isConfirm(true)"
             >

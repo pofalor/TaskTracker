@@ -30,7 +30,7 @@ export class UserService {
   }
 
   public isAuthentificated(): boolean {
-    var at = localStorage.getItem("accessToken");
+    var at = localStorage?.getItem("accessToken");
     return at != null && at.length > 0;
   }
 

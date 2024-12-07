@@ -45,19 +45,19 @@ export class ApiService {
   private getPublicHeaders() {
     return {
       "Content-Type": "application/json",
-      "Localization": localStorage.getItem("localization") ?? "en",
-      "Uuid": localStorage.getItem("Uuid") ?? "",
+      "Localization": localStorage?.getItem("localization") ?? "en",
+      "Uuid": localStorage?.getItem("Uuid") ?? "",
     }
   }
 
   private getAuthorizationHeaders(): any {
-    let accessToken = localStorage.getItem("accessToken");
+    let accessToken = localStorage?.getItem("accessToken");
     if (accessToken) {
 
       return {
-        "AuthorizationPolicy": `Bearer ${accessToken}`,
+        "Authorization": `Bearer ${accessToken}`,
         "Content-Type": "application/json",
-        "Localization": localStorage.getItem("localization") ?? "en",
+        "Localization": localStorage?.getItem("localization") ?? "en",
       };
     }
     return null;

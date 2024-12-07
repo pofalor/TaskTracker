@@ -11,5 +11,5 @@ export const routes: Routes = [
         canActivate: [UserGuard],
     },
 
-    { path: "**", redirectTo: 'organisations' },
+    { path: "*", redirectTo: 'organisations' },
 ];
