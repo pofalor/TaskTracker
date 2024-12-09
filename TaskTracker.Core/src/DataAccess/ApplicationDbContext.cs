@@ -21,6 +21,7 @@ namespace TaskTracker.Core.src.DataAccess
             modelBuilder.ApplyConfiguration(new ProjectConfiguration());
             modelBuilder.ApplyConfiguration(new IssueConfiguration());
             modelBuilder.ApplyConfiguration(new TimeTrackingConfiguration());
+            modelBuilder.ApplyConfiguration(new UserWorkspaceStatusChangeConfiguration());
         }
 
         public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default(CancellationToken))

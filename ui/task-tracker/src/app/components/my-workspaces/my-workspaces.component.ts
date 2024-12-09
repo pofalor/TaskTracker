@@ -6,12 +6,12 @@ import { BaseComponent } from '../../shared/base/base.component';
 import { ReactiveFormsModule } from '@angular/forms';
 
 @Component({
-    selector: 'app-all-organisations',
+    selector: 'app-my-workspaces',
     imports: [ReactiveFormsModule],
-    templateUrl: './all-organisations.component.html',
-    styleUrl: './all-organisations.component.scss'
+    templateUrl: './my-workspaces.component.html',
+    styleUrl: './my-workspaces.component.scss'
 })
-export class AllOrganisationsComponent extends BaseComponent {
+export class MyWorkspacesComponent extends BaseComponent {
 
 constructor(
     public authService: AuthService,

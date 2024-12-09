@@ -54,7 +54,7 @@ export class UserGuard implements CanActivate {
   }
 
   goAway(): boolean {
-    this.router.navigateByUrl('organisations');
+    this.router.navigateByUrl('my-workspaces');
     return false;
   }
 

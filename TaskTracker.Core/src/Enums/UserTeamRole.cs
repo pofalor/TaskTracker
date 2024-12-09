@@ -19,6 +19,8 @@
         /// <summary>
         /// Project manager
         /// </summary>
-        ProjectMgr = 4
+        ProjectMgr = 4, 
+
+        Owner = 5
     }
 }

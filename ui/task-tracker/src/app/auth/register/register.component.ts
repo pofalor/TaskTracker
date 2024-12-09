@@ -109,7 +109,7 @@ export class RegisterComponent extends BaseComponent {
           t.userService.init();
           t.setLoading(false);
           t.showSuccess("Registration completed successfully", "Success");
-          t.router.navigate(['/organisations']);
+          t.router.navigate(['/my-workspaces']);
         }).catch((ex) => {
           t.setLoading(false);
           t.showResponseError(ex);

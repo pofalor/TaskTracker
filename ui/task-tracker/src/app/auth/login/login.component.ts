@@ -49,7 +49,7 @@ export class LoginComponent extends BaseComponent {
     await t.authService.SignIn(loginCred)
       .then(() => {
         t.userService.init();
-        t.router.navigateByUrl('/organisations');
+        t.router.navigateByUrl('/my-workspaces');
       })
       .catch((e) => {
         if (!!e.error && !!e.error.errors && !!e.error.errors[0].message) {
