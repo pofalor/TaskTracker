@@ -1,0 +1,48 @@
+<div class="mx-auto">
+    <div class="row mb-3 mt-3 text-center" *ngIf="showTitle">
+      <div class="col text-uppercase f-22 f-w-700">{{ title }}</div>
+    </div>
+    <div class="col">
+      <div class="col">
+        <div class="row mb-3 text-center text-break" [hidden]="!descriptionHTML">
+          <label [innerHtml]="descriptionHTML" class="c-white f-18"></label>
+        </div>
+        <hr />
+        <div class="row justify-content-center text-center">
+          <div *ngIf="showDeclineButton" class="col mb-3">
+            <button
+              data-target="#modal-confirm"
+              data-toggle="modal"
+              class="btn btn-outline-info button-width"
+              type="button"
+              (click)="isConfirm(false)"
+            >
+              {{ buttonDecline }}
+            </button>
+          </div>
+          <div *ngIf="showConfirmButton" class="col mb-3">
+            <button
+              data-target="#modal-confirm"
+              data-toggle="modal"
+              class="btn btn-primary button-width"
+              type="button"
+              (click)="isConfirm(true)"
+            >
+              {{ buttonConfirm }}
+            </button>
+          </div>
+          <div *ngIf="showErrorButton" class="col mb-3">
+            <button
+              data-target="#modal-confirm"
+              data-toggle="modal"
+              class="btn btn-danger button-width"
+              type="button"
+              (click)="isConfirm(true)"
+            >
+              {{ buttonError }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>  

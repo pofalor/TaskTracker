@@ -19,6 +19,7 @@ namespace TaskTracker.Core.src.Installers
         public static IServiceCollection AddCoreServices(this IServiceCollection services)
         {
             services.AddScoped<IAuthenticationService, AuthenticationService>();
+            services.AddScoped<IUserService, UserService>();
             services.AddScoped<ILogNotificatorService, LogNotificatorService>();
             services.AddScoped<ISosService, SosService>();
 

@@ -8,7 +8,7 @@ namespace TaskTracker.Controllers.BaseControllers
     /// <summary>
     /// Защищенный авторизацией контроллер (пользователь должен быть аутентифицирован)
     /// </summary>
-    [Authorize(JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public abstract class ProtectedApiController : BaseApiController
     {
         /// <summary>

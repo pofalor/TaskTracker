@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using TaskTracker.Core.src.DataAccess.BaseClasses;
+using TaskTracker.Utils.src.Extensions;
 
 namespace TaskTracker.Core.src.Entities
 {
@@ -18,5 +19,31 @@ namespace TaskTracker.Core.src.Entities
         public int? Country { get; set; }
 
         public string NickName { get; set; } = string.Empty;
+
+        /// <summary>
+        /// возврат - фамилия и имя текущего пользователя, либо Nickname
+        /// </summary>
+        /// <returns></returns>
+        public string GetUserName(bool isAdmin = false)
+        {
+            var resultName = "";
+
+            if (MustUseNickname() && !isAdmin) resultName = NickName;
+            else if (!FirstName.Trim().IsEmpty() && !LastName.Trim().IsEmpty())
+            {
+                resultName = $"{LastName} {FirstName}";
+            }
+            else resultName = Email;
+
+            return resultName;
+        }
+
+        /// <summary>
+        /// true - если Nickname заполнен
+        /// </summary>
+        public bool MustUseNickname()
+        {
+            return !NickName.IsEmpty();
+        }
     }
 }

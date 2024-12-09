@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using TaskTracker.Web.Api.Attributes;
 
 namespace TaskTracker.Controllers.BaseControllers
 {
@@ -7,6 +8,7 @@ namespace TaskTracker.Controllers.BaseControllers
     /// </summary>
     [ApiController]
     [Route("api/[controller]")]
+    [ApiRequestValidation]
     public abstract class BaseApiController : ControllerBase
     {
     }

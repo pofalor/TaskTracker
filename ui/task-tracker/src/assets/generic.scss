@@ -1,0 +1,23 @@
+/*====== Font-weight css starts ======*/
+$i:100,
+300,
+400,
+600,
+700,
+900;
+@each $val in $i {
+  .f-w-#{$val} {
+    font-weight: $val;
+  }
+}
+/*====== Font-weight css ends ======*/
+
+/*====== Font-size css starts ======*/
+$i:12;
+@while $i<=100 {
+  .f-#{$i} {
+    font-size:#{$i}px;
+  }
+  $i:$i+1;
+}
+/*====== Font-size css ends ======*/

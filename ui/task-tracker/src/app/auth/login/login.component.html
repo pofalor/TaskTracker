@@ -1,0 +1,38 @@
+<div class="auth-bg">
+  <div class="authentication-box">
+    <div class="card" style="max-width: 500px;">
+      <div class="card-body">
+        <h1 class="text-center">{{"Log In"}}</h1>
+        <form class="custom-form" [formGroup]="loginForm">
+          <div class="form-group pt-5">
+            <input id="email-input-field" type="email" class="form-control" formControlName="email" placeholder="Email"
+              required="" autofocus="" />
+            <div *ngIf="elemIsInvalid(loginForm.get('email'))" class="text text-danger mt-1">
+                {{ textErrorStr(loginForm.get('email'), emailPattern) }}
+              </div>
+          </div>
+
+          <div class="form-group pt-3">
+            <input placeholder="Password" [type]="'password'" class="form-control" formControlName="password" />
+            <div *ngIf="elemIsInvalid(loginForm.get('password'))" class="text text-danger mt-1">
+                {{ textErrorStr(loginForm.get('password')) }}
+              </div>
+          </div>
+          <div *ngIf="!!errorText" class="text text-danger">
+            {{ errorText }}
+          </div>
+          <div class="form-group pt-3">
+            <button id="login-button" class="btn btn-primary w-100" (click)="login()">
+              {{"Sign in"}}
+            </button>
+          </div>
+          <div class="pt-3 text-center">
+            {{"Don't have an account yet"}}?
+            <a href="javascript:void(0)" routerLink="/register">{{"Sign Up"}}</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+</div>

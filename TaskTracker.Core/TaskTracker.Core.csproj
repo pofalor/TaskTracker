@@ -30,10 +30,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="src\Models\Filters\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Compile Update="src\Resources\ErrorCodes\AuthenticationErrorCodeResources.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -54,6 +50,11 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>SystemErrorCodeResources.resx</DependentUpon>
     </Compile>
+    <Compile Update="src\Resources\ErrorCodes\UserErrorCodeResources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>UserErrorCodeResources.resx</DependentUpon>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>
@@ -72,6 +73,10 @@
     <EmbeddedResource Update="src\Resources\ErrorCodes\SystemErrorCodeResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>SystemErrorCodeResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="src\Resources\ErrorCodes\UserErrorCodeResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>UserErrorCodeResources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
 

@@ -53,8 +53,8 @@ try
         throw new InvalidOperationException(mes);
     }
 
+    builder.Services.AddAuthorization();
     builder.Services
-        .AddAuthorization()
         // схема аутентификации - с помощью jwt-токенов
         .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         // подключение аутентификации с помощью jwt-токенов
@@ -71,7 +71,9 @@ try
                 ValidateLifetime = true,
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(identityConfiguration.TokenSecret)),
                 ValidateIssuerSigningKey = true,
+                ClockSkew = TimeSpan.Zero,
             };
+            options.UseSecurityTokenValidators = true;
         });
 
     builder.Services
