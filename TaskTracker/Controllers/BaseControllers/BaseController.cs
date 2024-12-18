@@ -35,6 +35,8 @@ namespace TaskTracker.Web.Api.Controllers.BaseControllers
             _baseService = baseService;
             _mapper = mapper;
             _userService = userService;
+
+            InitRoles();
         }
 
         protected void AddRole(string methodName, string role)
@@ -67,6 +69,8 @@ namespace TaskTracker.Web.Api.Controllers.BaseControllers
                 return false;
             }
         }
+
+        public virtual void InitRoles() { }
 
         [Route("getAll")]
         [HttpGet]
@@ -206,11 +210,6 @@ namespace TaskTracker.Web.Api.Controllers.BaseControllers
         public virtual async Task<DataResponse<bool>> CreateOrEdit(R request)
         {
             var response = new DataResponse<bool>();
-
-            if (!ModelState.IsValid)
-            {
-                return response.AddModelStateError(ModelState);
-            }
 
             var isSuccess = await CheckRoles(nameof(CreateOrEdit));
             if (!isSuccess)

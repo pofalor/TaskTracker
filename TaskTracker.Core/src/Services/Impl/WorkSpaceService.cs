@@ -23,10 +23,9 @@ namespace TaskTracker.Core.src.Services.Impl
             _logger = logger;
         }
 
-        public async Task<IDataResult<WorkSpace[]>> GetMyWorkspaces(int userId)
+        public async Task<IDataResult<List<WorkSpace>>> GetMyWorkspaces(int userId)
         {
-            //TODO: сделать проверку в контроллере кто делает запрос
-            var result = new DataResult<WorkSpace[]>();
+            var result = new DataResult<List<WorkSpace>>();
 
             try
             {
@@ -39,7 +38,7 @@ namespace TaskTracker.Core.src.Services.Impl
                     .Where(x=> x.UserStatus != UserWorkSpaceStatus.Deleted)
                     .Where(x => !x.IsDeleted)
                     .Select(x=> x.WorkSpace)
-                    .ToArrayAsync();
+                    .ToListAsync();
 
                 return result.WithData(workspaces);
             }

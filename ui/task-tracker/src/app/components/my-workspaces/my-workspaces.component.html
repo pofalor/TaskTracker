@@ -1,1 +1,44 @@
-<p>my-workspaces works!</p>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12 col-sm">
+            <div class="text-left text-uppercase f-22 f-w-700 my-3">
+                {{"My workspaces"}}
+            </div>
+        </div>
+    </div>
+    <div class="row" *ngIf="!!allMyWorkSpaces && allMyWorkSpaces.length > 0">
+        <div class="col-xl-6 mb-4" *ngFor="let workspace of allMyWorkSpaces">
+            <div class="card h-100 mb-0">
+                <div class="card-body pb-0 pr-0">
+                    <div class="row">
+                        <div class="col d-flex flex-column">
+                            <div class="text-left text-uppercase f-30 f-w-700">
+                                {{workspace.name}}
+                            </div>
+                            <div *ngIf="workspace.workSpaceType == WorkSpaceType.Personal" class="mt-1">
+                                {{'Personal'}}
+                            </div>
+                            <div *ngIf="workspace.workSpaceType == WorkSpaceType.Company" class="mt-1">
+                                {{'Company'}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-auto mb-4">
+            <div class="card h-100 mb-0">
+                <div class="card-body pb-0 pr-0">
+                    <div class="row">
+                        <div class="col d-flex flex-column">
+                            <img src="/assets/icons/plus_icon.png" type="button" class="cursor-pointer"
+                            (click)="createWorkspace()" draggable="false" class="mb-2">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
