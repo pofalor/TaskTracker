@@ -11,10 +11,11 @@ import { AuthenticatePostRequest } from '../../shared/model/postRequests/authent
 import { CreateUserPostRequest } from '../../shared/model/postRequests/createUserPostRequest';
 import { ListCountry } from '../../shared/constants/country';
 import { UserService } from '../../shared/services/user.service';
+import { LangPipe } from '../../shared/pipes/lang.pipe';
 
 @Component({
     selector: 'app-register',
-    imports: [CommonModule, RouterLink, ReactiveFormsModule],
+    imports: [CommonModule, RouterLink, ReactiveFormsModule, LangPipe],
     templateUrl: './register.component.html',
     styleUrl: './register.component.scss'
 })

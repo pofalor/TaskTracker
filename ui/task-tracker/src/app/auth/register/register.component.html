@@ -2,14 +2,14 @@
     <div class="authentication-box">
         <div class="card" style="max-width: 500px;">
             <div class="card-body">
-                <h1 class="text-center">{{"Register"}}</h1>
+                <h1 class="text-center">{{ "Register" | lang }}</h1>
                 <form class="custom-form" [formGroup]="registerForm">
                     <!--ЭМЕЙЛ-->
                     <div class="form-group pt-5">
                         <input id="email-input-field" type="email" class="form-control" formControlName="email"
                             placeholder="Email" required="" autofocus="" />
                         <div *ngIf="elemIsInvalid(registerForm.get('email'))" class="text text-danger mt-1">
-                        {{ textErrorStr(registerForm.get('email'), emailPattern) }}
+                        {{ textErrorStr(registerForm.get('email'), emailPattern) | lang }}
                         </div>
                     </div>
                     <!--ПАРОЛЬ-->
@@ -17,7 +17,7 @@
                         <input placeholder="Password" [type]="'password'" class="form-control"
                             formControlName="password" />
                         <div *ngIf="elemIsInvalid(registerForm.get('password'))" class="text text-danger mt-1">
-                        {{ textErrorStr(registerForm.get('password')) }}
+                        {{ textErrorStr(registerForm.get('password')) | lang }}
                         </div>
                     </div>
                     <!--ПОДТВЕРЖДЕНИЕ ПАРОЛЯ-->
@@ -25,7 +25,7 @@
                         <input id="passwordConfirm-input-field" class="form-control" type="password"
                             formControlName="passwordConfirm" placeholder="Password Confirmation">
                         <div *ngIf="elemIsInvalid(registerForm.get('passwordConfirm'))" class="text text-danger mt-1">
-                            {{textErrorStr(registerForm.get('passwordConfirm'))}}
+                            {{textErrorStr(registerForm.get('passwordConfirm')) | lang}}
                         </div>
                     </div>
                     <!--ФАМИЛИЯ-->
@@ -33,7 +33,7 @@
                         <input id="lastname-input-field" class="form-control" type="text" formControlName="lastname"
                             placeholder="Lastname">
                         <div *ngIf="elemIsInvalid(registerForm.get('lastname'))" class="text text-danger mt-1">
-                            {{textErrorStr(lastname, namePattern)}}
+                            {{textErrorStr(lastname, namePattern) | lang}}
                         </div>
                     </div>
                     <!--ИМЯ-->
@@ -41,7 +41,7 @@
                         <input id="firstname-input-field" class="form-control" type="text" formControlName="firstname"
                             placeholder="Firstname">
                         <div *ngIf="elemIsInvalid(registerForm.get('firstname'))" class="text text-danger mt-1">
-                            {{textErrorStr(firstname, namePattern)}}
+                            {{textErrorStr(firstname, namePattern) | lang}}
                         </div>
                     </div>
                     <!--СТРАНА РЕГИСТРАЦИИ-->
@@ -62,7 +62,7 @@
                           </ng-option>
                         </ng-select> -->
                         <div *ngIf="elemIsInvalid(registerForm.get('country'))" class="text text-danger mt-1">
-                            {{textErrorStr(country, namePattern)}}
+                            {{textErrorStr(country, namePattern) | lang}}
                         </div>
                     </div>
                     <div class="form-group pt-3">

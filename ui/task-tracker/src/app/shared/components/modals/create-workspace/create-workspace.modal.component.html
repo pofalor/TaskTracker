@@ -1,0 +1,94 @@
+<div class="card mb-0">
+    <div class="card-body">
+        <div class="row mb-4">
+            <div class="col text-center">
+                <h4 *ngIf="!workSpaceId" class="f-28">{{"Create workspace" | lang}}</h4>
+                <h4 *ngIf="!!workSpaceId" class="f-28">{{"Edit workspace" | lang}}</h4>
+            </div>
+        </div>
+
+        <form [formGroup]="workSpaceForm" class="form-group m-0">
+            <div class="row">
+                <div class="col-12 pb-3">
+                    <label class="mb-1">{{ "Workspace name" | lang }}</label>
+                    <input type="text" class="form-control" formControlName="name"
+                        placeholder="{{'Workspace name' | lang}}" />
+                    <div *ngIf="elemIsInvalid(workSpaceForm.get('name'))" class="text text-danger mt-1">
+                        {{textErrorStr(workSpaceForm.get('name'), namePattern) | lang}}
+                    </div>
+                </div>
+                <div *ngIf="!workSpaceId" class="col-12 pb-3">
+                    <div class="row">
+                        <div class="col-12">
+                            <label class="mb-1">{{ "Type of workspace" | lang}}</label>
+                        </div>
+                        <div class="col-12">
+                            <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+                                <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off"
+                                    checked (click)="changeWorkSpaceType(WorkSpaceType.Personal)">
+                                <label class="btn btn-outline-primary" for="btnradio1">
+                                    {{'workSpaceType.' + WorkSpaceType.Personal | lang}}
+                                </label>
+                                <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off">
+                                <label class="btn btn-outline-primary" for="btnradio2"
+                                    (click)="changeWorkSpaceType(WorkSpaceType.Company)">
+                                    {{'workSpaceType.' + WorkSpaceType.Company | lang}}
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="workSpace.workSpaceType == WorkSpaceType.Company" class="col-12 pb-3">
+                    <label>{{ "Country of registration" | lang }}</label>
+                    <ng-select appearance="outline" class="br-10" id="country-input-field" formControlName="country">
+                        <ng-option *ngFor="let country of countryList" class="br-10" value="country.value">
+                            {{ country.name }}
+                        </ng-option>
+                    </ng-select>
+                    <div *ngIf="elemIsInvalid(workSpaceForm.get('country'))" class="text text-danger mt-1">
+                        {{textErrorStr(workSpaceForm.get('country')) | lang}}
+                    </div>
+                </div>
+
+                <div *ngIf="workSpace.workSpaceType == WorkSpaceType.Company" class="col-12 pb-3">
+                    <label class="mb-1">{{ "Company registration date" | lang }}</label>
+                    <div class="row">
+                        <div class="col-11">
+                            <input class="form-control" formControlName="registrationDate" placeholder="yyyy-mm-dd" name="dp"
+                            ngbDatepicker #d="ngbDatepicker" />
+                        </div>
+                        <div class="col-1">
+                            <button class="btn btn-outline-secondary bi bi-calendar3" (click)="d.toggle()"
+                            type="button"></button>
+                        </div>
+                    </div>
+                    <div *ngIf="elemIsInvalid(workSpaceForm.get('registrationDate'))" class="text text-danger mt-1">
+                        {{textErrorStr(workSpaceForm.get('registrationDate')) | lang}}
+                    </div>
+                </div>
+                <div *ngIf="workSpace.workSpaceType == WorkSpaceType.Company" class="col-12 pb-3">
+                    <label class="mb-1">{{ "Legal address" | lang }}</label>
+                    <input type="text" class="form-control" formControlName="address"
+                        placeholder="{{'Legal address' | lang}}" />
+                    <div *ngIf="elemIsInvalid(workSpaceForm.get('address'))" class="text text-danger mt-1">
+                        {{textErrorStr(workSpaceForm.get('address')) | lang}}
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div class="row">
+            <div class="col">
+                <button data-target="#modal-confirm" data-toggle="modal" class="btn btn-outline-info btn-soft w-100"
+                    type="button" (click)="back()">
+                    {{ "buttons.cancel" | lang }}
+                </button>
+            </div>
+            <div class="col">
+                <button data-target="#modal-confirm" data-toggle="modal" class="btn btn-primary btn-soft w-100"
+                    type="button" (click)="createOrEditWorkspace()">
+                    {{ "buttons.save" | lang }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

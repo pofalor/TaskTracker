@@ -7,10 +7,11 @@ import { AuthService } from '../../shared/services/auth.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AuthenticatePostRequest } from '../../shared/model/postRequests/authenticatePostRequest';
 import { UserService } from '../../shared/services/user.service';
+import { LangPipe } from '../../shared/pipes/lang.pipe';
 
 @Component({
     selector: 'app-login',
-    imports: [CommonModule, RouterLink, ReactiveFormsModule],
+    imports: [CommonModule, RouterLink, ReactiveFormsModule, LangPipe],
     templateUrl: './login.component.html',
     styleUrl: './login.component.scss'
 })
