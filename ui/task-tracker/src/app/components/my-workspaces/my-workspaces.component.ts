@@ -9,6 +9,8 @@ import { WorkSpaceType } from '../../shared/enums/work-space-type';
 import { CommonModule } from '@angular/common';
 import { CreateWorkspaceModalComponent } from '../../shared/components/modals/create-workspace/create-workspace.modal.component';
 import { LangPipe } from '../../shared/pipes/lang.pipe';
+import { CreateOrEditWorkSpacePostRequest } from '../../shared/model/postRequests/createOrEditWorkSpacePostRequest';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-my-workspaces',
@@ -25,9 +27,10 @@ export class MyWorkspacesComponent extends BaseComponent {
   constructor(
     public authService: AuthService,
     private modalService: NgbModal,
-    private workSpaceService: WorkspaceService
+    private workSpaceService: WorkspaceService,
+    private translate: TranslateService
   ) {
-    super(modalService);
+    super(modalService, translate);
   }
 
   async ngOnInit() {
@@ -35,10 +38,10 @@ export class MyWorkspacesComponent extends BaseComponent {
     await t.getMyWorkspaces();
   }
 
-  public async getMyWorkspaces() {
+  public async getMyWorkspaces(needLoader: boolean = true) {
     var t = this;
-
-    t.setLoading(true);
+    if(needLoader)
+      t.setLoading(true);
 
     await t.workSpaceService.getMyWorkspaces()
       .then((resp: any) => {
@@ -48,7 +51,8 @@ export class MyWorkspacesComponent extends BaseComponent {
         t.showResponseError(e);
       })
       .finally(() => {
-        t.setLoading(false);
+        if(needLoader)
+          t.setLoading(false);
       });
   }
 
@@ -61,6 +65,28 @@ export class MyWorkspacesComponent extends BaseComponent {
         size: 'lg'
       });
 
-    t.modalRef.result;
+    t.modalRef.result.then(async (result) => {
+      if (result) {
+        await t.createOrEditWorkspace(result);
+      }
+    });
+  }
+
+  public async createOrEditWorkspace(createWorkspacePostRequest: CreateOrEditWorkSpacePostRequest){
+    var t = this;
+    t.setLoading(true);
+    await t.workSpaceService.createOrEdit(createWorkspacePostRequest)
+      .then(async (resp: any) => {
+        if(!!resp && !!resp.data){
+          await t.getMyWorkspaces(false);
+          t.showSuccess("Workspace sucessfully created", "Success");
+        }
+      })
+      .catch((e) => {
+        t.showResponseError(e);
+      })
+      .finally(() => {
+        t.setLoading(false);
+      });
   }
 }

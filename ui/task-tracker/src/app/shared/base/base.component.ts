@@ -5,6 +5,7 @@ import { ConfirmModalComponent } from '../components/modals/confirm/confirm.moda
 import { ModalInfoModel } from '../model/onlyFrontModels/modalInfo.model';
 import { LoaderComponent } from '../components/loader/loader.component';
 import { ValidationUtils } from '../utils/validationUtils';
+import { TranslateService } from '@ngx-translate/core';
 
 const apiUrl = environment.apiUrl;
 
@@ -31,6 +32,7 @@ export abstract class BaseComponent {
 
   constructor(
     private modalServiceBase: NgbModal,
+    private translateService: TranslateService
   ) {}
 
   public elemIsInvalid(elem: any): boolean {
@@ -110,15 +112,15 @@ export abstract class BaseComponent {
   }
 
   // упрощенное представление модалки с ошибкой
-  protected showError(message: string, titleMes: string = 'Attention'): Promise<any> {
+  protected showError(message: string, titleMes: string = 'Error'): Promise<any> {
     var t = this;
 
     var mes = message;
     var title = titleMes;
 
     var modalInfo = new ModalInfoModel();
-    modalInfo.title = !!title ? title : mes;
-    modalInfo.description = !!title ? mes : '';
+    modalInfo.title = !!title ? t.translateService.instant(title) : mes;
+    modalInfo.description = !!title ? t.translateService.instant(mes) : '';
     modalInfo.showConfirmButton = false;
     modalInfo.showDeclineButton = false;
     modalInfo.showErrorButton = true;
@@ -130,7 +132,7 @@ export abstract class BaseComponent {
   protected showSuccess(message: string, titleMes: string = 'System'): Promise<any> {
     var t = this;
 
-    var mes = message;
+    var mes =  message;
     var title = titleMes;
 
     var modalInfo = new ModalInfoModel();

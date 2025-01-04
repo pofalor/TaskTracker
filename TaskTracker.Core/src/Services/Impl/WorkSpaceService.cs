@@ -53,7 +53,6 @@ namespace TaskTracker.Core.src.Services.Impl
         public override async Task<IDataResult<bool>> CreateOrEdit(WorkSpace request)
         {
             var result = new DataResult<bool>();
-            //TODO: в контроллере проверить, что юзер текущий делает запрос
             try
             {
                 var newWorkSpace = new WorkSpace();
@@ -147,22 +146,27 @@ namespace TaskTracker.Core.src.Services.Impl
                 newWorkSpace.Address = request.Address;
                 newWorkSpace.INN = request.INN;
 
-                await _dbContext.AddAsync(newWorkSpace);
-                await _dbContext.SaveChangesAsync();
-                
-                //создаём сотрудника(владельца) для новой компании
-                if(existingWorkSpace == null)
+                using (var transaction = await _dbContext.Database.BeginTransactionAsync())
                 {
-                    var newWorkSpaceMember = new WorkSpaceMember()
-                    {
-                        UserId = newWorkSpace.DirectorUserId,
-                        TeamRole = UserTeamRole.Owner,
-                        UserStatus = UserWorkSpaceStatus.Active, 
-                        WorkSpaceId = newWorkSpace.Id
-                    };
 
-                    await _dbContext.AddAsync(newWorkSpaceMember);
+                    await _dbContext.AddAsync(newWorkSpace);
                     await _dbContext.SaveChangesAsync();
+
+                    //создаём сотрудника(владельца) для новой компании
+                    if (existingWorkSpace == null)
+                    {
+                        var newWorkSpaceMember = new WorkSpaceMember()
+                        {
+                            UserId = newWorkSpace.DirectorUserId,
+                            TeamRole = UserTeamRole.Owner,
+                            UserStatus = UserWorkSpaceStatus.Active,
+                            WorkSpaceId = newWorkSpace.Id
+                        };
+
+                        await _dbContext.AddAsync(newWorkSpaceMember);
+                        await _dbContext.SaveChangesAsync();
+                    }
+                    await transaction.CommitAsync();
                 }
 
                 return result.WithData(true);

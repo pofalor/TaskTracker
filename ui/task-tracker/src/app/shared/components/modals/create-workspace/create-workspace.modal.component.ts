@@ -8,6 +8,10 @@ import { LangPipe } from '../../../pipes/lang.pipe';
 import { CommonModule } from '@angular/common';
 import { ListCountry } from '../../../constants/country';
 import { NgOptionComponent, NgSelectComponent } from '@ng-select/ng-select';
+import { WorkspaceService } from '../../../services/workspace.service';
+import { TranslateService } from '@ngx-translate/core';
+import { UserModel } from '../../../model/userModel';
+import { UserService } from '../../../services/user.service';
 
 
 @Component({
@@ -18,7 +22,7 @@ import { NgOptionComponent, NgSelectComponent } from '@ng-select/ng-select';
   styleUrl: './create-workspace.modal.component.scss'
 })
 export class CreateWorkspaceModalComponent extends BaseComponent {
-  @Input() workSpaceId: number | null = null;
+  @Input() workSpaceId: number | undefined;
   @Input() workSpaceName: string = '';
   @Input() workSpaceType: WorkSpaceType = WorkSpaceType.Personal;
   @Input() workSpaceCountry: number | null = null;
@@ -33,9 +37,12 @@ export class CreateWorkspaceModalComponent extends BaseComponent {
   constructor(
     private modalService: NgbModal,
     private fb: FormBuilder,
-    private activeModal: NgbActiveModal
+    private activeModal: NgbActiveModal,
+    private workSpaceService: WorkspaceService,
+    private translate: TranslateService, 
+    private userService: UserService
   ){
-    super(modalService);
+    super(modalService, translate);
 
     var t = this;
     this.workSpaceForm = fb.group({
@@ -46,6 +53,7 @@ export class CreateWorkspaceModalComponent extends BaseComponent {
       address: [ { value: '', disabled: true }, [Validators.required, Validators.maxLength(300)]],
       TIN: [ { value: '', disabled: true }, [Validators.required, Validators.maxLength(50)]],
     });
+
   }
 
   get name() { return this.workSpaceForm.get('name'); }
@@ -82,8 +90,30 @@ export class CreateWorkspaceModalComponent extends BaseComponent {
     }
   }
 
-  createOrEditWorkspace(){
-    //TODO: если личное, то очищаем все поля
+  async createOrEditWorkspace(){
+    var t = this;
+    if (t.workSpaceForm.invalid) {
+      t.markFormGroupTouchedAndDirty(t.workSpaceForm)
+      return;
+    }
+    t.workSpace.id = t.workSpaceId;
+    t.workSpace.name = t.name?.value;
+    t.workSpace.workSpaceType = t.workSpaceTypeForm?.value;
+    t.workSpace.directorUserId = t.userService.get()?.id;
+
+    if(t.workSpace.workSpaceType == WorkSpaceType.Personal){
+      t.workSpace.country = undefined;
+      t.workSpace.registrationDate = undefined;
+      t.workSpace.address = undefined;
+      t.workSpace.iNN = undefined;
+    }
+    else{
+      t.workSpace.country = t.country?.value;
+      t.workSpace.registrationDate = t.registrationDate?.value;
+      t.workSpace.address = t.address?.value;
+      t.workSpace.iNN = t.TIN?.value;
+    }
+    t.activeModal.close(t.workSpace);
   }
 
   back(result: boolean = false) {

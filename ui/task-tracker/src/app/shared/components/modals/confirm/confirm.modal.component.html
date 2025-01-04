@@ -1,6 +1,6 @@
 <div class="mx-auto">
     <div class="row mb-3 mt-3 text-center" *ngIf="showTitle">
-      <div class="col text-uppercase f-22 f-w-700">{{ title }}</div>
+      <div class="col text-uppercase f-22 f-w-700">{{ title | lang }}</div>
     </div>
     <div class="col">
       <div class="col">
@@ -17,7 +17,7 @@
               type="button"
               (click)="isConfirm(false)"
             >
-              {{ buttonDecline }}
+              {{ buttonDecline | lang }}
             </button>
           </div>
           <div *ngIf="showConfirmButton" class="col mb-3">
@@ -28,7 +28,7 @@
               type="button"
               (click)="isConfirm(true)"
             >
-              {{ buttonConfirm }}
+              {{ buttonConfirm | lang }}
             </button>
           </div>
           <div *ngIf="showErrorButton" class="col mb-3">
@@ -39,7 +39,7 @@
               type="button"
               (click)="isConfirm(true)"
             >
-              {{ buttonError }}
+              {{ buttonError | lang }}
             </button>
           </div>
         </div>

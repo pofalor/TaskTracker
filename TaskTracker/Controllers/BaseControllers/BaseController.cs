@@ -43,7 +43,7 @@ namespace TaskTracker.Web.Api.Controllers.BaseControllers
         {
             var item = AccessDict.Get(methodName, []);
 
-            if (item == null) AccessDict[methodName] = [role];
+            if (item == null || item.Count == 0) AccessDict[methodName] = [role];
             else item.Add(role);
         }
 

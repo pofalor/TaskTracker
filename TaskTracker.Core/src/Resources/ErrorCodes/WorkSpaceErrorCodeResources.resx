@@ -147,4 +147,7 @@
   <data name="CannotCreateOrEditWorkspace" xml:space="preserve">
     <value>Could not create or modify workspace. Please contact support</value>
   </data>
+  <data name="AccessDenied" xml:space="preserve">
+    <value>Access denied</value>
+  </data>
 </root>

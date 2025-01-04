@@ -22,7 +22,7 @@ export class UserService {
   }
 
   public async init(): Promise<UserModel | undefined> {
-    var result = this.get();
+    var result = await this.get();
     if(!result){
       result = await this.refresh();
     }

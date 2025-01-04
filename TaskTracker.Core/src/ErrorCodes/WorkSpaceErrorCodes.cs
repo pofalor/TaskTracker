@@ -64,5 +64,11 @@ namespace TaskTracker.Core.src.ErrorCodes
         /// </summary>
         [ErrorMessage(typeof(WorkSpaceErrorCodeResources), nameof(CannotCreateOrEditWorkspace))]
         CannotCreateOrEditWorkspace = CanCreateOnlyOnePersonalWorkspace + 1,
+
+        /// <summary>
+        /// Не удаётся создать или изменить воркспейс, т.к. нет прав у пользователя
+        /// </summary>
+        [ErrorMessage(typeof(WorkSpaceErrorCodeResources), nameof(AccessDenied))]
+        AccessDenied = CannotCreateOrEditWorkspace + 1,
     }
 }

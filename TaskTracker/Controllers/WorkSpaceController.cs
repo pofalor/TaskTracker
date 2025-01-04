@@ -8,6 +8,7 @@ using TaskTracker.Core.src.Models.PostRequests;
 using TaskTracker.Core.src.Models.ResponseModels;
 using TaskTracker.Core.src.Services;
 using TaskTracker.Core.src.Services.Impl;
+using TaskTracker.Utils.src.Extensions;
 using TaskTracker.Web.Api.Controllers.BaseControllers;
 using TaskTracker.Web.Api.Extensions;
 using TaskTracker.Web.Api.Responses;
@@ -20,13 +21,15 @@ namespace TaskTracker.Web.Api.Controllers
         private readonly ILogger<WorkSpaceController> _logger;
         private readonly IWorkSpaceService _workSpaceService;
         private readonly IMapper _mapper;
+        private readonly ILogNotificatorService _logNotificatorService;
 
         public WorkSpaceController(ILogger<WorkSpaceController> logger, IWorkSpaceService workSpaceService,
-            IMapper mapper, IUserService userService) : base(logger, workSpaceService, mapper, userService)
+            IMapper mapper, IUserService userService, ILogNotificatorService logNotificatorService) : base(logger, workSpaceService, mapper, userService)
         {
             _logger = logger;
             _workSpaceService = workSpaceService;
             _mapper = mapper;
+            _logNotificatorService = logNotificatorService;
         }
 
         public override void InitRoles()
@@ -58,6 +61,45 @@ namespace TaskTracker.Web.Api.Controllers
             }
         }
 
+
+        [Route("add")]
+        [HttpPost]
+        public override async Task<DataResponse<bool>> CreateOrEdit(CreateOrEditWorkSpacePostRequest request)
+        {
+            var response = new DataResponse<bool>();
+
+            var isSuccess = await CheckRoles(nameof(CreateOrEdit));
+            if (!isSuccess)
+                return response.WithError(SystemErrorCodes.AccessDenied);
+
+            try
+            {
+                if (!request.DirectorUserId.HasValue)
+                    request.DirectorUserId = UserId;
+
+                if(request.DirectorUserId != UserId)
+                {
+                    await _logNotificatorService.SendTelegramAdminAsync($"The user has sent a request to create a workspace with a user Id " +
+                        $"different from his user Id in claims{Environment.NewLine} " +
+                        $"User id from request: {request.DirectorUserId}{Environment.NewLine} " +
+                        $"User id from claims: {UserId}.");
+                    return response.WithError(WorkSpaceErrorCodes.AccessDenied);
+                }
+                var mapRes = _mapper.Map<WorkSpace>(request);
+                var result = await _workSpaceService.CreateOrEdit(mapRes);
+
+                if (result.Success)
+                    return response.WithData(result.Data);
+                else
+                    return response.WithError(result.Errors[0]);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while sending request to add or change element.{NewLine}{Parameter}:{Request}{NewLine2}",
+                   Environment.NewLine, nameof(request), request?.ToJson(), Environment.NewLine);
+                return response.WithError(WorkSpaceErrorCodes.CannotCreateOrEditWorkspace);
+            }
+        }
 
     }
 }

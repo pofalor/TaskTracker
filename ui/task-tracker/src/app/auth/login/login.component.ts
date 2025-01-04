@@ -8,6 +8,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AuthenticatePostRequest } from '../../shared/model/postRequests/authenticatePostRequest';
 import { UserService } from '../../shared/services/user.service';
 import { LangPipe } from '../../shared/pipes/lang.pipe';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-login',
@@ -20,13 +21,14 @@ export class LoginComponent extends BaseComponent {
   errorText: string = '';
 
   constructor(
-    public authService: AuthService,
+    private authService: AuthService,
     private fb: FormBuilder,
     private router: Router,
     private modalService: NgbModal,
-    private userService: UserService
+    private userService: UserService,
+    private translate: TranslateService
   ) {
-    super(modalService);
+    super(modalService, translate);
 
     this.loginForm = fb.group({
       email: ['', [Validators.required, Validators.email]],

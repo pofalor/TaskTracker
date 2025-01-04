@@ -74,6 +74,14 @@
                         {{textErrorStr(workSpaceForm.get('address')) | lang}}
                     </div>
                 </div>
+                <div *ngIf="workSpace.workSpaceType == WorkSpaceType.Company" class="col-12 pb-3">
+                    <label class="mb-1">{{ "TIN" | lang }}</label>
+                    <input type="text" class="form-control" formControlName="TIN"
+                        placeholder="{{'TIN' | lang}}" />
+                    <div *ngIf="elemIsInvalid(workSpaceForm.get('TIN'))" class="text text-danger mt-1">
+                        {{textErrorStr(workSpaceForm.get('TIN')) | lang}}
+                    </div>
+                </div>
             </div>
         </form>
         <div class="row">

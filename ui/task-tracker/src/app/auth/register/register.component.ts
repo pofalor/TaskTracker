@@ -12,6 +12,7 @@ import { CreateUserPostRequest } from '../../shared/model/postRequests/createUse
 import { ListCountry } from '../../shared/constants/country';
 import { UserService } from '../../shared/services/user.service';
 import { LangPipe } from '../../shared/pipes/lang.pipe';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-register',
@@ -30,9 +31,10 @@ export class RegisterComponent extends BaseComponent {
     private router: Router,
     private modalService: NgbModal,
     private publicService: PublicService,
-    private userService: UserService
+    private userService: UserService,
+    private translate: TranslateService
   ) {
-    super(modalService);
+    super(modalService, translate);
 
     this.registerForm = fb.group({
       email: ['', [Validators.required, Validators.email]],

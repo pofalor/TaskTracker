@@ -10,7 +10,7 @@ export class CreateOrEditWorkSpacePostRequest{
     public workSpaceType! : WorkSpaceType;
     
     /** Ссылка на управляющего компании */
-    public directorUserId! : number;
+    public directorUserId : number | undefined;
     
     //Все поля ниже заполняются, если WorkSpaceType - Company
     

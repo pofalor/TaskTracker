@@ -2,10 +2,11 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Component, Input } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
+import { LangPipe } from '../../../pipes/lang.pipe';
 
 @Component({
     selector: 'app-confirm',
-    imports: [CommonModule],
+    imports: [CommonModule, LangPipe],
     templateUrl: './confirm.modal.component.html',
     styleUrl: './confirm.modal.component.scss'
 })

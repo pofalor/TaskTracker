@@ -6,35 +6,49 @@
             </div>
         </div>
     </div>
-    <div class="row" *ngIf="!!allMyWorkSpaces && allMyWorkSpaces.length > 0">
-        <div class="col-xl-6 mb-4" *ngFor="let workspace of allMyWorkSpaces">
-            <div class="card h-100 mb-0">
-                <div class="card-body pb-0 pr-0">
-                    <div class="row">
-                        <div class="col d-flex flex-column">
-                            <div class="text-left text-uppercase f-30 f-w-700">
-                                {{workspace.name}}
+    <div class="row">
+        <div *ngIf="!!allMyWorkSpaces && allMyWorkSpaces.length > 0" class="col-auto mb-4">
+            <ng-container *ngFor="let workspace of allMyWorkSpaces">
+                <div class="card h-100 mb-0">
+                    <div class="card-body pb-0 pr-0">
+                        <div class="row">
+                            <div class="col d-flex flex-column">
+                                <div class="text-left text-uppercase f-30 f-w-700">
+                                    {{workspace.name}}
+                                </div>
                             </div>
-                            <div *ngIf="workspace.workSpaceType == WorkSpaceType.Personal" class="mt-1">
-                                {{'Personal'}}
+                            <div class="col-12">
+                                <label class="mb-1">{{ "Type of workspace" | lang}}</label>
                             </div>
-                            <div *ngIf="workspace.workSpaceType == WorkSpaceType.Company" class="mt-1">
-                                {{'Company'}}
+                            <div class="col-12">
+                                <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+                                    <input type="radio" class="btn-check" name="btnradio" 
+                                    id="btnradio1" disabled autocomplete="off" 
+                                    [attr.checked]="workspace.workSpaceType == WorkSpaceType.Personal ? 'checked' : null">
+                                    <label class="btn btn-outline-primary" for="btnradio1">
+                                        {{'workSpaceType.' + WorkSpaceType.Personal | lang}}
+                                    </label>
+                                    <input type="radio" class="btn-check" name="btnradio" 
+                                    id="btnradio2" disabled autocomplete="off"
+                                    [attr.checked]="workspace.workSpaceType == WorkSpaceType.Company ? 'checked' : null">
+                                    <label class="btn btn-outline-primary" for="btnradio2">
+                                        {{'workSpaceType.' + WorkSpaceType.Company | lang}}
+                                    </label>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </ng-container>
         </div>
-    </div>
-    <div class="row">
+
         <div class="col-auto mb-4">
             <div class="card h-100 mb-0">
                 <div class="card-body pb-0 pr-0">
                     <div class="row">
                         <div class="col d-flex flex-column">
                             <img src="/assets/icons/plus_icon.png" type="button" class="cursor-pointer"
-                            (click)="createWorkspace()" draggable="false" class="mb-2">
+                                (click)="createWorkspace()" draggable="false" class="mb-2">
                         </div>
                     </div>
                 </div>

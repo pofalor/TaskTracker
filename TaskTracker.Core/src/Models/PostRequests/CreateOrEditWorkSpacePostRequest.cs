@@ -14,7 +14,7 @@ namespace TaskTracker.Core.src.Models.PostRequests
         /// <summary>
         /// Ссылка на управляющего компании
         /// </summary>
-        public int DirectorUserId { get; set; }
+        public int? DirectorUserId { get; set; }
 
         //Все поля ниже заполняются, если WorkSpaceType - Company
 
