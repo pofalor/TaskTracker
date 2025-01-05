@@ -23,6 +23,8 @@ namespace TaskTracker.Core.src.Models.ResponseModels
         /// </summary>
         public int DirectorUserId { get; set; }
 
+        public UserTeamRole TeamRole { get; set; }
+
         //Все поля ниже заполняются, если WorkSpaceType - Company
 
         /// <summary>

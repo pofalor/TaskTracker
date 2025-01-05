@@ -11,6 +11,7 @@ import { CreateWorkspaceModalComponent } from '../../shared/components/modals/cr
 import { LangPipe } from '../../shared/pipes/lang.pipe';
 import { CreateOrEditWorkSpacePostRequest } from '../../shared/model/postRequests/createOrEditWorkSpacePostRequest';
 import { TranslateService } from '@ngx-translate/core';
+import { UserTeamRole } from '../../shared/enums/user-team-role';
 
 @Component({
   selector: 'app-my-workspaces',
@@ -23,6 +24,7 @@ export class MyWorkspacesComponent extends BaseComponent {
   allMyWorkSpaces: WorkSpaceModel[] = [];
   WorkSpaceType = WorkSpaceType;
   modalRef!: NgbModalRef;
+  UserTeamRole = UserTeamRole;
 
   constructor(
     public authService: AuthService,
@@ -88,5 +90,13 @@ export class MyWorkspacesComponent extends BaseComponent {
       .finally(() => {
         t.setLoading(false);
       });
+  }
+
+  viewProjects(){
+
+  }
+
+  editWorkSpace(workSpaceId: number){
+
   }
 }

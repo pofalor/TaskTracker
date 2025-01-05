@@ -6,6 +6,6 @@ namespace TaskTracker.Core.src.Services
 {
     public interface IWorkSpaceService : IBaseService<WorkSpace, WorkSpaceFilter>
     {
-        Task<IDataResult<List<WorkSpace>>> GetMyWorkspaces(int userId);
+        Task<IDataResult<List<WorkSpaceMember>>> GetMyWorkspaces(int userId);
     }
 }

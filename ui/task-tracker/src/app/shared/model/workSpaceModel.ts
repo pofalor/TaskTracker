@@ -1,3 +1,4 @@
+import { UserTeamRole } from "../enums/user-team-role";
 import { WorkSpaceType } from "../enums/work-space-type";
 
 export class WorkSpaceModel{
@@ -11,6 +12,8 @@ export class WorkSpaceModel{
     
     /** Ссылка на управляющего компании */
     public directorUserId! : number;
+
+    public teamRole!: UserTeamRole;
     
     //Все поля ниже заполняются, если WorkSpaceType - Company
     

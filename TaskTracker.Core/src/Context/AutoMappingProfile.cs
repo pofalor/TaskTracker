@@ -16,7 +16,15 @@ namespace TaskTracker.Core.src.Context
             CreateMap<CreateUserPostRequest, User>();
             CreateMap<User, UserModel>()
                 .ForMember(dist => dist.Name, opt => opt.MapFrom(x => x.GetUserName(false)));
-            CreateMap<WorkSpace, WorkSpaceModel>();
+            CreateMap<WorkSpaceMember, WorkSpaceModel>()
+                .ForMember(dist => dist.Id, opt => opt.MapFrom(x => x.WorkSpace.Id))
+                .ForMember(dist => dist.Name, opt => opt.MapFrom(x => x.WorkSpace.Name))
+                .ForMember(dist => dist.WorkSpaceType, opt => opt.MapFrom(x => x.WorkSpace.WorkSpaceType))
+                .ForMember(dist => dist.DirectorUserId, opt => opt.MapFrom(x => x.WorkSpace.DirectorUserId))
+                .ForMember(dist => dist.Country, opt => opt.MapFrom(x => x.WorkSpace.Country))
+                .ForMember(dist => dist.RegistrationDate, opt => opt.MapFrom(x => x.WorkSpace.RegistrationDate))
+                .ForMember(dist => dist.Address, opt => opt.MapFrom(x => x.WorkSpace.Address))
+                .ForMember(dist => dist.INN, opt => opt.MapFrom(x => x.WorkSpace.INN));
             CreateMap<CreateOrEditWorkSpacePostRequest, WorkSpace>();
         }
     }

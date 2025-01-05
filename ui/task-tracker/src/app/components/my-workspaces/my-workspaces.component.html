@@ -7,20 +7,26 @@
         </div>
     </div>
     <div class="row">
-        <div *ngIf="!!allMyWorkSpaces && allMyWorkSpaces.length > 0" class="col-auto mb-4">
+        <div *ngIf="!!allMyWorkSpaces && allMyWorkSpaces.length > 0" class="col-auto col-xxl-3 mb-4">
             <ng-container *ngFor="let workspace of allMyWorkSpaces">
                 <div class="card h-100 mb-0">
                     <div class="card-body pb-0 pr-0">
                         <div class="row">
-                            <div class="col d-flex flex-column">
+                            <div class="col-6 d-flex flex-column">
                                 <div class="text-left text-uppercase f-30 f-w-700">
                                     {{workspace.name}}
                                 </div>
                             </div>
-                            <div class="col-12">
+                            <div class="col-6" *ngIf="workspace.teamRole == UserTeamRole.Owner">
+                                <button class="btn btn-outline-primary pull-right" style="float: right;">
+                                    <i class="fa fa-edit" style="font-size: 17px; "></i>
+                                    {{'buttons.change'| lang}}
+                                </button>
+                            </div>
+                            <div class="col-12 mt-4">
                                 <label class="mb-1">{{ "Type of workspace" | lang}}</label>
                             </div>
-                            <div class="col-12">
+                            <div class="col-12 pb-3">
                                 <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
                                     <input type="radio" class="btn-check" name="btnradio" 
                                     id="btnradio1" disabled autocomplete="off" 
@@ -36,6 +42,16 @@
                                     </label>
                                 </div>
                             </div>
+                            <div class="col-12 pb-3">
+                                <p class="mb-0">{{ "Your role in the team" | lang}}: 
+                                    <span class="mb-0">{{ 'teamRoles.' + workspace.teamRole | lang}}</span>
+                                </p>
+                            </div>
+                            <div class="col-12 pb-3">
+                                <button class="btn btn-primary" (click)="viewProjects()">
+                                    {{'buttons.viewProjects' | lang}}
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -43,11 +59,11 @@
         </div>
 
         <div class="col-auto mb-4">
-            <div class="card h-100 mb-0">
-                <div class="card-body pb-0 pr-0">
-                    <div class="row">
-                        <div class="col d-flex flex-column">
-                            <img src="/assets/icons/plus_icon.png" type="button" class="cursor-pointer"
+            <div class="card h-100 mb-0" style="min-width: 200px;">
+                <div class="card-body h-100 pb-0 pr-0">
+                    <div class="row h-100">
+                        <div class="col d-flex flex-column flex-center">
+                            <img style="width: 60px;" src="/assets/icons/plus_icon.png" type="button" class="cursor-pointer"
                                 (click)="createWorkspace()" draggable="false" class="mb-2">
                         </div>
                     </div>

@@ -29,6 +29,17 @@
     },
     "buttons":{
         "save": "Save",
-        "cancel":"Cancel"
+        "cancel":"Cancel",
+        "viewProjects":"View projects",
+        "change":"Change",
+        "edit":"Edit"
+    },
+    "teamRoles":{
+      "0": "Not set",
+      "1":"Developer",
+      "2":"Tester",
+      "3":"Director",
+      "4":"Project manager",
+      "5":"Owner"
     }
 }

@@ -23,9 +23,9 @@ namespace TaskTracker.Core.src.Services.Impl
             _logger = logger;
         }
 
-        public async Task<IDataResult<List<WorkSpace>>> GetMyWorkspaces(int userId)
+        public async Task<IDataResult<List<WorkSpaceMember>>> GetMyWorkspaces(int userId)
         {
-            var result = new DataResult<List<WorkSpace>>();
+            var result = new DataResult<List<WorkSpaceMember>>();
 
             try
             {
@@ -34,10 +34,10 @@ namespace TaskTracker.Core.src.Services.Impl
                 //т.к. на юзера создаётся WorkSpaceMember UserTeamRole - Owner)
                 var workspaces = await _dbContext.Set<WorkSpaceMember>()
                     .AsNoTracking()
+                    .Include(x=> x.WorkSpace)
                     .Where(x=> x.UserId == userId)
                     .Where(x=> x.UserStatus != UserWorkSpaceStatus.Deleted)
                     .Where(x => !x.IsDeleted)
-                    .Select(x=> x.WorkSpace)
                     .ToListAsync();
 
                 return result.WithData(workspaces);
