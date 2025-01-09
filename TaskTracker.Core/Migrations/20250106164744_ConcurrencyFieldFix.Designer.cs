@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TaskTracker.Core.src.DataAccess;
@@ -11,9 +12,11 @@ using TaskTracker.Core.src.DataAccess;
 namespace TaskTracker.Core.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250106164744_ConcurrencyFieldFix")]
+    partial class ConcurrencyFieldFix
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -402,8 +405,8 @@ namespace TaskTracker.Core.Migrations
                     b.Property<int>("DirectorUserId")
                         .HasColumnType("integer");
 
-                    b.Property<string>("INN")
-                        .HasColumnType("text")
+                    b.Property<int?>("INN")
+                        .HasColumnType("integer")
                         .HasColumnName("inn");
 
                     b.Property<bool>("IsDeleted")

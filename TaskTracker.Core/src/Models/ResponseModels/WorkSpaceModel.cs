@@ -35,13 +35,13 @@ namespace TaskTracker.Core.src.Models.ResponseModels
         /// <summary>
         /// Дата регистрации в UTC
         /// </summary>
-        public DateTime? RegistrationDate { get; set; }
+        public string? RegistrationDate { get; set; }
 
         /// <summary>
         /// Юр. адрес
         /// </summary>
         public string? Address { get; set; }
 
-        public int? INN { get; set; }
+        public string? INN { get; set; }
     }
 }

@@ -26,5 +26,5 @@ export class WorkSpaceModel{
     /** Юр. адрес */
     public address : string | undefined;
     
-    public iNN : number | undefined;
+    public inn : string | undefined;
 }

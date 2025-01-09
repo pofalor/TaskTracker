@@ -58,8 +58,7 @@ namespace TaskTracker.Core.src.Services.Impl
                 var newWorkSpace = new WorkSpace();
 
                 var existingWorkSpace = await _dbContext.Set<WorkSpace>()
-                        .AsNoTracking()
-                        .WhereIf(request.Id != 0, x => request.Id == x.Id)
+                        .Where(x => request.Id == x.Id)
                         .Where(x => !x.IsDeleted)
                         .FirstOrDefaultAsync();
 
@@ -76,7 +75,7 @@ namespace TaskTracker.Core.src.Services.Impl
                         {
                             return result.WithError(WorkSpaceErrorCodes.CountryNull);
                         }
-                        else if (!request.INN.HasValue)
+                        else if (string.IsNullOrEmpty(request.INN))
                         {
                             return result.WithError(WorkSpaceErrorCodes.INNNull);
                         }
@@ -148,8 +147,8 @@ namespace TaskTracker.Core.src.Services.Impl
 
                 using (var transaction = await _dbContext.Database.BeginTransactionAsync())
                 {
-
-                    await _dbContext.AddAsync(newWorkSpace);
+                    if(existingWorkSpace == null)
+                        await _dbContext.AddAsync(newWorkSpace);
                     await _dbContext.SaveChangesAsync();
 
                     //создаём сотрудника(владельца) для новой компании

@@ -35,7 +35,7 @@ export class UserService {
   }
 
   public async refresh(): Promise<UserModel | undefined> {
-    var promise = this.api.get<UserModel>(userServiceApiUrl + 'getUser');
+    var promise = this.api?.get<UserModel>(userServiceApiUrl + 'getUser');
     var resp = await lastValueFrom(promise);
     this.user = resp.data;
     if (this.isAuthentificated()) return this.user;

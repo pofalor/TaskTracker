@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ApplicationRef, Component } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { LoaderComponent } from './shared/components/loader/loader.component';
 import { TranslateModule } from '@ngx-translate/core';
@@ -21,15 +21,17 @@ export class AppComponent {
     private router: Router,
     private authService: AuthService,
     private userService: UserService,
-    private eventService: EventService) {
+    private eventService: EventService,
+    private applicationRef: ApplicationRef) {
     this.translate.addLangs(['ru', 'en']);
     this.translate.setDefaultLang('en');
     this.translate.use('en');
     var t = this;
     t.router.events.subscribe((event) => {
       let intervals: Promise<any>[] = [];
-      if (t.authService.isLoggedIn) {
+      if (t.authService.isLoggedIn && t.applicationRef.isStable) {
         if (!t.userService.get() && !t.requestSent) {
+          //костыль, чтобы не летела куча запросов на бек
           t.requestSent = true;
           intervals.push(t.userService.init());
           t.eventService.addFuncToArrayOfIntervals(

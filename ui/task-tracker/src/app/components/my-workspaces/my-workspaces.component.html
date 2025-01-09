@@ -1,24 +1,25 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-12 col-sm">
-            <div class="text-left text-uppercase f-22 f-w-700 my-3">
+            <div class="text-left text-uppercase f-30 f-w-700 my-3">
                 {{"My workspaces" | lang}}
             </div>
         </div>
     </div>
     <div class="row">
-        <div *ngIf="!!allMyWorkSpaces && allMyWorkSpaces.length > 0" class="col-auto col-xxl-3 mb-4">
-            <ng-container *ngFor="let workspace of allMyWorkSpaces">
+        <ng-container *ngFor="let workspace of allMyWorkSpaces">
+            <div *ngIf="!!allMyWorkSpaces && allMyWorkSpaces.length > 0" class="col-auto col-xxl-3 mb-4">
                 <div class="card h-100 mb-0">
                     <div class="card-body pb-0 pr-0">
                         <div class="row">
-                            <div class="col-6 d-flex flex-column">
-                                <div class="text-left text-uppercase f-30 f-w-700">
+                            <div class="col-auto d-flex flex-column">
+                                <div class="text-left text-uppercase f-22 f-w-700">
                                     {{workspace.name}}
                                 </div>
                             </div>
-                            <div class="col-6" *ngIf="workspace.teamRole == UserTeamRole.Owner">
-                                <button class="btn btn-outline-primary pull-right" style="float: right;">
+                            <div class="col" *ngIf="workspace.teamRole == UserTeamRole.Owner">
+                                <button (click)="editWorkSpace(workspace)" class="btn btn-outline-primary pull-right"
+                                    style="float: right;">
                                     <i class="fa fa-edit" style="font-size: 17px; "></i>
                                     {{'buttons.change'| lang}}
                                 </button>
@@ -28,22 +29,22 @@
                             </div>
                             <div class="col-12 pb-3">
                                 <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
-                                    <input type="radio" class="btn-check" name="btnradio" 
-                                    id="btnradio1" disabled autocomplete="off" 
-                                    [attr.checked]="workspace.workSpaceType == WorkSpaceType.Personal ? 'checked' : null">
-                                    <label class="btn btn-outline-primary" for="btnradio1">
+                                    <input type="radio" class="btn-check" [name]="'btnradio_' + workspace.id"
+                                        [id]="'btnradio1_' + workspace.id" disabled autocomplete="off"
+                                        [attr.checked]="workspace.workSpaceType == WorkSpaceType.Personal ? 'checked' : null">
+                                    <label class="btn btn-outline-primary" [for]="'btnradio1_' + workspace.id">
                                         {{'workSpaceType.' + WorkSpaceType.Personal | lang}}
                                     </label>
-                                    <input type="radio" class="btn-check" name="btnradio" 
-                                    id="btnradio2" disabled autocomplete="off"
-                                    [attr.checked]="workspace.workSpaceType == WorkSpaceType.Company ? 'checked' : null">
-                                    <label class="btn btn-outline-primary" for="btnradio2">
+                                    <input type="radio" class="btn-check" [name]="'btnradio_' + workspace.id"
+                                        [id]="'btnradio2_' + workspace.id" disabled autocomplete="off"
+                                        [attr.checked]="workspace.workSpaceType == WorkSpaceType.Company ? 'checked' : null">
+                                    <label class="btn btn-outline-primary" [for]="'btnradio2_' + workspace.id">
                                         {{'workSpaceType.' + WorkSpaceType.Company | lang}}
                                     </label>
                                 </div>
                             </div>
                             <div class="col-12 pb-3">
-                                <p class="mb-0">{{ "Your role in the team" | lang}}: 
+                                <p class="mb-0">{{ "Your role in the team" | lang}}:
                                     <span class="mb-0">{{ 'teamRoles.' + workspace.teamRole | lang}}</span>
                                 </p>
                             </div>
@@ -55,16 +56,16 @@
                         </div>
                     </div>
                 </div>
-            </ng-container>
-        </div>
+            </div>
+        </ng-container>
 
         <div class="col-auto mb-4">
-            <div class="card h-100 mb-0" style="min-width: 200px;">
+            <div class="card h-100 mb-0" style="min-width: 200px; min-height: 200px;">
                 <div class="card-body h-100 pb-0 pr-0">
                     <div class="row h-100">
                         <div class="col d-flex flex-column flex-center">
-                            <img style="width: 60px;" src="/assets/icons/plus_icon.png" type="button" class="cursor-pointer"
-                                (click)="createWorkspace()" draggable="false" class="mb-2">
+                            <img style="width: 60px;" src="/assets/icons/plus_icon.png" type="button"
+                                class="cursor-pointer" (click)="createWorkspace()" draggable="false" class="mb-2">
                         </div>
                     </div>
                 </div>

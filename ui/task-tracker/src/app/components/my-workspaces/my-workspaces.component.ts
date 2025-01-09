@@ -12,6 +12,7 @@ import { LangPipe } from '../../shared/pipes/lang.pipe';
 import { CreateOrEditWorkSpacePostRequest } from '../../shared/model/postRequests/createOrEditWorkSpacePostRequest';
 import { TranslateService } from '@ngx-translate/core';
 import { UserTeamRole } from '../../shared/enums/user-team-role';
+import { DatepickerUtils } from '../../shared/utils/ngbDatepickerUtils';
 
 @Component({
   selector: 'app-my-workspaces',
@@ -67,36 +68,41 @@ export class MyWorkspacesComponent extends BaseComponent {
         size: 'lg'
       });
 
-    t.modalRef.result.then(async (result) => {
-      if (result) {
-        await t.createOrEditWorkspace(result);
-      }
-    });
+    t.modalRef.result.then(async (result) => t.processModalResult(result));
   }
 
-  public async createOrEditWorkspace(createWorkspacePostRequest: CreateOrEditWorkSpacePostRequest){
-    var t = this;
-    t.setLoading(true);
-    await t.workSpaceService.createOrEdit(createWorkspacePostRequest)
-      .then(async (resp: any) => {
-        if(!!resp && !!resp.data){
-          await t.getMyWorkspaces(false);
-          t.showSuccess("Workspace sucessfully created", "Success");
-        }
-      })
-      .catch((e) => {
-        t.showResponseError(e);
-      })
-      .finally(() => {
-        t.setLoading(false);
-      });
+  private async processModalResult(result: any){
+    debugger
+    if(result){
+      var t = this;
+      await t.getMyWorkspaces(false);
+      t.showSuccess("Workspace sucessfully " + (!!result.id ? "updated" : "created"), "Success");
+      t.setLoading(false);
+    } 
   }
 
+  
   viewProjects(){
 
   }
 
-  editWorkSpace(workSpaceId: number){
+  editWorkSpace(workSpace: WorkSpaceModel){
+    var t = this;
 
+    t.modalRef = t.modalService.open(CreateWorkspaceModalComponent,
+      {
+        centered: true,
+        size: 'lg'
+      });
+
+      t.modalRef.componentInstance.workSpaceId = workSpace.id;
+      t.modalRef.componentInstance.workSpaceName = workSpace.name;
+      t.modalRef.componentInstance.workSpaceType = workSpace.workSpaceType;
+      t.modalRef.componentInstance.workSpaceCountry = workSpace.country;
+      t.modalRef.componentInstance.workSpaceRegisterDate = DatepickerUtils.dateFromStr(workSpace.registrationDate?.toString());
+      t.modalRef.componentInstance.workSpaceAddress = workSpace.address;
+      t.modalRef.componentInstance.workSpaceINN = workSpace.inn;
+
+    t.modalRef.result.then(async (result) => t.processModalResult(result));
   }
 }

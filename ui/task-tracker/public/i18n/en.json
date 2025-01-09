@@ -22,6 +22,7 @@
         "minLength": "Minimum length ",
         "maxLength": "Maximum length ",
         "futureDate": "The date must not be later than the current date"
+        
     },
     "workSpaceType":{
         "0": "Personal",

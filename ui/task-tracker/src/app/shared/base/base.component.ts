@@ -265,8 +265,8 @@ export abstract class BaseComponent {
       var customError = Object.getOwnPropertyNames(elem.errors);
       return elem.errors.required ? "errors.required" :
         elem.errors.min != undefined ? "errors.min" + ' ' + elem.errors.min.min :
-        elem.errors.maxlength != undefined ? ("errors.maxLength" + elem.errors.maxlength.requiredLength) :
-        elem.errors.minlength != undefined ? ("errors.minLength" + elem.errors.minlength.requiredLength) :
+        elem.errors.maxlength != undefined ? (this.translateService.instant("errors.maxLength") + elem.errors.maxlength.requiredLength) :
+        elem.errors.minlength != undefined ? (this.translateService.instant("errors.minLength") + elem.errors.minlength.requiredLength) :
         elem.errors.pattern != undefined && namepattern != null && namepattern == this.latinAndNumberPattern ? "errors.onlyLatinAndNum" :
         elem.errors.pattern != undefined && namepattern != null && namepattern == this.emailPattern ? "errors.invalidField" :
         elem.errors.pattern != undefined && namepattern != null && namepattern == this.namePattern ? "errors.invalidField" :
