@@ -131,7 +131,7 @@ namespace TaskTracker.Core.src.Services.Impl
             }
         }
 
-        public async Task<IDataResult<bool>> CreateOrEdit(T request)
+        public virtual async Task<IDataResult<bool>> CreateOrEdit(T request)
         {
             var result = new DataResult<bool>();
             try

@@ -96,6 +96,7 @@ namespace TaskTracker.Core.Migrations
 
                     b.Property<byte[]>("Version")
                         .IsConcurrencyToken()
+                        .IsRequired()
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("bytea")
                         .HasColumnName("version");
@@ -165,13 +166,12 @@ namespace TaskTracker.Core.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("StartDate")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2024, 11, 18, 7, 38, 8, 436, DateTimeKind.Utc).AddTicks(8580))
                         .HasColumnName("start_date");
 
                     b.Property<byte[]>("Version")
                         .IsConcurrencyToken()
+                        .IsRequired()
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("bytea")
                         .HasColumnName("version");
@@ -235,6 +235,7 @@ namespace TaskTracker.Core.Migrations
 
                     b.Property<byte[]>("Version")
                         .IsConcurrencyToken()
+                        .IsRequired()
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("bytea")
                         .HasColumnName("version");
@@ -302,6 +303,7 @@ namespace TaskTracker.Core.Migrations
 
                     b.Property<byte[]>("Version")
                         .IsConcurrencyToken()
+                        .IsRequired()
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("bytea")
                         .HasColumnName("version");
@@ -309,6 +311,75 @@ namespace TaskTracker.Core.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("User", (string)null);
+                });
+
+            modelBuilder.Entity("TaskTracker.Core.src.Entities.UserWorkspaceStatusChangeRequest", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("Date");
+
+                    b.Property<bool>("IsChecked")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_checked");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_deleted");
+
+                    b.Property<int>("NewStatus")
+                        .HasColumnType("integer")
+                        .HasColumnName("new_status");
+
+                    b.Property<DateTime>("ObjectCreateDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("object_create_date");
+
+                    b.Property<DateTime>("ObjectEditDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("object_edit_date");
+
+                    b.Property<int>("PreviousStatus")
+                        .HasColumnType("integer")
+                        .HasColumnName("previous_status");
+
+                    b.Property<int>("RequestStatus")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0)
+                        .HasColumnName("request_status");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.Property<byte[]>("Version")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("bytea")
+                        .HasColumnName("version");
+
+                    b.Property<int>("WorkSpaceId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("WorkSpaceId");
+
+                    b.ToTable("UserWorkspaceStatusChangeRequest", (string)null);
                 });
 
             modelBuilder.Entity("TaskTracker.Core.src.Entities.WorkSpace", b =>
@@ -331,8 +402,8 @@ namespace TaskTracker.Core.Migrations
                     b.Property<int>("DirectorUserId")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("INN")
-                        .HasColumnType("integer")
+                    b.Property<string>("INN")
+                        .HasColumnType("text")
                         .HasColumnName("inn");
 
                     b.Property<bool>("IsDeleted")
@@ -360,6 +431,7 @@ namespace TaskTracker.Core.Migrations
 
                     b.Property<byte[]>("Version")
                         .IsConcurrencyToken()
+                        .IsRequired()
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("bytea")
                         .HasColumnName("version");
@@ -417,6 +489,7 @@ namespace TaskTracker.Core.Migrations
 
                     b.Property<byte[]>("Version")
                         .IsConcurrencyToken()
+                        .IsRequired()
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("bytea")
                         .HasColumnName("version");
@@ -508,6 +581,25 @@ namespace TaskTracker.Core.Migrations
                     b.Navigation("Issue");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TaskTracker.Core.src.Entities.UserWorkspaceStatusChangeRequest", b =>
+                {
+                    b.HasOne("TaskTracker.Core.src.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TaskTracker.Core.src.Entities.WorkSpace", "WorkSpace")
+                        .WithMany()
+                        .HasForeignKey("WorkSpaceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+
+                    b.Navigation("WorkSpace");
                 });
 
             modelBuilder.Entity("TaskTracker.Core.src.Entities.WorkSpace", b =>

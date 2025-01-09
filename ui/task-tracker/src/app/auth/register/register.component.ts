@@ -11,10 +11,12 @@ import { AuthenticatePostRequest } from '../../shared/model/postRequests/authent
 import { CreateUserPostRequest } from '../../shared/model/postRequests/createUserPostRequest';
 import { ListCountry } from '../../shared/constants/country';
 import { UserService } from '../../shared/services/user.service';
+import { LangPipe } from '../../shared/pipes/lang.pipe';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-register',
-    imports: [CommonModule, RouterLink, ReactiveFormsModule],
+    imports: [CommonModule, RouterLink, ReactiveFormsModule, LangPipe],
     templateUrl: './register.component.html',
     styleUrl: './register.component.scss'
 })
@@ -29,9 +31,10 @@ export class RegisterComponent extends BaseComponent {
     private router: Router,
     private modalService: NgbModal,
     private publicService: PublicService,
-    private userService: UserService
+    private userService: UserService,
+    private translate: TranslateService
   ) {
-    super(modalService);
+    super(modalService, translate);
 
     this.registerForm = fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -109,7 +112,7 @@ export class RegisterComponent extends BaseComponent {
           t.userService.init();
           t.setLoading(false);
           t.showSuccess("Registration completed successfully", "Success");
-          t.router.navigate(['/organisations']);
+          t.router.navigate(['/my-workspaces']);
         }).catch((ex) => {
           t.setLoading(false);
           t.showResponseError(ex);

@@ -6,6 +6,7 @@ import { ApiService } from './api.service';
 import { firstValueFrom, map } from 'rxjs';
 import { AuthenticatePostRequest } from '../model/postRequests/authenticatePostRequest';
 import { UserService } from './user.service';
+import { EventService } from './event.service';
 
 
 @Injectable({
@@ -20,7 +21,7 @@ export class AuthService implements OnInit {
     public router: Router,
     public ngZone: NgZone,
     private api: ApiService,
-    // public eventService: EventService,
+    public eventService: EventService,
     // private cryptoUserService: CryptoUserService,
     // private statsService: StatsService,
     private userService: UserService
@@ -81,7 +82,7 @@ export class AuthService implements OnInit {
     // this.cryptoUserService.clear();
     this.userService.clear();
     // this.statsService.clear();
-    // this.eventService.logout();
+    this.eventService.logout();
     localStorage.clear(); //сбрасывает язык в localStorage (по дефолту 'en')
     this.router.navigate(['/login']);
   }

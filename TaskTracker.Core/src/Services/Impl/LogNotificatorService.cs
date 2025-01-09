@@ -29,7 +29,7 @@ namespace TaskTracker.Core.src.Services.Impl
             }
         }
 
-        public async Task<IDataResult<bool>> SendTelegramAdmin(string text)
+        public async Task<IDataResult<bool>> SendTelegramAdminAsync(string text)
         {
             var result = new DataResult<bool>();
             bool resp = true;
@@ -55,7 +55,7 @@ namespace TaskTracker.Core.src.Services.Impl
             try
             {
                 _logger.LogError(exception, text);
-                resp &= (await SendTelegramAdmin(text)).Success;
+                resp &= (await SendTelegramAdminAsync(text)).Success;
             }
             catch (Exception ex)
             {

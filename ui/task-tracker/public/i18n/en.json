@@ -1,0 +1,46 @@
+{
+    "errors": {
+        "required": "All fields are required",
+        "onlyLatinAndNum": "Only latin characters and numbers",
+        "onlyText": "You must enter only text without number",
+        "password": {
+          "atLeastOneUpperCase": "Password must contain at least one capital letter in Latin",
+          "atLeastOneLowerCase": "Password must contain at least one lowercase letter in Latin",
+          "noCyrillic": "Password can not contain any characters in Cyrillic",
+          "atLeastOneDigit": "Password must contain at least one number",
+          "minLength": "Password must be longer than 5 characters",
+          "maxLength": "Password must be less than 100 characters",
+          "alphaNumeric":"Password must contain at least one alphanumeric character"
+        },
+        "passwordConfirmation": {
+          "notMatch": "Password confirmation does not match password"
+        },
+        "inputFloatNumber": "Required format '0.0'",
+        "invalidField": "Field filled in incorrectly",
+        "mismatch": "Password mismatch",
+        "min": "Minimum ",
+        "minLength": "Minimum length ",
+        "maxLength": "Maximum length ",
+        "futureDate": "The date must not be later than the current date"
+        
+    },
+    "workSpaceType":{
+        "0": "Personal",
+        "1": "Company"
+    },
+    "buttons":{
+        "save": "Save",
+        "cancel":"Cancel",
+        "viewProjects":"View projects",
+        "change":"Change",
+        "edit":"Edit"
+    },
+    "teamRoles":{
+      "0": "Not set",
+      "1":"Developer",
+      "2":"Tester",
+      "3":"Director",
+      "4":"Project manager",
+      "5":"Owner"
+    }
+}

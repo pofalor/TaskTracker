@@ -13,7 +13,7 @@ namespace TaskTracker.Core.src.DataAccess.EntityConfiguration
             builder.Property(p => p.Name).HasColumnName("name").IsRequired();
             builder.Property(p => p.Description).HasColumnName("description").IsRequired(false);
             builder.Property(p => p.Code).HasColumnName("code").IsRequired();
-            builder.Property(p => p.StartDate).HasColumnName("start_date").HasDefaultValue(DateTime.UtcNow);
+            builder.Property(p => p.StartDate).HasColumnName("start_date");
             builder.Property(p => p.EndDate).HasColumnName("end_date").IsRequired(false);
             builder.HasOne(p => p.Author).WithMany().HasForeignKey(p => p.AuthorId).IsRequired();
             builder.HasOne(p => p.ProjectMgr).WithMany().HasForeignKey(p => p.ProjectMgrId).IsRequired();

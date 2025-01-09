@@ -10,6 +10,7 @@ using TaskTracker.Core.src.ErrorCodes;
 using TaskTracker.Core.src.Models.Filters;
 using TaskTracker.Core.src.Models.PostRequests;
 using TaskTracker.Core.src.Services;
+using TaskTracker.Core.src.Services.Impl;
 using TaskTracker.Utils.src.Extensions;
 using TaskTracker.Web.Api.Extensions;
 using TaskTracker.Web.Api.Responses;
@@ -24,23 +25,25 @@ namespace TaskTracker.Web.Api.Controllers.BaseControllers
         private readonly ILogger _logger;
         private readonly IBaseService<T, F> _baseService;
         private readonly IMapper _mapper;
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly IUserService _userService;
         private Dictionary<string, List<string>> AccessDict = new Dictionary<string, List<string>>();
 
         public BaseController(ILogger logger, IBaseService<T, F> baseService, 
-            IMapper mapper, SignInManager<IdentityUser> signInManager)
+            IMapper mapper, IUserService userService)
         {
             _logger = logger;
             _baseService = baseService;
             _mapper = mapper;
-            _signInManager = signInManager;
+            _userService = userService;
+
+            InitRoles();
         }
 
         protected void AddRole(string methodName, string role)
         {
             var item = AccessDict.Get(methodName, []);
 
-            if (item == null) AccessDict[methodName] = [role];
+            if (item == null || item.Count == 0) AccessDict[methodName] = [role];
             else item.Add(role);
         }
 
@@ -50,9 +53,10 @@ namespace TaskTracker.Web.Api.Controllers.BaseControllers
             {
                 var accessRoles = AccessDict.Get(methodName, []);
                 //TODO: протестить!
-                var user = await _signInManager.UserManager.GetUserAsync(User);
-                if(user is null) return false;
-                var myRoles = await _signInManager.UserManager.GetRolesAsync(user);
+                var dataResult = await _userService.GetUserById(UserId);
+                if(!dataResult.Success) return false;
+                var user = dataResult.Data;
+                var myRoles = user.Roles;
                 var result = false;
                 if (accessRoles != null) accessRoles.Foreach(x => result = myRoles.Contains(x) || result);
                 else result = true;
@@ -65,6 +69,8 @@ namespace TaskTracker.Web.Api.Controllers.BaseControllers
                 return false;
             }
         }
+
+        public virtual void InitRoles() { }
 
         [Route("getAll")]
         [HttpGet]
@@ -109,9 +115,10 @@ namespace TaskTracker.Web.Api.Controllers.BaseControllers
 
             filter.UserId = UserId;
 
-            var user = await _signInManager.UserManager.GetUserAsync(User);
-            if (user is null) return response.WithError(BaseErrorCodes.GetItemsError);
-            var userRoles = await _signInManager.UserManager.GetRolesAsync(user);
+            var dataResult = await _userService.GetUserById(UserId);
+            if (!dataResult.Success) return response.WithError(BaseErrorCodes.GetItemsError);
+            var user = dataResult.Data;
+            var userRoles = user.Roles;
             filter.IsAdmin = userRoles.Contains(Permissions.Admin);
 
             try
@@ -203,11 +210,6 @@ namespace TaskTracker.Web.Api.Controllers.BaseControllers
         public virtual async Task<DataResponse<bool>> CreateOrEdit(R request)
         {
             var response = new DataResponse<bool>();
-
-            if (!ModelState.IsValid)
-            {
-                return response.AddModelStateError(ModelState);
-            }
 
             var isSuccess = await CheckRoles(nameof(CreateOrEdit));
             if (!isSuccess)

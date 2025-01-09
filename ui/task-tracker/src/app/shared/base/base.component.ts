@@ -1,9 +1,11 @@
-import { UntypedFormGroup } from '@angular/forms';
+import { FormGroup, UntypedFormGroup } from '@angular/forms';
 import { NgbModalRef, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { environment } from '../../../environments/environment';
 import { ConfirmModalComponent } from '../components/modals/confirm/confirm.modal.component';
 import { ModalInfoModel } from '../model/onlyFrontModels/modalInfo.model';
 import { LoaderComponent } from '../components/loader/loader.component';
+import { ValidationUtils } from '../utils/validationUtils';
+import { TranslateService } from '@ngx-translate/core';
 
 const apiUrl = environment.apiUrl;
 
@@ -19,8 +21,6 @@ export abstract class BaseComponent {
   public companyNamePattern = /^[äöüÄÖÜßáéúőóüöíÁÉÚŐÓÜÖÍa-zA-Zа-яёЁА-Я0-9" ,.'-]+$/i;
   public latinAndNumberPattern = /^[A-Za-z0-9]+$/;
   public flightIdPattern = /^[A-Za-z0-9]+$/;
-  public youTubeLinkPattern = /https:\/\/(?:youtu\.be\/|(?:[a-z]{2,3}\.)?youtube\.com\/([\w-]+))/;
-  public youTubeLinkPattern2 = /http(s)?:\/\/www\.youtube\.com\/watch\?v=([\w\-_=&]+)\&?/;
   public filePattern = /\.([a-zA-Z]+)$/;
   public URLPattern =
     /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/;
@@ -32,6 +32,7 @@ export abstract class BaseComponent {
 
   constructor(
     private modalServiceBase: NgbModal,
+    private translateService: TranslateService
   ) {}
 
   public elemIsInvalid(elem: any): boolean {
@@ -111,15 +112,15 @@ export abstract class BaseComponent {
   }
 
   // упрощенное представление модалки с ошибкой
-  protected showError(message: string, titleMes: string = 'Attention'): Promise<any> {
+  protected showError(message: string, titleMes: string = 'Error'): Promise<any> {
     var t = this;
 
     var mes = message;
     var title = titleMes;
 
     var modalInfo = new ModalInfoModel();
-    modalInfo.title = !!title ? title : mes;
-    modalInfo.description = !!title ? mes : '';
+    modalInfo.title = !!title ? t.translateService.instant(title) : mes;
+    modalInfo.description = !!title ? t.translateService.instant(mes) : '';
     modalInfo.showConfirmButton = false;
     modalInfo.showDeclineButton = false;
     modalInfo.showErrorButton = true;
@@ -131,7 +132,7 @@ export abstract class BaseComponent {
   protected showSuccess(message: string, titleMes: string = 'System'): Promise<any> {
     var t = this;
 
-    var mes = message;
+    var mes =  message;
     var title = titleMes;
 
     var modalInfo = new ModalInfoModel();
@@ -262,21 +263,34 @@ export abstract class BaseComponent {
   public textErrorStr(elem: any, namepattern: RegExp | null = null) {
     if (this.elemIsInvalid(elem)) {
       var customError = Object.getOwnPropertyNames(elem.errors);
-      return elem.errors.required ? "All fields are required" :
-        elem.errors.min != undefined ? "Minimum" + ' ' + elem.errors.min.min :
-        elem.errors.maxlength != undefined ? ("Maximum length " + elem.errors.maxlength.requiredLength) :
-        elem.errors.minlength != undefined ? ("Minimum length " + elem.errors.minlength.requiredLength) :
-        elem.errors.pattern != undefined && namepattern != null && namepattern == this.latinAndNumberPattern ? "Only latin characters and numbers" :
-        elem.errors.pattern != undefined && namepattern != null && namepattern == this.youTubeLinkPattern ? "Enter the link in the format:'https://youtube.com/embed/pXRviuL6vMY'" :
-        elem.errors.pattern != undefined && namepattern != null && namepattern == this.youTubeLinkPattern2 ? "Enter the link in the format:'https://www.youtube.com/watch?v=pXRviuL6vMY'" :
-        elem.errors.pattern != undefined && namepattern != null && namepattern == this.emailPattern ? "Field filled in incorrectly" :
-        elem.errors.pattern != undefined && namepattern != null && namepattern == this.namePattern ? "Field filled in incorrectly" :
-        elem.errors.pattern != undefined && namepattern != null && namepattern == this.floatNumberPattern ? "Required format '0.0'" :
-        elem.errors.email != undefined ? "Field filled in incorrectly" :
-        elem.errors.mismatch != undefined ? "Password mismatch" :
+      return elem.errors.required ? "errors.required" :
+        elem.errors.min != undefined ? "errors.min" + ' ' + elem.errors.min.min :
+        elem.errors.maxlength != undefined ? (this.translateService.instant("errors.maxLength") + elem.errors.maxlength.requiredLength) :
+        elem.errors.minlength != undefined ? (this.translateService.instant("errors.minLength") + elem.errors.minlength.requiredLength) :
+        elem.errors.pattern != undefined && namepattern != null && namepattern == this.latinAndNumberPattern ? "errors.onlyLatinAndNum" :
+        elem.errors.pattern != undefined && namepattern != null && namepattern == this.emailPattern ? "errors.invalidField" :
+        elem.errors.pattern != undefined && namepattern != null && namepattern == this.namePattern ? "errors.invalidField" :
+        elem.errors.pattern != undefined && namepattern != null && namepattern == this.floatNumberPattern ? "errors.inputFloatNumber" :
+        elem.errors.email != undefined ? "errors.invalidField" :
+        elem.errors.mismatch != undefined ? "errors.mismatch" :
         !!customError && customError.length>0 ? customError[0] :
               "";
     }
     return "";
+  }
+
+  public baseDateValidator(formGroup: FormGroup, key: string){
+    var dateFromForm = formGroup.get(key)?.value;
+    if(!dateFromForm){
+      return;
+    }
+    var date = new Date(dateFromForm.year, dateFromForm.month - 1, dateFromForm.day, 0, 0, 0, 0);
+    var isValidDate = ValidationUtils.validateDate(date);
+    if(!isValidDate.isValid)
+    {
+      let obj = { [isValidDate.errorText] : true };
+      return obj;
+    }
+    return;
   }
 }

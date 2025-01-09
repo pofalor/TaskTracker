@@ -2,7 +2,7 @@ import { IValidationResult } from "../interfaces/validationResult";
 import { RegexUtils } from "./regexUtils";
 
 export class ValidationUtils {
-    private static requiredError: string = "All fields are required";
+    private static requiredError: string = "errors.required";
     /**
      * Проверка что электронная почта валидна.
      * В случае невалидности возвращает IValidationResult с текстом ошибки.
@@ -41,49 +41,49 @@ export class ValidationUtils {
         if (!/[A-ZА-ЯЁ]/.test(password)) {
             return {
                 isValid: false,
-                errorText: "Password must contain at least one capital letter in Latin"
+                errorText: "errors.password.atLeastOneUpperCase"
             };
         }
 
         if (!/[a-zа-яё]/.test(password)) {
             return {
                 isValid: false,
-                errorText: "Password must contain at least one lowercase letter in Latin"
+                errorText: "errors.password.atLeastOneLowerCase"
             };
         }
 
         if (/[А-ЯЁ]/.test(password) || /[а-яё]/.test(password)) {
             return {
                 isValid: false,
-                errorText: "Password can not contain any characters in Cyrillic"
+                errorText: "errors.password.noCyrillic"
             };
         }
 
         if (!/\d/.test(password)) {
             return {
                 isValid: false,
-                errorText: "Password must contain at least one number"
+                errorText: "errors.password.atLeastOneDigit"
             };
         }
 
         if (password.length < 6) {
             return {
                 isValid: false,
-                errorText: "Password must be longer than 5 characters"
+                errorText: "errors.password.minLength"
             };
         }
 
         if (password.length > 100) {
             return {
                 isValid: false,
-                errorText: "Password must be less than 100 characters"
+                errorText: "errors.password.maxLength"
             };
         }
 
         if (/^[\w\-\s]+$/.test(password)) {
             return {
                 isValid: false,
-                errorText: "Password must contain at least one alphanumeric character"
+                errorText: "errors.password.alphaNumeric"
             };
         }
 
@@ -105,10 +105,25 @@ export class ValidationUtils {
         if (password !== confirmation) {
             return {
                 isValid: false,
-                errorText: "Password confirmation does not match password"
+                errorText: "errors.passwordConfirmation.notMatch"
             }
         }
 
+        return {
+            isValid: true,
+            errorText: ""
+        };
+    }
+
+    /** валидация даты */
+    public static validateDate(date: any): IValidationResult {
+        var today = new Date();
+        if (date > today || date == "Invalid Date") {
+            return {
+                isValid: false,
+                errorText: "errors.futureDate"
+            }
+        }
         return {
             isValid: true,
             errorText: ""

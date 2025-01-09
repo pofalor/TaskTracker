@@ -8,14 +8,14 @@
             <input id="email-input-field" type="email" class="form-control" formControlName="email" placeholder="Email"
               required="" autofocus="" />
             <div *ngIf="elemIsInvalid(loginForm.get('email'))" class="text text-danger mt-1">
-                {{ textErrorStr(loginForm.get('email'), emailPattern) }}
+                {{ textErrorStr(loginForm.get('email'), emailPattern) | lang }}
               </div>
           </div>
 
           <div class="form-group pt-3">
             <input placeholder="Password" [type]="'password'" class="form-control" formControlName="password" />
             <div *ngIf="elemIsInvalid(loginForm.get('password'))" class="text text-danger mt-1">
-                {{ textErrorStr(loginForm.get('password')) }}
+                {{ textErrorStr(loginForm.get('password')) | lang }}
               </div>
           </div>
           <div *ngIf="!!errorText" class="text text-danger">

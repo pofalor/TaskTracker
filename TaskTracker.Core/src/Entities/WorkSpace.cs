@@ -34,6 +34,6 @@ namespace TaskTracker.Core.src.Entities
         /// </summary>
         public string? Address { get; set; }
 
-        public int? INN { get; set; }
+        public string? INN { get; set; }
     }
 }

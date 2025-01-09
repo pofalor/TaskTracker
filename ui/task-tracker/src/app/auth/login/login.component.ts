@@ -7,10 +7,12 @@ import { AuthService } from '../../shared/services/auth.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AuthenticatePostRequest } from '../../shared/model/postRequests/authenticatePostRequest';
 import { UserService } from '../../shared/services/user.service';
+import { LangPipe } from '../../shared/pipes/lang.pipe';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-login',
-    imports: [CommonModule, RouterLink, ReactiveFormsModule],
+    imports: [CommonModule, RouterLink, ReactiveFormsModule, LangPipe],
     templateUrl: './login.component.html',
     styleUrl: './login.component.scss'
 })
@@ -19,13 +21,14 @@ export class LoginComponent extends BaseComponent {
   errorText: string = '';
 
   constructor(
-    public authService: AuthService,
+    private authService: AuthService,
     private fb: FormBuilder,
     private router: Router,
     private modalService: NgbModal,
-    private userService: UserService
+    private userService: UserService,
+    private translate: TranslateService
   ) {
-    super(modalService);
+    super(modalService, translate);
 
     this.loginForm = fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -49,7 +52,7 @@ export class LoginComponent extends BaseComponent {
     await t.authService.SignIn(loginCred)
       .then(() => {
         t.userService.init();
-        t.router.navigateByUrl('/organisations');
+        t.router.navigateByUrl('/my-workspaces');
       })
       .catch((e) => {
         if (!!e.error && !!e.error.errors && !!e.error.errors[0].message) {
