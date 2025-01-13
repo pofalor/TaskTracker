@@ -177,5 +177,153 @@ namespace TaskTracker.Core.src.Services.Impl
                 return result.WithError(WorkSpaceErrorCodes.CannotCreateOrEditWorkspace);
             }
         }
+
+        public async Task<IDataResult<List<UserWorkspaceStatusChangeRequest>>> GetUserInvitations(int userId)
+        {
+            var result = new DataResult<List<UserWorkspaceStatusChangeRequest>>();
+
+            try
+            {
+                var statusesNeedShow = new UserStatusChangeType[]
+                {
+                    UserStatusChangeType.Default, UserStatusChangeType.UserDeclined
+                };
+
+                //Вытаскиваем все запросы, в которые приглашают юзера
+                var statusChanges = await _dbContext.Set<UserWorkspaceStatusChangeRequest>()
+                    .AsNoTracking()
+                    .Include(x => x.WorkSpace)
+                    .Include(x=> x.WorkSpace.DirectorUser)
+                    .Include(x=> x.Inviter)
+                    .Where(x => x.UserId == userId)
+                    .Where(x => statusesNeedShow.Contains(x.RequestStatus))
+                    .Where(x => !x.IsDeleted)
+                    .Where(x=> !x.IsHidden)
+                    .OrderBy(x=> x.RequestStatus)
+                    .ToListAsync();
+
+                return result.WithData(statusChanges);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while getting user workspace invations.{NewLine}{Parameter}: {UserId}{NewLine2}",
+                    Environment.NewLine, nameof(userId), userId, Environment.NewLine);
+                return result.WithError(WorkSpaceErrorCodes.CannotGetWpsRequests);
+            }
+        }
+
+        public async Task<IDataResult<List<UserWorkspaceStatusChangeRequest>>> GetUserCreatedInvites(int userId, int workspaceId)
+        {
+            var result = new DataResult<List<UserWorkspaceStatusChangeRequest>>();
+
+            try
+            {
+                var statusesNeedShow = new UserStatusChangeType[]
+                {
+                    UserStatusChangeType.Default, 
+                    UserStatusChangeType.UserConfirmed, 
+                    UserStatusChangeType.UserDeclined
+                };
+                //TODO: добавить проверку в контроллер, что текущий юзер делает запрос
+                //Вытаскиваем все запросы, в которых юзер - приглашающий
+                var statusChanges = await _dbContext.Set<UserWorkspaceStatusChangeRequest>()
+                    .AsNoTracking()
+                    .Include(x => x.WorkSpace)
+                    .Where(x => x.InviterId == userId)
+                    .Where(x => statusesNeedShow.Contains(x.RequestStatus))
+                    .Where(x => !x.IsDeleted)
+                    .Where(x => !x.IsHidden)
+                    .OrderBy(x => x.RequestStatus)
+                    .ToListAsync();
+
+                return result.WithData(statusChanges);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while getting user workspace invations.{NewLine}{Parameter}: {UserId}{NewLine2}",
+                    Environment.NewLine, nameof(userId), userId, Environment.NewLine);
+                return result.WithError(WorkSpaceErrorCodes.CannotGetWpsRequests);
+            }
+        }
+
+        public async Task<IDataResult<bool>> CreateWpsInvitationRequest(UserWorkspaceStatusChangeRequest request)
+        {
+            var result = new DataResult<bool>();
+            try
+            {
+                if (request.WorkSpaceId <= 0)
+                {
+                    return result.WithError(WorkSpaceErrorCodes.WorkspaceNotSet);
+                }
+                else if (request.UserId <= 0)
+                {
+                    return result.WithError(WorkSpaceErrorCodes.WpsInviteUserIdNotSet);
+                }
+                else if (request.InviterId <= 0)
+                {
+                    return result.WithError(WorkSpaceErrorCodes.WpsInviterIdNotSet);
+                }
+                else if (request.Date == DateTime.MinValue)
+                {
+                    return result.WithError(WorkSpaceErrorCodes.WpsInviteReqDateNotSet);
+                }
+                else if (request.Date < DateTime.UtcNow)
+                {
+                    return result.WithError(WorkSpaceErrorCodes.WpsInviteReqDateFuture);
+                }
+
+                //два активных реквеста не может быть
+                var activeRequestForUserExists = await _dbContext.Set<UserWorkspaceStatusChangeRequest>()
+                        .Where(x => !x.IsDeleted)
+                        .Where(x=> x.UserId == request.UserId)
+                        .Where(x=> x.RequestStatus == UserStatusChangeType.Default)
+                        .AnyAsync();
+
+                if(activeRequestForUserExists)
+                    return result.WithError(WorkSpaceErrorCodes.ActiveInviteAlreadyExists);
+
+                var workspaceExists = await _dbContext.Set<WorkSpace>()
+                        .Where(x => !x.IsDeleted)
+                        .Where(x => x.DirectorUserId == request.InviterId)
+                        .Where(x => x.Id == request.WorkSpaceId)
+                        .AnyAsync();
+
+                if (!workspaceExists)
+                    return result.WithError(WorkSpaceErrorCodes.WpsForInviteNotExists);
+
+                 var lastUserMemberInfo = await _dbContext.Set<WorkSpaceMember>()
+                        .Where(x => !x.IsDeleted)
+                        .Where(x => x.UserId == request.UserId)
+                        .Where(x => x.WorkSpaceId == request.WorkSpaceId)
+                        .OrderBy(x=> x.Id)
+                        .FirstOrDefaultAsync();
+
+                var lastUserMemberInfoExists = lastUserMemberInfo != null;
+                if (lastUserMemberInfoExists && lastUserMemberInfo.UserStatus == request.NewStatus)
+                    return result.WithError(WorkSpaceErrorCodes.UserAlreadyInWsp);
+
+                var newWpsInviteRequest = new UserWorkspaceStatusChangeRequest()
+                { 
+                    UserId = request.UserId,
+                    WorkSpaceId = request.WorkSpaceId,
+                    InviterId = request.InviterId,
+                    Date = request.Date,
+                    PreviousStatus = lastUserMemberInfo?.UserStatus,
+                    NewStatus = request.NewStatus,
+                    RequestStatus = UserStatusChangeType.Default
+                };
+
+                await _dbContext.AddAsync(newWpsInviteRequest);
+                await _dbContext.SaveChangesAsync();
+
+                return result.WithData(true);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while creating invite to WSP.{NewLine}{Parameter}: {Request}{NewLine2}",
+                    Environment.NewLine, nameof(request), request?.ToJson(), Environment.NewLine);
+                return result.WithError(WorkSpaceErrorCodes.CannotCreateOrEditInviteWsp);
+            }
+        }
     }
 }

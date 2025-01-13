@@ -4,6 +4,7 @@ import { IResponse } from '../interfaces/response';
 import { ApiService } from './api.service';
 import { lastValueFrom } from 'rxjs';
 import { WorkSpaceModel } from '../model/workSpaceModel';
+import { UserWspStatusChangeModel } from '../model/userWspStatusChangeModel';
 
 const serviceApiUrl = 'api/workspace/';
 
@@ -21,6 +22,11 @@ export class WorkspaceService {
 
   public async createOrEdit(postRequest: CreateOrEditWorkSpacePostRequest): Promise<IResponse<boolean>> {
     var res = this.api.post<boolean>(serviceApiUrl + 'add', postRequest);
+    return await lastValueFrom(res);
+  }
+
+  public async getMyInvitations(): Promise<IResponse<UserWspStatusChangeModel[]>> {
+    var res = this.api.get<UserWspStatusChangeModel[]>(serviceApiUrl + 'getUserInvitations');
     return await lastValueFrom(res);
   }
 }

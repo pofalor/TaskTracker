@@ -61,11 +61,191 @@ namespace TaskTracker.Core.src.Resources.ErrorCodes {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Access denied.
+        /// </summary>
+        internal static string AccessDenied {
+            get {
+                return ResourceManager.GetString("AccessDenied", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на The user has already been invited to the workspace. The user must confirm the request.
+        /// </summary>
+        internal static string ActiveInviteAlreadyExists {
+            get {
+                return ResourceManager.GetString("ActiveInviteAlreadyExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Fill in the address.
+        /// </summary>
+        internal static string AddressNull {
+            get {
+                return ResourceManager.GetString("AddressNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на You can only create one personal workspace.
+        /// </summary>
+        internal static string CanCreateOnlyOnePersonalWorkspace {
+            get {
+                return ResourceManager.GetString("CanCreateOnlyOnePersonalWorkspace", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Failed to create workspace invite.
+        /// </summary>
+        internal static string CannotCreateOrEditInviteWsp {
+            get {
+                return ResourceManager.GetString("CannotCreateOrEditInviteWsp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Could not create or modify workspace. Please contact support.
+        /// </summary>
+        internal static string CannotCreateOrEditWorkspace {
+            get {
+                return ResourceManager.GetString("CannotCreateOrEditWorkspace", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Unable to retrieve information about available workspaces. Please, contact to support..
         /// </summary>
         internal static string CannotGetMyWorkspaces {
             get {
                 return ResourceManager.GetString("CannotGetMyWorkspaces", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Unable to retrieve workspace invitation information.
+        /// </summary>
+        internal static string CannotGetWpsRequests {
+            get {
+                return ResourceManager.GetString("CannotGetWpsRequests", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на A company with the same parameters exists (country, registration date, registration address)..
+        /// </summary>
+        internal static string CompanyWithDataAlreadyExists {
+            get {
+                return ResourceManager.GetString("CompanyWithDataAlreadyExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на A company with this tax ID already exists.
+        /// </summary>
+        internal static string CompanyWithInnAlreadyExists {
+            get {
+                return ResourceManager.GetString("CompanyWithInnAlreadyExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на A company with that name already exists.
+        /// </summary>
+        internal static string CompanyWithNameAlreadyExists {
+            get {
+                return ResourceManager.GetString("CompanyWithNameAlreadyExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Fill in the country value.
+        /// </summary>
+        internal static string CountryNull {
+            get {
+                return ResourceManager.GetString("CountryNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Fill in the tax identification number.
+        /// </summary>
+        internal static string INNNull {
+            get {
+                return ResourceManager.GetString("INNNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Fill in the registration date.
+        /// </summary>
+        internal static string RegistrationDateNull {
+            get {
+                return ResourceManager.GetString("RegistrationDateNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на The user is already in this workspace.
+        /// </summary>
+        internal static string UserAlreadyInWsp {
+            get {
+                return ResourceManager.GetString("UserAlreadyInWsp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Error creating request. Please contact support.
+        /// </summary>
+        internal static string WorkspaceNotSet {
+            get {
+                return ResourceManager.GetString("WorkspaceNotSet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Error creating request. Please contact support.
+        /// </summary>
+        internal static string WpsForInviteNotExists {
+            get {
+                return ResourceManager.GetString("WpsForInviteNotExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Error creating request. Please contact support.
+        /// </summary>
+        internal static string WpsInviteReqDateFuture {
+            get {
+                return ResourceManager.GetString("WpsInviteReqDateFuture", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Error creating request. Please contact support.
+        /// </summary>
+        internal static string WpsInviteReqDateNotSet {
+            get {
+                return ResourceManager.GetString("WpsInviteReqDateNotSet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Error creating request. Please contact support.
+        /// </summary>
+        internal static string WpsInviterIdNotSet {
+            get {
+                return ResourceManager.GetString("WpsInviterIdNotSet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на The user is incorrect. Please try again or contact support.
+        /// </summary>
+        internal static string WpsInviteUserIdNotSet {
+            get {
+                return ResourceManager.GetString("WpsInviteUserIdNotSet", resourceCulture);
             }
         }
     }

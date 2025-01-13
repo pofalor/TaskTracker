@@ -52,7 +52,6 @@ namespace TaskTracker.Web.Api.Controllers.BaseControllers
             try
             {
                 var accessRoles = AccessDict.Get(methodName, []);
-                //TODO: протестить!
                 var dataResult = await _userService.GetUserById(UserId);
                 if(!dataResult.Success) return false;
                 var user = dataResult.Data;

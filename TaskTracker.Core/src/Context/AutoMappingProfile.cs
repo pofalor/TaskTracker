@@ -31,6 +31,13 @@ namespace TaskTracker.Core.src.Context
                 .ForMember(dist => dist.INN, opt => opt.MapFrom(x => x.WorkSpace.INN));
             CreateMap<CreateOrEditWorkSpacePostRequest, WorkSpace>()
                 .ForMember(dist => dist.RegistrationDate, opt => opt.MapFrom(x => DateTime.ParseExact(x.RegistrationDate, DateFormatConstants.FrontInputFormat, CultureInfo.InvariantCulture)));
+            CreateMap<UserWorkspaceStatusChangeRequest, UserWspStatusChangeModel>()
+                .ForMember(dist => dist.Date, opt => opt.MapFrom(x => x.Date.ToString(DateFormatConstants.FullDateTimeShort)))
+                .ForMember(dist => dist.WorkSpaceName, opt => opt.MapFrom(x => x.WorkSpace.Name))
+                .ForMember(dist => dist.InviterName, opt => opt.MapFrom(x => x.Inviter.GetUserName(false)))
+                .ForMember(dist => dist.DirectorWpsName, opt => opt.MapFrom(x => x.WorkSpace.DirectorUser.GetUserName(false)));
+            CreateMap<CreateWspInvitePostRequest, UserWorkspaceStatusChangeRequest>()
+               .ForMember(dist => dist.Date, opt => opt.MapFrom(x => DateTime.ParseExact(x.Date, DateFormatConstants.FrontInputFormat, CultureInfo.InvariantCulture)));
         }
     }
 }

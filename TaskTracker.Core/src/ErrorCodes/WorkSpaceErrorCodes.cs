@@ -60,7 +60,7 @@ namespace TaskTracker.Core.src.ErrorCodes
         CanCreateOnlyOnePersonalWorkspace = CompanyWithNameAlreadyExists + 1,
 
         /// <summary>
-        /// Не удаётся создать или изменить воркспейс
+        /// Не удаётся создать или изменить сущность(вокрспейс или инвайт)
         /// </summary>
         [ErrorMessage(typeof(WorkSpaceErrorCodeResources), nameof(CannotCreateOrEditWorkspace))]
         CannotCreateOrEditWorkspace = CanCreateOnlyOnePersonalWorkspace + 1,
@@ -70,5 +70,66 @@ namespace TaskTracker.Core.src.ErrorCodes
         /// </summary>
         [ErrorMessage(typeof(WorkSpaceErrorCodeResources), nameof(AccessDenied))]
         AccessDenied = CannotCreateOrEditWorkspace + 1,
+
+
+        /// <summary>
+        /// Не удаётся получить данные о приглашениях юзера
+        /// </summary>
+        [ErrorMessage(typeof(WorkSpaceErrorCodeResources), nameof(CannotGetWpsRequests))]
+        CannotGetWpsRequests = AccessDenied + 1,
+
+        /// <summary>
+        /// Не удаётся создать инвайт, т.к. не задана ссылка на рабочее пространство
+        /// </summary>
+        [ErrorMessage(typeof(WorkSpaceErrorCodeResources), nameof(WorkspaceNotSet))]
+        WorkspaceNotSet = CannotGetWpsRequests + 1,
+
+        /// <summary>
+        /// Не удаётся создать инвайт, т.к. не задана ссылка на юзера
+        /// </summary>
+        [ErrorMessage(typeof(WorkSpaceErrorCodeResources), nameof(WpsInviteUserIdNotSet))]
+        WpsInviteUserIdNotSet = WorkspaceNotSet + 1,
+
+        /// <summary>
+        /// Не удаётся создать инвайт, т.к. не задана ссылка на инвайтера
+        /// </summary>
+        [ErrorMessage(typeof(WorkSpaceErrorCodeResources), nameof(WpsInviterIdNotSet))]
+        WpsInviterIdNotSet = WpsInviteUserIdNotSet + 1,
+
+        /// <summary>
+        /// Не удаётся создать инвайт, т.к. не задана дата запроса
+        /// </summary>
+        [ErrorMessage(typeof(WorkSpaceErrorCodeResources), nameof(WpsInviteReqDateNotSet))]
+        WpsInviteReqDateNotSet = WpsInviterIdNotSet + 1,
+
+        /// <summary>
+        /// Не удаётся создать инвайт, т.к. дата запроса в будущем
+        /// </summary>
+        [ErrorMessage(typeof(WorkSpaceErrorCodeResources), nameof(WpsInviteReqDateFuture))]
+        WpsInviteReqDateFuture = WpsInviteReqDateNotSet + 1,
+
+        /// <summary>
+        /// Не удаётся создать инвайт, т.к. такого воркспейса не существует
+        /// </summary>
+        [ErrorMessage(typeof(WorkSpaceErrorCodeResources), nameof(WpsForInviteNotExists))]
+        WpsForInviteNotExists = WpsInviteReqDateFuture + 1,
+
+        /// <summary>
+        /// Не удаётся создать инвайт, т.к. инвайт уже создан
+        /// </summary>
+        [ErrorMessage(typeof(WorkSpaceErrorCodeResources), nameof(ActiveInviteAlreadyExists))]
+        ActiveInviteAlreadyExists = WpsForInviteNotExists + 1,
+
+        /// <summary>
+        /// Не удаётся создать или изменить инвайт
+        /// </summary>
+        [ErrorMessage(typeof(WorkSpaceErrorCodeResources), nameof(CannotCreateOrEditInviteWsp))]
+        CannotCreateOrEditInviteWsp = ActiveInviteAlreadyExists + 1,
+
+        /// <summary>
+        /// Юзер уже член рабочего пространства
+        /// </summary>
+        [ErrorMessage(typeof(WorkSpaceErrorCodeResources), nameof(UserAlreadyInWsp))]
+        UserAlreadyInWsp = CannotCreateOrEditInviteWsp + 1,
     }
 }

@@ -23,21 +23,32 @@ namespace TaskTracker.Core.src.Entities
         public int UserId { get; set; }
 
         /// <summary>
+        /// Юзер, который приглашает или удаляет из рабочего пространства
+        /// </summary>
+        public User Inviter { get; set; } = null!;
+        public int InviterId { get; set; }
+
+        /// <summary>
         /// Дата, когда был создан запрос в UTC
         /// </summary>
         public DateTime Date { get; set; } 
-        public UserWorkSpaceStatus PreviousStatus { get; set; }
+        public UserWorkSpaceStatus? PreviousStatus { get; set; }
 
         public UserWorkSpaceStatus NewStatus { get; set; }
 
         /// <summary>
-        /// Подтвердил юзер приглашение или нет. Для удаления юзера заполняется Default значением
+        /// Подтвердил юзер приглашение или нет
         /// </summary>
         public UserStatusChangeType RequestStatus { get; set; }
 
         /// <summary>
         /// Просмотрел ли бек жоб 
         /// </summary>
-        public bool IsChecked { get; set; } 
+        public bool IsChecked { get; set; }
+
+        /// <summary>
+        /// Скрыл ли юзер с фронта этот запрос(пока не используется, функционал на будущее)
+        /// </summary>
+        public bool IsHidden { get; set; }
     }
 }

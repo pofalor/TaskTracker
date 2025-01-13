@@ -13,6 +13,8 @@ import { CreateOrEditWorkSpacePostRequest } from '../../shared/model/postRequest
 import { TranslateService } from '@ngx-translate/core';
 import { UserTeamRole } from '../../shared/enums/user-team-role';
 import { DatepickerUtils } from '../../shared/utils/ngbDatepickerUtils';
+import { Router } from '@angular/router';
+import { UserWspStatusChangeModel } from '../../shared/model/userWspStatusChangeModel';
 
 @Component({
   selector: 'app-my-workspaces',
@@ -26,24 +28,33 @@ export class MyWorkspacesComponent extends BaseComponent {
   WorkSpaceType = WorkSpaceType;
   modalRef!: NgbModalRef;
   UserTeamRole = UserTeamRole;
+  allMyInvitations: UserWspStatusChangeModel[] = [];
 
   constructor(
     public authService: AuthService,
     private modalService: NgbModal,
     private workSpaceService: WorkspaceService,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private router: Router,
   ) {
     super(modalService, translate);
   }
 
   async ngOnInit() {
     var t = this;
-    await t.getMyWorkspaces();
+    t.setLoading(true);
+    Promise.all([
+      t.getMyWorkspaces(false),
+      t.getMyInvitations(false)
+    ])
+    .then(()=>{
+      t.setLoading(false);
+    });
   }
 
   public async getMyWorkspaces(needLoader: boolean = true) {
     var t = this;
-    if(needLoader)
+    if (needLoader)
       t.setLoading(true);
 
     await t.workSpaceService.getMyWorkspaces()
@@ -54,7 +65,25 @@ export class MyWorkspacesComponent extends BaseComponent {
         t.showResponseError(e);
       })
       .finally(() => {
-        if(needLoader)
+        if (needLoader)
+          t.setLoading(false);
+      });
+  }
+
+  public async getMyInvitations(needLoader: boolean = true) {
+    var t = this;
+    if (needLoader)
+      t.setLoading(true);
+
+    await t.workSpaceService.getMyInvitations()
+      .then((resp: any) => {
+        t.allMyInvitations = resp.data;
+      })
+      .catch((e) => {
+        t.showResponseError(e);
+      })
+      .finally(() => {
+        if (needLoader)
           t.setLoading(false);
       });
   }
@@ -71,22 +100,21 @@ export class MyWorkspacesComponent extends BaseComponent {
     t.modalRef.result.then(async (result) => t.processModalResult(result));
   }
 
-  private async processModalResult(result: any){
-    debugger
-    if(result){
+  private async processModalResult(result: any) {
+    if (result) {
       var t = this;
       await t.getMyWorkspaces(false);
       t.showSuccess("Workspace sucessfully " + (!!result.id ? "updated" : "created"), "Success");
       t.setLoading(false);
-    } 
+    }
   }
 
-  
-  viewProjects(){
 
+  viewWorkspace(workspaceId: number) {
+    this.router.navigate(['/workspace-info/' + workspaceId]);
   }
 
-  editWorkSpace(workSpace: WorkSpaceModel){
+  editWorkSpace(workSpace: WorkSpaceModel) {
     var t = this;
 
     t.modalRef = t.modalService.open(CreateWorkspaceModalComponent,
@@ -95,13 +123,13 @@ export class MyWorkspacesComponent extends BaseComponent {
         size: 'lg'
       });
 
-      t.modalRef.componentInstance.workSpaceId = workSpace.id;
-      t.modalRef.componentInstance.workSpaceName = workSpace.name;
-      t.modalRef.componentInstance.workSpaceType = workSpace.workSpaceType;
-      t.modalRef.componentInstance.workSpaceCountry = workSpace.country;
-      t.modalRef.componentInstance.workSpaceRegisterDate = DatepickerUtils.dateFromStr(workSpace.registrationDate?.toString());
-      t.modalRef.componentInstance.workSpaceAddress = workSpace.address;
-      t.modalRef.componentInstance.workSpaceINN = workSpace.inn;
+    t.modalRef.componentInstance.workSpaceId = workSpace.id;
+    t.modalRef.componentInstance.workSpaceName = workSpace.name;
+    t.modalRef.componentInstance.workSpaceType = workSpace.workSpaceType;
+    t.modalRef.componentInstance.workSpaceCountry = workSpace.country;
+    t.modalRef.componentInstance.workSpaceRegisterDate = DatepickerUtils.dateFromStr(workSpace.registrationDate?.toString());
+    t.modalRef.componentInstance.workSpaceAddress = workSpace.address;
+    t.modalRef.componentInstance.workSpaceINN = workSpace.inn;
 
     t.modalRef.result.then(async (result) => t.processModalResult(result));
   }

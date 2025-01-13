@@ -49,8 +49,8 @@
                                 </p>
                             </div>
                             <div class="col-12 pb-3">
-                                <button class="btn btn-primary" (click)="viewProjects()">
-                                    {{'buttons.viewProjects' | lang}}
+                                <button class="btn btn-primary" (click)="viewWorkspace(workspace.id)">
+                                    {{'buttons.view' | lang}}
                                 </button>
                             </div>
                         </div>
@@ -66,6 +66,28 @@
                         <div class="col d-flex flex-column flex-center">
                             <img style="width: 60px;" src="/assets/icons/plus_icon.png" type="button"
                                 class="cursor-pointer" (click)="createWorkspace()" draggable="false" class="mb-2">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" *ngIf="!!allMyInvitations && allMyInvitations.length > 0">
+        <div class="col-12 col-sm">
+            <div class="text-left text-uppercase f-30 f-w-700 my-3">
+                {{"My invitations to workspaces" | lang}}
+            </div>
+        </div>
+<!-- Имя воркспейса, кто приглашает(имя, фамилия, либо никнейм), директор воркспейса -->
+        <div *ngFor="let invitation of allMyInvitations" class="col-auto col-xxl-3 mb-4">
+            <div class="card h-100 mb-0">
+                <div class="card-body pb-0 pr-0">
+                    <div class="row">
+                        <div class="col-auto d-flex flex-column">
+                            <div class="text-left text-uppercase f-22 f-w-700">
+                                {{invitation.date}}
+                            </div>
                         </div>
                     </div>
                 </div>

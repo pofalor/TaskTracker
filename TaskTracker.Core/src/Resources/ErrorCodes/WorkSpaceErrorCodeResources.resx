@@ -150,4 +150,34 @@
   <data name="AccessDenied" xml:space="preserve">
     <value>Access denied</value>
   </data>
+  <data name="CannotGetWpsRequests" xml:space="preserve">
+    <value>Unable to retrieve workspace invitation information</value>
+  </data>
+  <data name="WorkspaceNotSet" xml:space="preserve">
+    <value>Error creating request. Please contact support</value>
+  </data>
+  <data name="WpsInviteUserIdNotSet" xml:space="preserve">
+    <value>The user is incorrect. Please try again or contact support</value>
+  </data>
+  <data name="WpsInviterIdNotSet" xml:space="preserve">
+    <value>Error creating request. Please contact support</value>
+  </data>
+  <data name="WpsInviteReqDateNotSet" xml:space="preserve">
+    <value>Error creating request. Please contact support</value>
+  </data>
+  <data name="WpsInviteReqDateFuture" xml:space="preserve">
+    <value>Error creating request. Please contact support</value>
+  </data>
+  <data name="WpsForInviteNotExists" xml:space="preserve">
+    <value>Error creating request. Please contact support</value>
+  </data>
+  <data name="ActiveInviteAlreadyExists" xml:space="preserve">
+    <value>The user has already been invited to the workspace. The user must confirm the request</value>
+  </data>
+  <data name="CannotCreateOrEditInviteWsp" xml:space="preserve">
+    <value>Failed to create workspace invite</value>
+  </data>
+  <data name="UserAlreadyInWsp" xml:space="preserve">
+    <value>The user is already in this workspace</value>
+  </data>
 </root>

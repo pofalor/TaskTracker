@@ -33,7 +33,8 @@
         "cancel":"Cancel",
         "viewProjects":"View projects",
         "change":"Change",
-        "edit":"Edit"
+        "edit":"Edit",
+        "view":"View"
     },
     "teamRoles":{
       "0": "Not set",
