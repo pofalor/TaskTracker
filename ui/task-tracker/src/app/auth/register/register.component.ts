@@ -4,7 +4,7 @@ import { Router, RouterLink, RouterOutlet } from '@angular/router';
 import { BaseComponent } from '../../shared/base/base.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
-import { AuthService } from '../../shared/services/auth.service';
+import { AuthService } from '../../shared/services/onlyFrontServices/auth.service';
 import { ValidationUtils } from '../../shared/utils/validationUtils';
 import { PublicService } from '../../shared/services/public.service';
 import { AuthenticatePostRequest } from '../../shared/model/postRequests/authenticatePostRequest';

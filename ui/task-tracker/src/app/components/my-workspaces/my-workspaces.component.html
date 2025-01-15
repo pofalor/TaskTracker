@@ -49,7 +49,7 @@
                                 </p>
                             </div>
                             <div class="col-12 pb-3">
-                                <button class="btn btn-primary" (click)="viewWorkspace(workspace.id)">
+                                <button class="btn btn-primary" (click)="viewWorkspace(workspace)">
                                     {{'buttons.view' | lang}}
                                 </button>
                             </div>
@@ -79,7 +79,6 @@
                 {{"My invitations to workspaces" | lang}}
             </div>
         </div>
-<!-- Имя воркспейса, кто приглашает(имя, фамилия, либо никнейм), директор воркспейса -->
         <div *ngFor="let invitation of allMyInvitations" class="col-auto col-xxl-3 mb-4">
             <div class="card h-100 mb-0">
                 <div class="card-body pb-0 pr-0">

@@ -24,5 +24,5 @@ export class UserWspStatusChangeModel {
     public inviterName!: string;
 
     /** Фамилия, имя либо никнейм директора воркспейса */
-    public directorWpsName!: string;
+    public directorWspName!: string;
 }

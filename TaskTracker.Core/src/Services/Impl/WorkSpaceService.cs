@@ -7,6 +7,8 @@ using TaskTracker.Core.src.Entities;
 using TaskTracker.Core.src.Enums;
 using TaskTracker.Core.src.ErrorCodes;
 using TaskTracker.Core.src.Models.Filters;
+using TaskTracker.Core.src.Models.PostRequests;
+using TaskTracker.Core.src.Models.ResponseModels;
 using TaskTracker.Utils.src.Extensions;
 
 namespace TaskTracker.Core.src.Services.Impl
@@ -230,18 +232,21 @@ namespace TaskTracker.Core.src.Services.Impl
                     .AsNoTracking()
                     .Include(x => x.WorkSpace)
                     .Where(x => x.InviterId == userId)
+                    .Where(x=> x.WorkSpaceId == workspaceId)
                     .Where(x => statusesNeedShow.Contains(x.RequestStatus))
                     .Where(x => !x.IsDeleted)
                     .Where(x => !x.IsHidden)
                     .OrderBy(x => x.RequestStatus)
+                    .ThenByDescending(x => x.Id)
                     .ToListAsync();
 
                 return result.WithData(statusChanges);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error while getting user workspace invations.{NewLine}{Parameter}: {UserId}{NewLine2}",
-                    Environment.NewLine, nameof(userId), userId, Environment.NewLine);
+                _logger.LogError(ex, "Error while getting user created invites.{NewLine}{Parameter}: {UserId}{NewLine2}" +
+                    "{Parameter2}: {WorkspaceId}{NewLine3}",
+                    Environment.NewLine, nameof(userId), userId, Environment.NewLine, nameof(workspaceId), workspaceId, Environment.NewLine);
                 return result.WithError(WorkSpaceErrorCodes.CannotGetWpsRequests);
             }
         }
@@ -274,29 +279,32 @@ namespace TaskTracker.Core.src.Services.Impl
 
                 //два активных реквеста не может быть
                 var activeRequestForUserExists = await _dbContext.Set<UserWorkspaceStatusChangeRequest>()
-                        .Where(x => !x.IsDeleted)
-                        .Where(x=> x.UserId == request.UserId)
-                        .Where(x=> x.RequestStatus == UserStatusChangeType.Default)
-                        .AnyAsync();
+                    .AsNoTracking()
+                    .Where(x => !x.IsDeleted)
+                    .Where(x=> x.UserId == request.UserId)
+                    .Where(x=> x.RequestStatus == UserStatusChangeType.Default)
+                    .AnyAsync();
 
                 if(activeRequestForUserExists)
                     return result.WithError(WorkSpaceErrorCodes.ActiveInviteAlreadyExists);
 
                 var workspaceExists = await _dbContext.Set<WorkSpace>()
-                        .Where(x => !x.IsDeleted)
-                        .Where(x => x.DirectorUserId == request.InviterId)
-                        .Where(x => x.Id == request.WorkSpaceId)
-                        .AnyAsync();
+                    .AsNoTracking()
+                    .Where(x => !x.IsDeleted)
+                    .Where(x => x.DirectorUserId == request.InviterId)
+                    .Where(x => x.Id == request.WorkSpaceId)
+                    .AnyAsync();
 
                 if (!workspaceExists)
                     return result.WithError(WorkSpaceErrorCodes.WpsForInviteNotExists);
 
                  var lastUserMemberInfo = await _dbContext.Set<WorkSpaceMember>()
-                        .Where(x => !x.IsDeleted)
-                        .Where(x => x.UserId == request.UserId)
-                        .Where(x => x.WorkSpaceId == request.WorkSpaceId)
-                        .OrderBy(x=> x.Id)
-                        .FirstOrDefaultAsync();
+                    .AsNoTracking()
+                    .Where(x => !x.IsDeleted)
+                    .Where(x => x.UserId == request.UserId)
+                    .Where(x => x.WorkSpaceId == request.WorkSpaceId)
+                    .OrderBy(x=> x.Id)
+                    .FirstOrDefaultAsync();
 
                 var lastUserMemberInfoExists = lastUserMemberInfo != null;
                 if (lastUserMemberInfoExists && lastUserMemberInfo.UserStatus == request.NewStatus)
@@ -325,5 +333,73 @@ namespace TaskTracker.Core.src.Services.Impl
                 return result.WithError(WorkSpaceErrorCodes.CannotCreateOrEditInviteWsp);
             }
         }
+
+        public async Task<bool> IsWorkspaceMember(int userId, int workspaceId)
+        {
+            return await _dbContext.Set<WorkSpaceMember>()
+                .AsNoTracking()
+                .Where(x => !x.IsDeleted)
+                .Where(x=> !x.WorkSpace.IsDeleted)
+                .Where(x => x.WorkSpaceId == workspaceId)
+                .Where(x => x.UserId == userId)
+                .Where(x=> x.UserStatus == UserWorkSpaceStatus.Active)
+                .AnyAsync();
+        }
+
+        public async Task<bool> IsWorkspaceOwner(int userId, int workspaceId)
+        {
+            return await _dbContext.Set<WorkSpaceMember>()
+                .AsNoTracking()
+                .Where(x => !x.IsDeleted)
+                .Where(x => !x.WorkSpace.IsDeleted)
+                .Where(x => x.WorkSpaceId == workspaceId)
+                .Where(x => x.UserId == userId)
+                .Where(x => x.UserStatus == UserWorkSpaceStatus.Active)
+                .Where(x=> x.TeamRole == UserTeamRole.Owner)
+                .AnyAsync();
+        }
+
+        public async Task<IDataResult<List<UserModel>>> SearchUsersForInvite(SearchUserForInvitePR searchUser)
+        {
+            var result = new DataResult<List<UserModel>>();
+
+            try
+            {
+                //Исключить тех, кто уже есть в вокрспейсе
+                var usersAlreadyInWsp = await _dbContext.Set<WorkSpaceMember>()
+                    .AsNoTracking()
+                    .Where(x => !x.IsDeleted)
+                    .Where(x => x.WorkSpaceId == searchUser.WorkSpaceId)
+                    .Select(x=> x.UserId)
+                    .ToArrayAsync();
+
+                //Вытаскиваем все запросы, в которые приглашают юзера
+                var users = await _dbContext.Set<User>()
+                    .AsNoTracking()
+                    .Where(x=> !usersAlreadyInWsp.Contains(x.Id))
+                    .Where(x => !x.IsDeleted)
+                    .Where(x=> x.Email == searchUser.Search 
+                    || x.NickName == searchUser.Search)
+                    .ToListAsync();
+
+                //сделано для безопасности, чтобы не раскрывать айдишники
+                var usersWithHiddenId = users
+                .Select(x => new UserModel
+                {
+                    Name = x.GetUserName(),
+                    Email = x.Email
+                })
+                .ToList();
+
+                return result.WithData(usersWithHiddenId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while searching user for invite.{NewLine}{Parameter}: {SearchUser}{NewLine2}",
+                    Environment.NewLine, nameof(searchUser), searchUser?.ToJson(), Environment.NewLine);
+                return result.WithError(WorkSpaceErrorCodes.CannotFindUserForInvite);
+            }
+        }
+
     }
 }

@@ -42,6 +42,6 @@ namespace TaskTracker.Core.src.Models.ResponseModels
         /// <summary>
         /// Фамилия, имя либо никнейм директора воркспейса
         /// </summary>
-        public string DirectorWpsName { get; set; } = null!;
+        public string DirectorWspName { get; set; } = null!;
     }
 }

@@ -66,7 +66,7 @@ namespace TaskTracker.Core.src.ErrorCodes
         CannotCreateOrEditWorkspace = CanCreateOnlyOnePersonalWorkspace + 1,
 
         /// <summary>
-        /// Не удаётся создать или изменить воркспейс, т.к. нет прав у пользователя
+        /// Не удаётся сделать запрос, т.к. нет прав у пользователя
         /// </summary>
         [ErrorMessage(typeof(WorkSpaceErrorCodeResources), nameof(AccessDenied))]
         AccessDenied = CannotCreateOrEditWorkspace + 1,
@@ -131,5 +131,24 @@ namespace TaskTracker.Core.src.ErrorCodes
         /// </summary>
         [ErrorMessage(typeof(WorkSpaceErrorCodeResources), nameof(UserAlreadyInWsp))]
         UserAlreadyInWsp = CannotCreateOrEditInviteWsp + 1,
+
+        /// <summary>
+        /// Юзер в таком рабочем пространстве не найден
+        /// </summary>
+        [ErrorMessage(typeof(WorkSpaceErrorCodeResources), nameof(UserNotFoundInWsp))]
+        UserNotFoundInWsp = UserAlreadyInWsp + 1,
+
+        /// <summary>
+        /// Юзер для инвайта не найден
+        /// </summary>
+        [ErrorMessage(typeof(WorkSpaceErrorCodeResources), nameof(CannotFindUserForInvite))]
+        CannotFindUserForInvite = UserNotFoundInWsp + 1,
+
+        /// <summary>
+        /// Не удалось проверить является ли юзер владельцем организации
+        /// </summary>
+        [ErrorMessage(typeof(WorkSpaceErrorCodeResources), nameof(CannotCheckOwner))]
+        CannotCheckOwner = CannotFindUserForInvite + 1,
+
     }
 }

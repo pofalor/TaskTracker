@@ -115,6 +115,15 @@ namespace TaskTracker.Core.src.Resources.ErrorCodes {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Unable to find any users. Please contact support.
+        /// </summary>
+        internal static string CannotFindUserForInvite {
+            get {
+                return ResourceManager.GetString("CannotFindUserForInvite", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Unable to retrieve information about available workspaces. Please, contact to support..
         /// </summary>
         internal static string CannotGetMyWorkspaces {
@@ -192,6 +201,15 @@ namespace TaskTracker.Core.src.Resources.ErrorCodes {
         internal static string UserAlreadyInWsp {
             get {
                 return ResourceManager.GetString("UserAlreadyInWsp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на User not found in such workspace.
+        /// </summary>
+        internal static string UserNotFoundInWsp {
+            get {
+                return ResourceManager.GetString("UserNotFoundInWsp", resourceCulture);
             }
         }
         

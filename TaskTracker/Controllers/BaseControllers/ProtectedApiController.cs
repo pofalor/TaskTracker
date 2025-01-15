@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
+using TaskTracker.Core.src.Entities;
 using TaskTracker.Core.src.Identity;
 using TaskTracker.Utils.src.Extensions;
 

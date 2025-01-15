@@ -3,7 +3,7 @@ import { Component, NgZone } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink, RouterOutlet } from '@angular/router';
 import { BaseComponent } from '../../shared/base/base.component';
-import { AuthService } from '../../shared/services/auth.service';
+import { AuthService } from '../../shared/services/onlyFrontServices/auth.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AuthenticatePostRequest } from '../../shared/model/postRequests/authenticatePostRequest';
 import { UserService } from '../../shared/services/user.service';

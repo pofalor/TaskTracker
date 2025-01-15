@@ -16,7 +16,6 @@ namespace TaskTracker.Core.src.Models.PostRequests
         /// Дата, когда был создан запрос в UTC
         /// </summary>
         public string Date { get; set; } = DateTime.UtcNow.ToString(DateFormatConstants.FrontInputFormat);
-        public UserWorkSpaceStatus PreviousStatus { get; set; }
 
         public UserWorkSpaceStatus NewStatus { get; set; }
     }

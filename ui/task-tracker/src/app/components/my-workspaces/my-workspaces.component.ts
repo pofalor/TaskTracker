@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { AuthService } from '../../shared/services/auth.service';
+import { AuthService } from '../../shared/services/onlyFrontServices/auth.service';
 import { BaseComponent } from '../../shared/base/base.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { WorkSpaceModel } from '../../shared/model/workSpaceModel';
@@ -23,7 +23,6 @@ import { UserWspStatusChangeModel } from '../../shared/model/userWspStatusChange
   styleUrl: './my-workspaces.component.scss'
 })
 export class MyWorkspacesComponent extends BaseComponent {
-
   allMyWorkSpaces: WorkSpaceModel[] = [];
   WorkSpaceType = WorkSpaceType;
   modalRef!: NgbModalRef;
@@ -110,8 +109,13 @@ export class MyWorkspacesComponent extends BaseComponent {
   }
 
 
-  viewWorkspace(workspaceId: number) {
-    this.router.navigate(['/workspace-info/' + workspaceId]);
+  viewWorkspace(workspace: WorkSpaceModel) {
+    this.router.navigate(['/workspace-info/', workspace.id], 
+      { 
+        queryParams: {
+          "name": workspace.name
+        }
+      });
   }
 
   editWorkSpace(workSpace: WorkSpaceModel) {
