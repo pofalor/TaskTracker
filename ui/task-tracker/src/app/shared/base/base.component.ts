@@ -279,8 +279,8 @@ export abstract class BaseComponent {
     return "";
   }
 
-  public baseDateValidator(formGroup: FormGroup, key: string){
-    var dateFromForm = formGroup.get(key)?.value;
+  public baseDateValidator(formGroup: FormGroup){
+    var dateFromForm = formGroup?.value;
     if(!dateFromForm){
       return;
     }

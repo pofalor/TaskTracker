@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ namespace TaskTracker.Core.src.Models.PostRequests
 {
     public class CreateOrEditProjectPR : BasePostRequest
     {
+        public int Id { get; set; }
         /// <summary>
         /// Название проекта
         /// </summary>
@@ -45,5 +47,13 @@ namespace TaskTracker.Core.src.Models.PostRequests
         /// Рабочее пространство проекта
         /// </summary>
         public int WorkSpaceId { get; set; }
+
+        public DateTime? ConvertEndDate()
+        {
+            var val = !string.IsNullOrEmpty(EndDate) 
+                ? DateTime.ParseExact(EndDate, DateFormatConstants.FrontInputFormat, CultureInfo.InvariantCulture) 
+                : (DateTime?)null;
+            return val;
+        }
     }
 }

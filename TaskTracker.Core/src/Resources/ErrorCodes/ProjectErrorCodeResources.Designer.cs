@@ -70,11 +70,38 @@ namespace TaskTracker.Core.src.Resources.ErrorCodes {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Error processing request. Please contact support.
+        /// </summary>
+        internal static string AuthorNotSet {
+            get {
+                return ResourceManager.GetString("AuthorNotSet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Unable to verify the current user&apos;s permissions. Please contact support.
         /// </summary>
         internal static string CannotCheckOwner {
             get {
                 return ResourceManager.GetString("CannotCheckOwner", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Error processing request. Please contact support.
+        /// </summary>
+        internal static string CannotCreateProject {
+            get {
+                return ResourceManager.GetString("CannotCreateProject", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Unable to get managers for your workspace. Please contact support.
+        /// </summary>
+        internal static string CannotGetProjectMgrCandidates {
+            get {
+                return ResourceManager.GetString("CannotGetProjectMgrCandidates", resourceCulture);
             }
         }
         
@@ -88,11 +115,83 @@ namespace TaskTracker.Core.src.Resources.ErrorCodes {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Error processing request. Please contact support.
+        /// </summary>
+        internal static string EndDateNotSet {
+            get {
+                return ResourceManager.GetString("EndDateNotSet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Empty code of project.
+        /// </summary>
+        internal static string ProjectEmptyCode {
+            get {
+                return ResourceManager.GetString("ProjectEmptyCode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Empty name of project.
+        /// </summary>
+        internal static string ProjectEmptyName {
+            get {
+                return ResourceManager.GetString("ProjectEmptyName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Error processing request. Please contact support.
+        /// </summary>
+        internal static string ProjectMgrNotSet {
+            get {
+                return ResourceManager.GetString("ProjectMgrNotSet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Please choose another project manager.
+        /// </summary>
+        internal static string ProjectMgrNotWspMember {
+            get {
+                return ResourceManager.GetString("ProjectMgrNotWspMember", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Project with the same name exists.
+        /// </summary>
+        internal static string ProjectWithNameOrCodeExists {
+            get {
+                return ResourceManager.GetString("ProjectWithNameOrCodeExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Start date in future.
+        /// </summary>
+        internal static string StartDateInFuture {
+            get {
+                return ResourceManager.GetString("StartDateInFuture", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Access to organization projects is restricted. Contact the owner of your organization.
         /// </summary>
         internal static string UserNotMemberWsp {
             get {
                 return ResourceManager.GetString("UserNotMemberWsp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Error processing request. Please contact support.
+        /// </summary>
+        internal static string WorkspaceNotSet {
+            get {
+                return ResourceManager.GetString("WorkspaceNotSet", resourceCulture);
             }
         }
     }

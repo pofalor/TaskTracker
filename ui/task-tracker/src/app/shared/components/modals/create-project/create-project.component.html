@@ -1,0 +1,97 @@
+<div class="card mb-0">
+    <div class="card-body">
+        <div class="row mb-4">
+            <div class="col text-center">
+                <h4 *ngIf="!projectId" class="f-28">{{"Create project" | lang}}</h4>
+                <h4 *ngIf="!!projectId" class="f-28">{{"Edit project" | lang}}</h4>
+            </div>
+        </div>
+
+        <form [formGroup]="projectForm" class="form-group m-0">
+            <div class="row">
+                <div class="col-12 pb-3">
+                    <label class="mb-1">{{ "Project name" | lang }}</label>
+                    <input type="text" class="form-control" formControlName="formProjectName"
+                        placeholder="{{'Project name' | lang}}" (input)="setCode()" />
+                    <div *ngIf="elemIsInvalid(projectForm.get('formProjectName'))" class="text text-danger mt-1">
+                        {{textErrorStr(projectForm.get('formProjectName'), namePattern) | lang}}
+                    </div>
+                </div>
+                <div class="col-12 pb-3">
+                    <label class="mb-1">{{ "Project description" | lang }}</label>
+                    <input type="text" class="form-control" formControlName="formProjectDescr"
+                        placeholder="{{'Project description' | lang}}"/>
+                    <div *ngIf="elemIsInvalid(projectForm.get('formProjectDescr'))" class="text text-danger mt-1">
+                        {{textErrorStr(projectForm.get('formProjectDescr'), namePattern) | lang}}
+                    </div>
+                </div>
+                <div class="col-12 pb-3">
+                    <label class="mb-1">{{ "Project code" | lang }}</label>
+                    <input type="text" class="form-control" formControlName="formProjectCode"
+                        placeholder="{{'Project code' | lang}}"/>
+                    <div *ngIf="elemIsInvalid(projectForm.get('formProjectCode'))" class="text text-danger mt-1">
+                        {{textErrorStr(projectForm.get('formProjectCode'), namePattern) | lang}}
+                    </div>
+                </div>
+                <div class="col-12 pb-3">
+                    <label>{{ "Project manager" | lang }}</label>
+                    <ng-select appearance="outline" class="br-10" id="mgr-input-field" formControlName="formProjectMgrId">
+                        <ng-option *ngFor="let mgr of projectMgrCandidates" class="br-10" [value]="mgr.id">
+                            {{ mgr.name }}
+                        </ng-option>
+                    </ng-select>
+                    <div *ngIf="elemIsInvalid(projectForm.get('formProjectMgrId'))" class="text text-danger mt-1">
+                        {{textErrorStr(projectForm.get('formProjectMgrId')) | lang}}
+                    </div>
+                </div>
+
+                <div class="col-12 pb-3">
+                    <label class="mb-1">{{ "Project start date" | lang }}</label>
+                    <div class="row">
+                        <div class="col-11">
+                            <input class="form-control" formControlName="formProjectStartDate" placeholder="yyyy-mm-dd" name="dp"
+                            ngbDatepicker #d="ngbDatepicker" />
+                        </div>
+                        <div class="col-1">
+                            <button class="btn btn-outline-secondary bi bi-calendar3" (click)="d.toggle()"
+                            type="button"></button>
+                        </div>
+                    </div>
+                    <div *ngIf="elemIsInvalid(projectForm.get('formProjectStartDate'))" class="text text-danger mt-1">
+                        {{textErrorStr(projectForm.get('formProjectStartDate')) | lang}}
+                    </div>
+                </div>
+                <div class="col-12 pb-3">
+                    <label class="mb-1">{{ "Project end date" | lang }}</label>
+                    <div class="row">
+                        <div class="col-11">
+                            <input class="form-control" formControlName="formProjectEndDate" placeholder="yyyy-mm-dd" name="dp2"
+                            ngbDatepicker #dp="ngbDatepicker" />
+                        </div>
+                        <div class="col-1">
+                            <button class="btn btn-outline-secondary bi bi-calendar3" (click)="dp.toggle()"
+                            type="button"></button>
+                        </div>
+                    </div>
+                    <div *ngIf="elemIsInvalid(projectForm.get('formProjectEndDate'))" class="text text-danger mt-1">
+                        {{textErrorStr(projectForm.get('formProjectEndDate')) | lang}}
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div class="row">
+            <div class="col">
+                <button data-target="#modal-confirm" data-toggle="modal" class="btn btn-outline-info btn-soft w-100"
+                    type="button" (click)="back()">
+                    {{ "buttons.cancel" | lang }}
+                </button>
+            </div>
+            <div class="col">
+                <button data-target="#modal-confirm" data-toggle="modal" class="btn btn-primary btn-soft w-100"
+                    type="button" (click)="createOrEditProject()">
+                    {{ "buttons.save" | lang }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

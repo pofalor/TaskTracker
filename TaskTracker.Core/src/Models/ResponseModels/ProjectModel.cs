@@ -36,6 +36,8 @@
         /// </summary>
         public int ProjectMgrId { get; set; }
 
+        public string ProjectMgrName { get; set; } = null!;
+
         /// <summary>
         /// Рабочее пространство проекта
         /// </summary>

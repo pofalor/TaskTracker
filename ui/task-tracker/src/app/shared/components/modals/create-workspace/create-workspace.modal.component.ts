@@ -59,17 +59,13 @@ export class CreateWorkspaceModalComponent extends BaseComponent {
     this.workSpaceForm = t.fb.group({
       name: [t.workSpaceName, [Validators.required, Validators.pattern(t.namePattern), Validators.maxLength(t.maxNameLength)]],
       country: [{ value: t.workSpaceCountry, disabled: true }, [Validators.required, Validators.min(0), Validators.max(279)]],
-      registrationDate: [{ value: t.workSpaceRegisterDate, disabled: true }, [Validators.required, t.dateValidator.bind(t)]],
+      registrationDate: [{ value: t.workSpaceRegisterDate, disabled: true }, [Validators.required, t.baseDateValidator.bind(t)]],
       address: [{ value: t.workSpaceAddress, disabled: true }, [Validators.required, Validators.maxLength(300)]],
       TIN: [{ value: t.workSpaceINN, disabled: true }, [Validators.required, Validators.maxLength(50)]],
     });
 
     if(t.workSpace.workSpaceType == WorkSpaceType.Company)
       t.changeWorkSpaceType(t.workSpace.workSpaceType);
-  }
-
-  dateValidator() {
-    return this.baseDateValidator(this.workSpaceForm, 'registrationDate');
   }
 
   changeWorkSpaceType(workSpaceType: WorkSpaceType) {
