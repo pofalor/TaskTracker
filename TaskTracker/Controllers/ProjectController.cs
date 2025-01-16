@@ -119,5 +119,39 @@ namespace TaskTracker.Web.Api.Controllers
                 return response.WithError(WorkSpaceErrorCodes.CannotCreateOrEditWorkspace);
             }
         }
+
+        [Route("getProjectMgrCandidates")]
+        [HttpGet]
+        public async Task<DataResponse<List<UserModel>>> GetProjectMgrCandidates(int workspaceId)
+        {
+            var response = new DataResponse<List<UserModel>>();
+
+            try
+            {
+                var isWorkspaceMember = await _workSpaceService.IsWorkspaceMember(UserId, workspaceId);
+                if (!isWorkspaceMember)
+                {
+                    await _logNotificatorService.SendTelegramAdminAsync($"The user has sent a request to get project manager candidates, " +
+                        $"but he not workspace membership{Environment.NewLine} " +
+                        $"Workspace id: {workspaceId}{Environment.NewLine} " +
+                        $"User id: {UserId}.");
+                    return response.WithError(ProjectErrorCodes.UserNotMemberWsp);
+                }
+
+                var result = await _projectService.GetProjectMgrCandidates(workspaceId);
+                if (!result.Success)
+                {
+                    return response.WithError(result.Errors[0]);
+                }
+
+                var models = result.Data.Select(x => _mapper.Map<UserModel>(x)).ToList();
+                return response.WithData(models);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while getting project manager candidates => {Parameter1}: {WorkspaceId},", nameof(workspaceId), workspaceId);
+                return response.WithError(ProjectErrorCodes.CannotGetProjectMgrCandidates);
+            }
+        }
     }
 }

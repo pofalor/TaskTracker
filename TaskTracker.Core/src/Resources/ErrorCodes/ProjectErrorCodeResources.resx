@@ -129,4 +129,37 @@
   <data name="CannotCheckOwner" xml:space="preserve">
     <value>Unable to verify the current user's permissions. Please contact support</value>
   </data>
+  <data name="WorkspaceNotSet" xml:space="preserve">
+    <value>Error processing request. Please contact support</value>
+  </data>
+  <data name="ProjectMgrNotSet" xml:space="preserve">
+    <value>Error processing request. Please contact support</value>
+  </data>
+  <data name="AuthorNotSet" xml:space="preserve">
+    <value>Error processing request. Please contact support</value>
+  </data>
+  <data name="EndDateNotSet" xml:space="preserve">
+    <value>Error processing request. Please contact support</value>
+  </data>
+  <data name="StartDateInFuture" xml:space="preserve">
+    <value>Start date in future</value>
+  </data>
+  <data name="ProjectEmptyName" xml:space="preserve">
+    <value>Empty name of project</value>
+  </data>
+  <data name="ProjectEmptyCode" xml:space="preserve">
+    <value>Empty code of project</value>
+  </data>
+  <data name="ProjectWithNameOrCodeExists" xml:space="preserve">
+    <value>Project with the same name exists</value>
+  </data>
+  <data name="ProjectMgrNotWspMember" xml:space="preserve">
+    <value>Please choose another project manager</value>
+  </data>
+  <data name="CannotCreateProject" xml:space="preserve">
+    <value>Error processing request. Please contact support</value>
+  </data>
+  <data name="CannotGetProjectMgrCandidates" xml:space="preserve">
+    <value>Unable to get managers for your workspace. Please contact support</value>
+  </data>
 </root>

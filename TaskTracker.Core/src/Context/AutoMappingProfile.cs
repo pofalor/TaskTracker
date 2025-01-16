@@ -42,11 +42,12 @@ namespace TaskTracker.Core.src.Context
             CreateMap<CreateWspInvitePostRequest, UserWorkspaceStatusChangeRequest>()
                .ForMember(dist => dist.Date, opt => opt.MapFrom(x => DateTime.ParseExact(x.Date, DateFormatConstants.DataBaseTime, CultureInfo.InvariantCulture)));
             CreateMap<Project, ProjectModel>()
-                .ForMember(dist => dist.StartDate, opt => opt.MapFrom(x => x.StartDate.ToString(DateFormatConstants.FullDateTimeShort)))
-                .ForMember(dist => dist.EndDate, opt => opt.MapFrom(x => x.EndDate.HasValue ? x.EndDate.Value.ToString(DateFormatConstants.FullDateTimeShort) : null));
+                .ForMember(dist => dist.StartDate, opt => opt.MapFrom(x => x.StartDate.ToString(DateFormatConstants.DatewithoutTimeZone)))
+                .ForMember(dist => dist.EndDate, opt => opt.MapFrom(x => x.EndDate.HasValue ? x.EndDate.Value.ToString(DateFormatConstants.DatewithoutTimeZone) : null))
+                .ForMember(dist => dist.ProjectMgrName, opt => opt.MapFrom(x => x.ProjectMgr.GetUserName(false)));
             CreateMap<CreateOrEditProjectPR, Project>()
                 .ForMember(dist => dist.StartDate, opt => opt.MapFrom(x => DateTime.ParseExact(x.StartDate, DateFormatConstants.FrontInputFormat, CultureInfo.InvariantCulture)))
-                .ForMember(dist => dist.EndDate, opt => opt.MapFrom(x => DateTime.ParseExact(x.EndDate, DateFormatConstants.FrontInputFormat, CultureInfo.InvariantCulture)));
+                .ForMember(dist => dist.EndDate, opt => opt.MapFrom(x => x.ConvertEndDate()));
         }
     }
 }

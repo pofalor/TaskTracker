@@ -1,57 +1,53 @@
 <div class="container-fluid">
     <div class="row">
-        <div class="col-12 col-sm px-3">
+        <div class="col col-sm px-3">
             <div class="text-left text-uppercase f-30 f-w-700 my-3">
                 {{"Projects" | lang}}
             </div>
         </div>
+        <div class="col-auto">
+            <button type="button" class="btn btn-primary" (click)="createProject()">
+                {{'Create project'| lang}}
+            </button>
+        </div>
     </div>
     <div class="row">
-        <ng-container *ngFor="let project of allProjects">
-            <div *ngIf="!!allProjects && allProjects.length > 0" class="col-auto col-xxl-3 mb-4 px-3">
-                <div class="card h-100 mb-0">
-                    <div class="card-body pb-0 pr-0">
-                        <div class="row">
-                            <div class="col-auto d-flex flex-column">
-                                <div class="text-left text-uppercase f-22 f-w-700">
-                                    {{project.name}}
-                                </div>
-                            </div>
-                            <div class="col-auto d-flex flex-column">
-                                <div class="text-left text-uppercase f-22 f-w-700">
-                                    {{project.description}}
-                                </div>
-                            </div>
-                            <!-- <div class="col" *ngIf="project.teamRole == UserTeamRole.Owner">
-                                <button (click)="editWorkSpace(project)" class="btn btn-outline-primary pull-right"
-                                    style="float: right;">
-                                    <i class="fa fa-edit" style="font-size: 17px; "></i>
-                                    {{'buttons.change'| lang}}
-                                </button>
-                            </div> -->
-                            <div class="col-12 pb-3">
-                                <button class="btn btn-primary">
-                                    {{'buttons.view' | lang}}
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </ng-container>
-
-        <div class="col-auto mb-4" *ngIf="isWorkspaceOwner">
-            <div class="card h-100 mb-0" style="min-width: 200px; min-height: 200px;">
-                <div class="card-body h-100 pb-0 pr-0">
-                    <div class="row h-100">
-                        <div class="col d-flex flex-column flex-center">
-                            <img style="width: 60px;" src="/assets/icons/plus_icon.png" type="button"
-                                class="cursor-pointer" (click)="createProject()" draggable="false" class="mb-2">
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="col-12" *ngIf="!!allProjects && allProjects.length > 0">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">{{"Name" | lang}}</th>
+                        <th scope="col">{{"Description" | lang}}</th>
+                        <th scope="col">{{"Code" | lang}}</th>
+                        <th scope="col">{{"Start date" | lang}}</th>
+                        <th scope="col">{{"End date" | lang}}</th>
+                        <th scope="col">{{"Project manager" | lang}}</th>
+                        <th scope="col">{{"Actions" | lang}}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let project of allProjects let i = index">
+                        <th scope="row">{{i + 1}}</th>
+                        <td>{{project.name}}</td>
+                        <td>{{project.description}}</td>
+                        <td>{{project.code}}</td>
+                        <td>{{project.startDate}}</td>
+                        <td>{{project.endDate ?? ("Not set" | lang)}}</td>
+                        <td>{{project.projectMgrName}}</td>
+                        <td>
+                            <a class="cursor-pointer">
+                                <i class="fa fa-edit p-2" (click)="editProject(project)"></i>
+                            </a>
+                            <a class="cursor-pointer">
+                                <i class="fa fa-info p-2" (click)="goToIssues()"></i>
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
+
         <div class="col px-3" *ngIf="!isWorkspaceOwner && (!allProjects || allProjects.length == 0)">
             <div class="card">
                 <div class="card-body f-20 f-w-600" style="min-height: 260px; line-height: 200px; text-align: center;">

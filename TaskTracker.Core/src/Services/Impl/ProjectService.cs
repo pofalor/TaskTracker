@@ -33,6 +33,7 @@ namespace TaskTracker.Core.src.Services.Impl
                 //Вытаскиваем все проекты организации
                 var projects = await _dbContext.Set<Project>()
                     .AsNoTracking()
+                    .Include(x=> x.ProjectMgr)
                     .Where(x=> x.WorkSpaceId == workspaceId)
                     .Include(x => x.WorkSpace)
                     .Where(x => !x.IsDeleted)
@@ -50,7 +51,6 @@ namespace TaskTracker.Core.src.Services.Impl
 
         public override async Task<IDataResult<bool>> CreateOrEdit(Project request)
         {
-            //TODO: добавить проверку, что автор текущий юзер
             var result = new DataResult<bool>();
             try
             {
@@ -83,6 +83,18 @@ namespace TaskTracker.Core.src.Services.Impl
                     return result.WithError(ProjectErrorCodes.ProjectEmptyName);
                 }
 
+                var isProjectMgrInWsp = await _workSpaceService.IsWorkspaceMember(request.ProjectMgrId, request.WorkSpaceId);
+
+                if (!isProjectMgrInWsp)
+                {
+                    return result.WithError(ProjectErrorCodes.ProjectMgrNotWspMember);
+                }
+
+                var existingProject = await _dbContext.Set<Project>()
+                      .Where(x => request.Id == x.Id)
+                      .Where(x => !x.IsDeleted)
+                      .FirstOrDefaultAsync();
+
                 //два активных реквеста не может быть
                 var projectWithNameOrCodeExists = await _dbContext.Set<Project>()
                     .AsNoTracking()
@@ -92,21 +104,10 @@ namespace TaskTracker.Core.src.Services.Impl
                     || x.Code == request.Code)
                     .AnyAsync();
 
-                if (projectWithNameOrCodeExists)
+                if (projectWithNameOrCodeExists && existingProject == null)
                     return result.WithError(ProjectErrorCodes.ProjectWithNameOrCodeExists);
 
-                var isProjectMgrInWsp = await _workSpaceService.IsWorkspaceMember(request.ProjectMgrId, request.WorkSpaceId);
-
-                if (!isProjectMgrInWsp)
-                {
-                    return result.WithError(ProjectErrorCodes.ProjectMgrNotWspMember);
-                }
-
                 var newProject = new Project();
-                var existingProject = await _dbContext.Set<Project>()
-                       .Where(x => request.Id == x.Id)
-                       .Where(x => !x.IsDeleted)
-                       .FirstOrDefaultAsync();
 
                 //если не пусто, значит изменяем, иначе добавляем новое рабочее пространство
                 if (existingProject != null)
@@ -137,6 +138,33 @@ namespace TaskTracker.Core.src.Services.Impl
                 _logger.LogError(ex, "Error while creating project.{NewLine}{Parameter}: {Request}{NewLine2}",
                     Environment.NewLine, nameof(request), request?.ToJson(), Environment.NewLine);
                 return result.WithError(ProjectErrorCodes.CannotCreateProject);
+            }
+        }
+
+        public async Task<IDataResult<List<User>>> GetProjectMgrCandidates(int workspaceId)
+        {
+            var result = new DataResult<List<User>>();
+
+            try
+            {
+                //Вытаскиваем все проекты организации
+                var managerCandidates = await _dbContext.Set<WorkSpaceMember>()
+                    .AsNoTracking()
+                    .Where(x => x.WorkSpaceId == workspaceId)
+                    .Where(x=> x.UserStatus == UserWorkSpaceStatus.Active)
+                    .Include(x => x.WorkSpace)
+                    .Where(x => !x.IsDeleted)
+                    .Where(x=> !x.WorkSpace.IsDeleted)
+                    .Select(x=> x.User)
+                    .ToListAsync();
+
+                return result.WithData(managerCandidates);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while getting project manager candidates.{NewLine}{Parameter}: {WorkspaceId}{NewLine2}",
+                    Environment.NewLine, nameof(workspaceId), workspaceId, Environment.NewLine);
+                return result.WithError(ProjectErrorCodes.CannotGetProjectMgrCandidates);
             }
         }
     }

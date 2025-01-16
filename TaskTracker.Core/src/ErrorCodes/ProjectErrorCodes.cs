@@ -82,5 +82,12 @@ namespace TaskTracker.Core.src.ErrorCodes
         /// </summary>
         [ErrorMessage(typeof(WorkSpaceErrorCodeResources), nameof(AccessDenied))]
         AccessDenied = CannotCreateProject + 1,
+
+
+        /// <summary>
+        /// Не удалось получить кандидатов в проджект менеджеры
+        /// </summary>
+        [ErrorMessage(typeof(WorkSpaceErrorCodeResources), nameof(CannotGetProjectMgrCandidates))]
+        CannotGetProjectMgrCandidates = AccessDenied + 1,
     }
 }

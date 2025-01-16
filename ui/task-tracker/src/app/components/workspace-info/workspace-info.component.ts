@@ -16,6 +16,8 @@ import { UserWspStatusChangeModel } from '../../shared/model/userWspStatusChange
 import { CreateWspInvitationModalComponent } from '../../shared/components/modals/create-wsp-invitation-modal/create-wsp-invitation.modal.component';
 import { WorkSpaceModel } from '../../shared/model/workSpaceModel';
 import { UserStatusChangeType } from '../../shared/enums/user-status-change-type';
+import { CreateProjectComponent } from '../../shared/components/modals/create-project/create-project.component';
+import { DatepickerUtils } from '../../shared/utils/ngbDatepickerUtils';
 
 @Component({
   selector: 'app-workspace-info',
@@ -129,6 +131,39 @@ export class WorkspaceInfoComponent extends BaseComponent {
   }
 
   public createProject() {
+    var t = this;
+    t.modalRef = t.modalService.open(CreateProjectComponent,
+      {
+        centered: true,
+        size: 'lg'
+      });
+      t.modalRef.componentInstance.workspaceId = +t.workspaceId;
+      t.modalRef.componentInstance.projectAuthorId = t.getUser().id;
+
+    t.modalRef.result.then(async (result) => t.processProjectModalResult(result));
+  }
+
+  public editProject(project: ProjectModel){
+    var t = this;
+    t.modalRef = t.modalService.open(CreateProjectComponent,
+      {
+        centered: true,
+        size: 'lg'
+      });
+      t.modalRef.componentInstance.projectId = project.id;
+      t.modalRef.componentInstance.projectName = project.name;
+      t.modalRef.componentInstance.projectDescr = project.description;
+      t.modalRef.componentInstance.projectCode = project.code;
+      t.modalRef.componentInstance.projectStartDate = DatepickerUtils.dateFromStr(project.startDate);
+      t.modalRef.componentInstance.projectEndDate = DatepickerUtils.dateFromStr(project.endDate);
+      t.modalRef.componentInstance.projectAuthorId = project.authorId;
+      t.modalRef.componentInstance.projectMgrId = project.projectMgrId;
+      t.modalRef.componentInstance.workspaceId = +t.workspaceId;
+
+    t.modalRef.result.then(async (result) => t.processProjectModalResult(result));
+  }
+
+  public goToIssues(){
 
   }
 
@@ -151,6 +186,15 @@ export class WorkspaceInfoComponent extends BaseComponent {
       var t = this;
       await t.getUserCreatedInvites(false);
       t.showSuccess("Invite sucessfully " + (!!result.id ? "updated" : "created"), "Success");
+      t.setLoading(false);
+    }
+  }
+
+  private async processProjectModalResult(result: any) {
+    if (result) {
+      var t = this;
+      await t.getWorkspaceProjects(false);
+      t.showSuccess("Project sucessfully " + (!!result.id ? "updated" : "created"), "Success");
       t.setLoading(false);
     }
   }

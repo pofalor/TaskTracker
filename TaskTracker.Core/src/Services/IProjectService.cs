@@ -7,5 +7,7 @@ namespace TaskTracker.Core.src.Services
     public interface IProjectService : IBaseService<Project, BaseFilter>
     {
         Task<IDataResult<List<Project>>> GetWorkspaceProjects(int workspaceId);
+
+        Task<IDataResult<List<User>>> GetProjectMgrCandidates(int workspaceId);
     }
 }

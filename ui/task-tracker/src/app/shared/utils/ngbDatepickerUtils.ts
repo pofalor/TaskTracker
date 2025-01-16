@@ -20,15 +20,19 @@ export class DatepickerUtils {
     }
 
     /**
-     * Преобразовать дату в объект(ngbDatepicker) из строки в формате yyyy-mm-dd
+     * Преобразовать дату в объект(ngbDatepicker) из строки в формате yyyy-mm-dd или dd.mm.yyyy
      */
     public static dateFromStr(dateStr: string | undefined){
         if(!!dateStr){
-            var dateSplited = dateStr.split('-');
+            var determiner = dateStr.includes('.') ? '.' : dateStr.includes('-') ? '-' : '';
+            var dateSplited = dateStr.split(determiner);
+            var yearIndex = determiner == '-' ? 0 : 2;
+            var monthIndex = 1;
+            var dayIndex =  determiner == '-' ? 2 : 0;
             var dateObj = {
-                year: +dateSplited[0],
-                month: +dateSplited[1],
-                day: +dateSplited[2]
+                year: +dateSplited[yearIndex],
+                month: +dateSplited[monthIndex],
+                day: +dateSplited[dayIndex]
             };
             return dateObj;
         }

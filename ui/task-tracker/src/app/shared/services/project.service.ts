@@ -3,6 +3,7 @@ import { ApiService } from './api.service';
 import { ProjectModel } from '../model/projectModel';
 import { IResponse } from '../interfaces/response';
 import { lastValueFrom } from 'rxjs';
+import { CreateOrEditProjectPR } from '../model/postRequests/createOrEditProjectPR';
 
 const serviceApiUrl = 'api/project/';
 
@@ -16,5 +17,15 @@ export class ProjectService {
   public async getWorkspaceProjects(workspaceId: number): Promise<IResponse<ProjectModel[]>> {
     var res = this.api.get<ProjectModel[]>(serviceApiUrl + `getWorkspaceProjects?workspaceId=${workspaceId}`);
     return await lastValueFrom(res);
+  }
+
+  public async getProjectMgrCandidates(workspaceId: number): Promise<IResponse<ProjectModel[]>> {
+    var res = this.api.get<ProjectModel[]>(serviceApiUrl + `getProjectMgrCandidates?workspaceId=${workspaceId}`);
+    return await lastValueFrom(res);
+  }
+
+  public async createOrEdit(postRequest: CreateOrEditProjectPR): Promise<IResponse<boolean>> {
+      var res = this.api.post<boolean>(serviceApiUrl + 'add', postRequest);
+      return await lastValueFrom(res);
   }
 }
