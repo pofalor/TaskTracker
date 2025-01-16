@@ -97,6 +97,15 @@ namespace TaskTracker.Core.src.Resources.ErrorCodes {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Failed to accept request. Please contact support.
+        /// </summary>
+        internal static string CannotAcceptInviteWsp {
+            get {
+                return ResourceManager.GetString("CannotAcceptInviteWsp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Failed to create workspace invite.
         /// </summary>
         internal static string CannotCreateOrEditInviteWsp {
@@ -183,6 +192,33 @@ namespace TaskTracker.Core.src.Resources.ErrorCodes {
         internal static string INNNull {
             get {
                 return ResourceManager.GetString("INNNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Error processing request. Please contact support.
+        /// </summary>
+        internal static string InvalidStatusInvite {
+            get {
+                return ResourceManager.GetString("InvalidStatusInvite", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Error processing request. Please contact support.
+        /// </summary>
+        internal static string InviteIdNotSet {
+            get {
+                return ResourceManager.GetString("InviteIdNotSet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на This invite does not exist. Please contact support.
+        /// </summary>
+        internal static string InviteNotExists {
+            get {
+                return ResourceManager.GetString("InviteNotExists", resourceCulture);
             }
         }
         

@@ -36,5 +36,10 @@ namespace TaskTracker.Core.src.Services
         Task<bool> IsWorkspaceOwner(int userId, int workspaceId);
 
         Task<IDataResult<List<UserWorkspaceStatusChangeRequest>>> GetUserCreatedInvites(int userId, int workspaceId);
+
+        /// <summary>
+        /// Принять или отклонить запрос на вступление в рабочее пространство
+        /// </summary>
+        Task<IDataResult<bool>> AcceptInvitationRequest(AcceptInvitePR request);
     }
 }

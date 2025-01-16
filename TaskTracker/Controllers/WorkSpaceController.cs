@@ -38,6 +38,7 @@ namespace TaskTracker.Web.Api.Controllers
             AddRole(nameof(CreateWspInvite), Permissions.UserRole);
             AddRole(nameof(SearchUsersForInvite), Permissions.UserRole);
             AddRole(nameof(IsUserWorkspaceOwner), Permissions.UserRole);
+            AddRole(nameof(AcceptInvitationRequest), Permissions.UserRole);
         }
 
         [Route("getMyWorkspaces")]
@@ -261,6 +262,45 @@ namespace TaskTracker.Web.Api.Controllers
             {
                 _logger.LogError(ex, "Error while getting user created invites => {Parameter1}: {UserId},", nameof(UserId), UserId);
                 return response.WithError(WorkSpaceErrorCodes.CannotGetWpsRequests);
+            }
+        }
+
+        [Route("acceptInvitationRequest")]
+        [HttpPost]
+        public async Task<DataResponse<bool>> AcceptInvitationRequest(AcceptInvitePR request)
+        {
+            var response = new DataResponse<bool>();
+
+            var isSuccess = await CheckRoles(nameof(CreateWspInvite));
+            if (!isSuccess)
+                return response.WithError(SystemErrorCodes.AccessDenied);
+
+            try
+            {
+                if (!request.UserId.HasValue)
+                    request.UserId = UserId;
+
+                if (request.UserId != UserId)
+                {
+                    await _logNotificatorService.SendTelegramAdminAsync($"The user has sent a request to accept a invite with a user Id " +
+                       $"different from his user Id in claims{Environment.NewLine} " +
+                       $"User id from request: {request.UserId}{Environment.NewLine} " +
+                       $"User id from claims: {UserId}.");
+                    return response.WithError(WorkSpaceErrorCodes.AccessDenied);
+                }
+
+                var result = await _workSpaceService.AcceptInvitationRequest(request);
+
+                if (result.Success)
+                    return response.WithData(result.Data);
+                else
+                    return response.WithError(result.Errors[0]);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while sending request to accept workspace invite.{NewLine}{Parameter}:{Request}{NewLine2}",
+                   Environment.NewLine, nameof(request), request?.ToJson(), Environment.NewLine);
+                return response.WithError(WorkSpaceErrorCodes.CannotAcceptInviteWsp);
             }
         }
     }
