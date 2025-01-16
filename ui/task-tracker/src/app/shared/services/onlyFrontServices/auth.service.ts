@@ -1,11 +1,11 @@
 import { Injectable, OnInit, NgZone } from '@angular/core';
 import { Router } from '@angular/router';
-import { TokenService } from "./token.service";
-import { AuthData } from '../interfaces/auth-data'
-import { ApiService } from './api.service';
+import { TokenService } from "../token.service";
+import { AuthData } from '../../interfaces/auth-data'
+import { ApiService } from '../api.service';
 import { firstValueFrom, map } from 'rxjs';
-import { AuthenticatePostRequest } from '../model/postRequests/authenticatePostRequest';
-import { UserService } from './user.service';
+import { AuthenticatePostRequest } from '../../model/postRequests/authenticatePostRequest';
+import { UserService } from '../user.service';
 import { EventService } from './event.service';
 
 
@@ -78,10 +78,6 @@ export class AuthService implements OnInit {
   SignOut() {
     window.stop();
     this.authData = null;
-    //TODO: сделать clear сервисов
-    // this.cryptoUserService.clear();
-    this.userService.clear();
-    // this.statsService.clear();
     this.eventService.logout();
     localStorage.clear(); //сбрасывает язык в localStorage (по дефолту 'en')
     this.router.navigate(['/login']);

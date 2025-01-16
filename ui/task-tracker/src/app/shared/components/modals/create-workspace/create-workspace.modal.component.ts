@@ -45,9 +45,6 @@ export class CreateWorkspaceModalComponent extends BaseComponent {
     private userService: UserService,
   ) {
     super(modalService, translate);
-
-    var t = this;
-
   }
 
   get name() { return this.workSpaceForm.get('name'); }

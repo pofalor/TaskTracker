@@ -31,6 +31,22 @@ namespace TaskTracker.Core.src.Context
                 .ForMember(dist => dist.INN, opt => opt.MapFrom(x => x.WorkSpace.INN));
             CreateMap<CreateOrEditWorkSpacePostRequest, WorkSpace>()
                 .ForMember(dist => dist.RegistrationDate, opt => opt.MapFrom(x => DateTime.ParseExact(x.RegistrationDate, DateFormatConstants.FrontInputFormat, CultureInfo.InvariantCulture)));
+            CreateMap<UserWorkspaceStatusChangeRequest, UserWspStatusChangeModel>()
+                .ForMember(dist => dist.Date, opt => opt.MapFrom(x => x.Date.ToString(DateFormatConstants.FullDateTimeShort)))
+                .ForMember(dist => dist.WorkSpaceName, opt => opt.MapFrom(x => x.WorkSpace.Name))
+                .ForMember(dist => dist.InviterName, opt => opt.MapFrom(x => x.Inviter.GetUserName(false)))
+                .ForMember(dist => dist.DirectorWspName, opt => opt.MapFrom(x => x.WorkSpace.DirectorUser.GetUserName(false)))
+                .ForMember(dist => dist.UserName, opt => opt.MapFrom(x => x.User.GetUserName(false)))
+                .ForMember(dist => dist.UserEmail, opt => opt.MapFrom(x => x.User.Email))
+                .ForMember(dist => dist.InviterEmail, opt => opt.MapFrom(x => x.Inviter.Email));
+            CreateMap<CreateWspInvitePostRequest, UserWorkspaceStatusChangeRequest>()
+               .ForMember(dist => dist.Date, opt => opt.MapFrom(x => DateTime.ParseExact(x.Date, DateFormatConstants.DataBaseTime, CultureInfo.InvariantCulture)));
+            CreateMap<Project, ProjectModel>()
+                .ForMember(dist => dist.StartDate, opt => opt.MapFrom(x => x.StartDate.ToString(DateFormatConstants.FullDateTimeShort)))
+                .ForMember(dist => dist.EndDate, opt => opt.MapFrom(x => x.EndDate.HasValue ? x.EndDate.Value.ToString(DateFormatConstants.FullDateTimeShort) : null));
+            CreateMap<CreateOrEditProjectPR, Project>()
+                .ForMember(dist => dist.StartDate, opt => opt.MapFrom(x => DateTime.ParseExact(x.StartDate, DateFormatConstants.FrontInputFormat, CultureInfo.InvariantCulture)))
+                .ForMember(dist => dist.EndDate, opt => opt.MapFrom(x => DateTime.ParseExact(x.EndDate, DateFormatConstants.FrontInputFormat, CultureInfo.InvariantCulture)));
         }
     }
 }

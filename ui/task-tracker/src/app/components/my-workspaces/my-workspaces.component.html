@@ -49,8 +49,8 @@
                                 </p>
                             </div>
                             <div class="col-12 pb-3">
-                                <button class="btn btn-primary" (click)="viewProjects()">
-                                    {{'buttons.viewProjects' | lang}}
+                                <button class="btn btn-primary" (click)="viewWorkspace(workspace)">
+                                    {{'buttons.view' | lang}}
                                 </button>
                             </div>
                         </div>
@@ -66,6 +66,56 @@
                         <div class="col d-flex flex-column flex-center">
                             <img style="width: 60px;" src="/assets/icons/plus_icon.png" type="button"
                                 class="cursor-pointer" (click)="createWorkspace()" draggable="false" class="mb-2">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" *ngIf="!!allMyInvitations && allMyInvitations.length > 0">
+        <div class="col-12">
+            <div class="text-left text-uppercase f-30 f-w-700 my-3">
+                {{"My invitations to workspaces" | lang}}
+            </div>
+        </div>
+        <div *ngFor="let invitation of allMyInvitations" class="col-auto col-xxl-3 mb-4">
+            <div class="card h-100 mb-0">
+                <div class="card-body pb-0 pr-0">
+                    <div class="row">
+                        <div class="col-12 pb-3">
+                            <div class="text-left text-uppercase f-22 f-w-700">
+                                {{invitation.workSpaceName}}
+                            </div>
+                        </div>
+                        <div class="col-12 pb-2">
+                            <p class="mb-0">{{ "Inviter" | lang}}:
+                                <span class="mb-0">{{ invitation.inviterName }}</span>
+                            </p>
+                        </div>
+                        <div class="col-12 pb-2">
+                            <p class="mb-0">{{ "Inviter email" | lang}}:
+                                <span class="mb-0">{{ invitation.inviterEmail }}</span>
+                            </p>
+                        </div>
+                        <div class="col-12 pb-2">
+                            <p class="mb-0">{{ "Request date" | lang}}:
+                                <span class="mb-0">{{ invitation.date }}</span>
+                            </p>
+                        </div>
+                        <div class="col-12 pb-2">
+                            <div class="row">
+                                <div class="col-6">
+                                    <button class="btn btn-danger button-width" type="button" (click)="setRequestStatus(false)">
+                                        {{ "buttons.decline" | lang }}
+                                    </button>
+                                </div>
+                                <div class="col-6">
+                                    <button class="btn btn-primary button-width" type="button" (click)="setRequestStatus(true)">
+                                        {{ "buttons.confirm" | lang }}
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

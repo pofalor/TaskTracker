@@ -14,7 +14,7 @@ export class DatepickerUtils {
         return val;
     }
 
-    private static dateObjToStr(year: number, month: number, day: number): string {
+    public static dateObjToStr(year: number, month: number, day: number): string {
         var date = new Date(year, month - 1, day);
         return date.toISOString().split('T')[0];
     }

@@ -1,0 +1,62 @@
+<div class="card mb-0">
+    <div class="card-body">
+        <div class="row mb-2">
+            <div class="col-12 mb-4 text-center">
+                <h4 *ngIf="!invitationId" class="f-28">{{"Create invitation" | lang}}</h4>
+                <h4 *ngIf="!!invitationId" class="f-28">{{"Edit invitation" | lang}}</h4>
+            </div>
+            <div class="col">
+                <h6 *ngIf="!invitationId" class="f-22">{{"Invite users to your workspace!" | lang}}</h6>
+            </div>
+        </div>
+
+        <form [formGroup]="invitationForm" class="form-group m-0">
+            <div class="row">
+                <div class="col-12 pb-3">
+                    <label>{{ "Select workspace" | lang }}</label>
+                    <ng-select *ngIf="!!workspaces && useArray && workspaces.length > 0" appearance="outline" class="br-10" 
+                        id="wsp-input-field" formControlName="workspaceId">
+                        <ng-option *ngFor="let wsp of workspaces" class="br-10" [value]="wsp.id" 
+                        clearable="false" searchable="false" hideSelected="true">
+                            {{ wsp.name }}
+                        </ng-option>
+                    </ng-select>
+                    <input *ngIf="!!workspace && !useArray" readonly type="text" class="form-control mt-2" 
+                    [value]="workspace.name"/>
+                    <div *ngIf="elemIsInvalid(invitationForm.get('workspaceId'))" class="text text-danger mt-1">
+                        {{textErrorStr(invitationForm.get('workspaceId')) | lang}}
+                    </div>
+                </div>
+                <div class="col-12 pb-3">
+                    <label>{{ "Select user" | lang }}</label>
+                    <ng-select appearance="outline" class="br-10" id="allusers-input-field" formControlName="userId"
+                    (search)="searchUsersForInvite($event)">
+                    <ng-container *ngFor="let user of allUsers">
+                        <ng-option class="br-10" [value]="user.id">
+                            {{ user.name }}
+                        </ng-option>
+                    </ng-container>
+                    </ng-select>
+                    <div *ngIf="elemIsInvalid(invitationForm.get('userId'))" class="text text-danger mt-1">
+                        {{textErrorStr(invitationForm.get('userId')) | lang}}
+                    </div>
+                </div>
+                
+            </div>
+        </form>
+        <div class="row">
+            <div class="col">
+                <button data-target="#modal-confirm" data-toggle="modal" class="btn btn-outline-info btn-soft w-100"
+                    type="button" (click)="back()">
+                    {{ "buttons.cancel" | lang }}
+                </button>
+            </div>
+            <div class="col">
+                <button data-target="#modal-confirm" data-toggle="modal" class="btn btn-primary btn-soft w-100"
+                    type="button" (click)="createOrEditWspInvite()">
+                    {{ "buttons.save" | lang }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

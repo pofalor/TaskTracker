@@ -326,6 +326,9 @@ namespace TaskTracker.Core.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("Date");
 
+                    b.Property<int>("InviterId")
+                        .HasColumnType("integer");
+
                     b.Property<bool>("IsChecked")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
@@ -337,6 +340,12 @@ namespace TaskTracker.Core.Migrations
                         .HasColumnType("boolean")
                         .HasDefaultValue(false)
                         .HasColumnName("is_deleted");
+
+                    b.Property<bool>("IsHidden")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_hidden");
 
                     b.Property<int>("NewStatus")
                         .HasColumnType("integer")
@@ -350,7 +359,7 @@ namespace TaskTracker.Core.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("object_edit_date");
 
-                    b.Property<int>("PreviousStatus")
+                    b.Property<int?>("PreviousStatus")
                         .HasColumnType("integer")
                         .HasColumnName("previous_status");
 
@@ -374,6 +383,8 @@ namespace TaskTracker.Core.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("InviterId");
 
                     b.HasIndex("UserId");
 
@@ -585,6 +596,12 @@ namespace TaskTracker.Core.Migrations
 
             modelBuilder.Entity("TaskTracker.Core.src.Entities.UserWorkspaceStatusChangeRequest", b =>
                 {
+                    b.HasOne("TaskTracker.Core.src.Entities.User", "Inviter")
+                        .WithMany()
+                        .HasForeignKey("InviterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("TaskTracker.Core.src.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
@@ -596,6 +613,8 @@ namespace TaskTracker.Core.Migrations
                         .HasForeignKey("WorkSpaceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Inviter");
 
                     b.Navigation("User");
 
