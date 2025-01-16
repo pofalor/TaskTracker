@@ -110,10 +110,11 @@ export class MyWorkspacesComponent extends BaseComponent {
 
 
   viewWorkspace(workspace: WorkSpaceModel) {
-    this.router.navigate(['/workspace-info/', workspace.id], 
+    this.router.navigate(['/workspace-info'], 
       { 
         queryParams: {
-          "name": workspace.name
+          "name": workspace.name,
+          "workspaceId": workspace.id
         }
       });
   }
@@ -136,5 +137,9 @@ export class MyWorkspacesComponent extends BaseComponent {
     t.modalRef.componentInstance.workSpaceINN = workSpace.inn;
 
     t.modalRef.result.then(async (result) => t.processModalResult(result));
+  }
+
+  setRequestStatus(accept: boolean){
+    
   }
 }

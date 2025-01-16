@@ -34,7 +34,9 @@
         "viewProjects":"View projects",
         "change":"Change",
         "edit":"Edit",
-        "view":"View"
+        "view":"View",
+        "confirm":"Confirm",
+        "decline":"Decline"
     },
     "teamRoles":{
       "0": "Not set",
@@ -43,5 +45,11 @@
       "3":"Director",
       "4":"Project manager",
       "5":"Owner"
+    },
+    "wspInviteStatus": {
+      "0": "Waiting for confirmation",
+      "1":"Confirmed",
+      "2":"Declined"
     }
+
 }

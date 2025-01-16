@@ -2,7 +2,7 @@ import { Routes } from '@angular/router';
 import { UserGuard } from './shared/guards/user.guard';
 
 export const routes: Routes = [
-    { path: "", redirectTo: 'login', pathMatch: 'full' },
+    { path: "", redirectTo: 'my-workspaces', pathMatch: 'full' },
     { path: 'login', loadComponent: () => import('./auth/login/login.component').then(c => c.LoginComponent) },
     { path: "register", loadComponent: () => import('./auth/register/register.component').then(c => c.RegisterComponent)  },
     { 
@@ -11,7 +11,7 @@ export const routes: Routes = [
         canActivate: [UserGuard],
     },
     { 
-        path: "workspace-info/:workspaceId",
+        path: "workspace-info",
         loadComponent: () => import('./components/workspace-info/workspace-info.component').then(c => c.WorkspaceInfoComponent),
         canActivate: [UserGuard],
     },

@@ -15,11 +15,14 @@ import { IResponse } from '../../../interfaces/response';
 import { CommonModule } from '@angular/common';
 import { LangPipe } from '../../../pipes/lang.pipe';
 import { NgSelectComponent, NgOptionComponent } from '@ng-select/ng-select';
+import { DatepickerUtils } from '../../../utils/ngbDatepickerUtils';
+import { UserWorkSpaceStatus } from '../../../enums/user-workspace-status';
+import { DateUtils } from '../../../utils/dateUtils';
 
 @Component({
   selector: 'app-create-wsp-invitation-modal',
   imports: [CommonModule, LangPipe, ReactiveFormsModule, NgSelectComponent, NgOptionComponent, FormsModule,
-  NgbAlertModule, NgbDatepickerModule],
+    NgbAlertModule, NgbDatepickerModule],
   templateUrl: './create-wsp-invitation.modal.component.html',
   styleUrl: './create-wsp-invitation.modal.component.scss'
 })
@@ -30,7 +33,6 @@ export class CreateWspInvitationModalComponent extends BaseComponent {
   @Input() useArray: boolean = false;
   public invitationForm!: FormGroup;
   newInvitation: CreateWspInvitePostRequest = new CreateWspInvitePostRequest();
-  public allUsersObservable!: Observable<UserModel[] | undefined>;
   public allUsers: UserModel[] | undefined;
 
   constructor(
@@ -56,22 +58,20 @@ export class CreateWspInvitationModalComponent extends BaseComponent {
       workspaceId = t.workspace?.id ?? null;
     }
 
-    this.invitationForm = t.fb.group({
+    t.invitationForm = t.fb.group({
       workspaceId: [workspaceId, [Validators.required]],
-      userId: ['', [Validators.required]],
-      search: ['', [Validators.required]]
+      userId: ['', [Validators.required, Validators.min(1)]]
     });
   }
 
   get workspaceId() { return this.invitationForm.get('workspaceId'); }
   get userId() { return this.invitationForm.get('userId'); }
-  get search() { return this.invitationForm.get('search'); }
 
-  public async searchUsersForInvite() {
+  public async searchUsersForInvite(event: any) {
     var t = this;
     var wspId = t.workspaceId?.value;
 
-    if (!!wspId) {
+    if (!wspId) {
       var userControl = t.userId;
       let obj: ValidationErrors = {};
       var error = t.translate.instant("Please select a workspace");
@@ -83,26 +83,46 @@ export class CreateWspInvitationModalComponent extends BaseComponent {
     var postRequest: SearchUserForInvitePR = {
       workSpaceId: wspId,
       inviterId: t.userService.get()?.id,
-      search: t.search?.value
+      search: event.term
     };
 
     await t.workSpaceService.searchUsersForInvite(postRequest)
-    .then((resp: any) => {
-      t.allUsers = resp.data;
-    })
-    .catch((e) => {
-      t.showResponseError(e);
-    })
-
-    t.allUsersObservable = of(t.allUsers);
+      .then((resp: any) => {
+        t.allUsers = resp.data;
+      })
+      .catch((e) => {
+        t.showResponseError(e);
+      })
   }
 
   back(result: boolean = false) {
     this.activeModal.close(result);
   }
 
-  createOrEditWspInvite(){
+  async createOrEditWspInvite() {
+    var t = this;
+    if (t.invitationForm.invalid) {
+      t.markFormGroupTouchedAndDirty(t.invitationForm)
+      return;
+    }
+    t.setLoading(true);
 
+    t.newInvitation.userId = t.userId?.value;
+    t.newInvitation.inviterId = t.userService.get()?.id;
+    t.newInvitation.date = DateUtils.getNowDateStr(true);
+    t.newInvitation.newStatus = UserWorkSpaceStatus.Active;
+    t.newInvitation.workSpaceId = t.workspaceId?.value;
+
+    await t.workSpaceService.createWspInvite(t.newInvitation)
+      .then(async (resp: any) => {
+        if (!!resp && !!resp.data) {
+          t.activeModal.close(t.newInvitation);
+        }
+      })
+      .catch((e) => {
+        t.setLoading(false);
+        t.showResponseError(e);
+      })
   }
 
 }

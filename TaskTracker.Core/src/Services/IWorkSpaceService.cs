@@ -23,7 +23,7 @@ namespace TaskTracker.Core.src.Services
         /// <summary>
         /// Поиск пользователей для создания инвайта
         /// </summary>
-        Task<IDataResult<List<UserModel>>> SearchUsersForInvite(SearchUserForInvitePR searchUser);
+        Task<IDataResult<List<User>>> SearchUsersForInvite(SearchUserForInvitePR searchUser);
 
         /// <summary>
         /// Проверить является ли юзер членом рабочего пространства

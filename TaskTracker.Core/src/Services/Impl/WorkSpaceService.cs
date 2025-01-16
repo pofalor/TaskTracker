@@ -197,6 +197,7 @@ namespace TaskTracker.Core.src.Services.Impl
                     .Include(x => x.WorkSpace)
                     .Include(x=> x.WorkSpace.DirectorUser)
                     .Include(x=> x.Inviter)
+                    .Include(x=> x.User)
                     .Where(x => x.UserId == userId)
                     .Where(x => statusesNeedShow.Contains(x.RequestStatus))
                     .Where(x => !x.IsDeleted)
@@ -231,6 +232,9 @@ namespace TaskTracker.Core.src.Services.Impl
                 var statusChanges = await _dbContext.Set<UserWorkspaceStatusChangeRequest>()
                     .AsNoTracking()
                     .Include(x => x.WorkSpace)
+                    .Include(x=> x.User)
+                    .Include(x => x.WorkSpace.DirectorUser)
+                    .Include(x => x.Inviter)
                     .Where(x => x.InviterId == userId)
                     .Where(x=> x.WorkSpaceId == workspaceId)
                     .Where(x => statusesNeedShow.Contains(x.RequestStatus))
@@ -272,7 +276,7 @@ namespace TaskTracker.Core.src.Services.Impl
                 {
                     return result.WithError(WorkSpaceErrorCodes.WpsInviteReqDateNotSet);
                 }
-                else if (request.Date < DateTime.UtcNow)
+                else if (request.Date > DateTime.UtcNow)
                 {
                     return result.WithError(WorkSpaceErrorCodes.WpsInviteReqDateFuture);
                 }
@@ -359,9 +363,9 @@ namespace TaskTracker.Core.src.Services.Impl
                 .AnyAsync();
         }
 
-        public async Task<IDataResult<List<UserModel>>> SearchUsersForInvite(SearchUserForInvitePR searchUser)
+        public async Task<IDataResult<List<User>>> SearchUsersForInvite(SearchUserForInvitePR searchUser)
         {
-            var result = new DataResult<List<UserModel>>();
+            var result = new DataResult<List<User>>();
 
             try
             {
@@ -382,16 +386,7 @@ namespace TaskTracker.Core.src.Services.Impl
                     || x.NickName == searchUser.Search)
                     .ToListAsync();
 
-                //сделано для безопасности, чтобы не раскрывать айдишники
-                var usersWithHiddenId = users
-                .Select(x => new UserModel
-                {
-                    Name = x.GetUserName(),
-                    Email = x.Email
-                })
-                .ToList();
-
-                return result.WithData(usersWithHiddenId);
+                return result.WithData(users);
             }
             catch (Exception ex)
             {

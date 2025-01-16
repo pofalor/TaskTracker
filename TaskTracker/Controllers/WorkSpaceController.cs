@@ -205,7 +205,9 @@ namespace TaskTracker.Web.Api.Controllers
                 if (!result.Success)
                     return response.WithError(result.Errors[0]);
 
-                return response.WithData(result.Data);
+                var mapRes = result.Data.Select(x=> _mapper.Map<UserModel>(x)).ToList();
+
+                return response.WithData(mapRes);
             }
             catch (Exception ex)
             {

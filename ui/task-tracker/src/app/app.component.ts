@@ -6,10 +6,11 @@ import {TranslateService} from "@ngx-translate/core";
 import { AuthService } from './shared/services/onlyFrontServices/auth.service';
 import { UserService } from './shared/services/user.service';
 import { EventService } from './shared/services/onlyFrontServices/event.service';
+import { HeaderComponent } from './shared/components/header/header.component';
 
 @Component({
     selector: 'app-root',
-    imports: [RouterOutlet, LoaderComponent, TranslateModule],
+    imports: [RouterOutlet, LoaderComponent, TranslateModule, HeaderComponent],
     templateUrl: './app.component.html',
     styleUrl: './app.component.scss'
 })

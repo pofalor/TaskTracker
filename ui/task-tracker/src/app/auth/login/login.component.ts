@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, NgZone } from '@angular/core';
+import { Component, NgZone, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink, RouterOutlet } from '@angular/router';
 import { BaseComponent } from '../../shared/base/base.component';
@@ -16,7 +16,7 @@ import { TranslateService } from '@ngx-translate/core';
     templateUrl: './login.component.html',
     styleUrl: './login.component.scss'
 })
-export class LoginComponent extends BaseComponent {
+export class LoginComponent extends BaseComponent implements OnInit {
   public loginForm: FormGroup;
   errorText: string = '';
 
@@ -34,6 +34,13 @@ export class LoginComponent extends BaseComponent {
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required]],
     });
+  }
+
+  ngOnInit() {
+    var t = this;
+    if(t.authService.isLoggedIn){
+      t.authService.SignOut();
+    }
   }
 
   async login() {

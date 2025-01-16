@@ -15,6 +15,7 @@ import { WorkspaceService } from '../../shared/services/workspace.service';
 import { UserWspStatusChangeModel } from '../../shared/model/userWspStatusChangeModel';
 import { CreateWspInvitationModalComponent } from '../../shared/components/modals/create-wsp-invitation-modal/create-wsp-invitation.modal.component';
 import { WorkSpaceModel } from '../../shared/model/workSpaceModel';
+import { UserStatusChangeType } from '../../shared/enums/user-status-change-type';
 
 @Component({
   selector: 'app-workspace-info',
@@ -30,6 +31,7 @@ export class WorkspaceInfoComponent extends BaseComponent {
   public invitesMeCreated: UserWspStatusChangeModel[] = [];
   modalRef!: NgbModalRef;
   workspace: WorkSpaceModel = new WorkSpaceModel();
+  UserStatusChangeType = UserStatusChangeType;
 
   constructor(
     public authService: AuthService,
@@ -51,15 +53,15 @@ export class WorkspaceInfoComponent extends BaseComponent {
 
   async ngOnInit() {
     var t = this;
-    var wspIdStr = t.activateRoute.snapshot.paramMap.get('workspaceId');
+    var wspIdStr = t.activateRoute.snapshot.queryParamMap.get('workspaceId');
     if (!wspIdStr || Number.isNaN(wspIdStr)) {
       t.router.navigate(['/my-workspaces']);
       return;
     }
     t.workspaceId = wspIdStr;
-    debugger
     var workspaceName = t.activateRoute.snapshot.queryParamMap.get('name');
     t.workspace.name = workspaceName ?? "";
+    t.workspace.id = +t.workspaceId;
 
     t.setLoading(true);
     Promise.all([
@@ -139,6 +141,17 @@ export class WorkspaceInfoComponent extends BaseComponent {
         size: 'lg'
       });
 
-    t.modalRef.componentInstance.workspaces = t.workspace;
+    t.modalRef.componentInstance.workspace = t.workspace;
+
+    t.modalRef.result.then(async (result) => t.processModalResult(result));
+  }
+
+  private async processModalResult(result: any) {
+    if (result) {
+      var t = this;
+      await t.getUserCreatedInvites(false);
+      t.showSuccess("Invite sucessfully " + (!!result.id ? "updated" : "created"), "Success");
+      t.setLoading(false);
+    }
   }
 }

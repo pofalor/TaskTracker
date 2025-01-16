@@ -68,11 +68,48 @@
                 <div class="card h-100 mb-0">
                     <div class="card-body pb-0 pr-0">
                         <div class="row">
-                            <div class="col-auto d-flex flex-column">
+                            <div class="col-12 pb-3">
                                 <div class="text-left text-uppercase f-22 f-w-700">
                                     {{invitation.date}}
                                 </div>
                             </div>
+                            <div class="col-12 pb-2">
+                                <div class="text-left">
+                                    {{invitation.workSpaceName}}
+                                </div>
+                            </div>
+                            <div class="col-12 pb-2">
+                                <p class="mb-0">{{ "User name" | lang}}:
+                                    <span class="mb-0">{{ invitation.userName }}</span>
+                                </p>
+                            </div>
+                            <div class="col-12 pb-2">
+                                <p class="mb-0">{{ "User email" | lang}}:
+                                    <span class="mb-0">{{ invitation.userEmail }}</span>
+                                </p>
+                            </div>
+                            <div class="col-12 pb-2">
+                                <div class="text-left">
+                                    <p class="mb-0">{{ "Status" | lang}}:
+                                        <span [ngClass]="{ 'c-red': invitation.requestStatus == UserStatusChangeType.UserDeclined,
+                                            'c-blue': invitation.requestStatus == UserStatusChangeType.Default,
+                                            'c-green': invitation.requestStatus == UserStatusChangeType.UserConfirmed}">
+                                            {{ 'wspInviteStatus.' + invitation.requestStatus | lang}}
+                                        </span>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="col-12 pb-2">
+                                <p class="mb-0">{{ "Inviter" | lang}}:
+                                    <span class="mb-0">{{ invitation.inviterName }}</span>
+                                </p>
+                            </div>
+                            <!-- В будущем не только директор сможет приглашать, пока скрыто -->
+                            <!-- <div class="col-12 pb-2">
+                                <p class="mb-0">{{ "Workspace director" | lang}}:
+                                    <span class="mb-0">{{ invitation.directorWspName }}</span>
+                                </p>
+                            </div> -->
                         </div>
                     </div>
                 </div>

@@ -49,6 +49,13 @@ export class RegisterComponent extends BaseComponent {
     });
   }
 
+  ngOnInit() {
+    var t = this;
+    if(t.authService.isLoggedIn){
+      t.authService.SignOut();
+    }
+  }
+
   get email() { return this.registerForm.get('email'); }
   get password() { return this.registerForm.get('password'); }
   get passwordConfirm() { return this.registerForm.get('passwordConfirm'); }

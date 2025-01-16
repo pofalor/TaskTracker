@@ -1,0 +1,32 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light" style="justify-content: right;" *ngIf="isLoggedIn()">
+    <div class="navbar navbar-light bg-light">
+        <ul class="navbar-nav">
+            <li class="px-3 py-1">
+                <a (click)="back()" href="#">
+                    <img src="/assets/icons/chevron_left_icon.png" width="45" height="45" alt="">
+                </a>
+            </li>
+            <li class="pr-3" style="padding-right: 20px;">
+                <a (click)="logout()" href="#">
+                    <img src="/assets/icons/sign_out_icon.png" width="50" height="50" alt="">
+                </a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<!-- Page Header Start-->
+<!-- <div class="page-main-header" id="page-main-header">
+    <div class="main-header-right row">
+      <div class="nav-right col">
+        <ul class="nav-menus fontsize" style="float: right;">
+          <li>
+            <div class="media align-items-center">
+              <img src="/assets/icons/sign_out_icon.png" (click)="logout()" style="cursor: pointer;">
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div> -->
+<!-- Page Header Ends -->

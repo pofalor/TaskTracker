@@ -40,8 +40,23 @@ namespace TaskTracker.Core.src.Models.ResponseModels
         public string InviterName { get; set; } = null!;
 
         /// <summary>
+        /// Эмейл того, кто приглашает в воркспейс
+        /// </summary>
+        public string InviterEmail { get; set; } = null!;
+
+        /// <summary>
         /// Фамилия, имя либо никнейм директора воркспейса
         /// </summary>
         public string DirectorWspName { get; set; } = null!;
+
+        /// <summary>
+        /// Фамилия, имя либо никнейм юзера, которого приглашают
+        /// </summary>
+        public string UserName { get; set; } = null!;
+
+        /// <summary>
+        /// Эмейл юзера, которого приглашают
+        /// </summary>
+        public string UserEmail { get; set; } = null!;
     }
 }

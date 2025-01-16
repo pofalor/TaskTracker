@@ -23,6 +23,15 @@ export class UserWspStatusChangeModel {
     /** Фамилия, имя либо никнейм того, кто приглашает в воркспейс */
     public inviterName!: string;
 
+    /** Эмейл того, кто приглашает в воркспейс */
+    public inviterEmail!: string;
+
     /** Фамилия, имя либо никнейм директора воркспейса */
     public directorWspName!: string;
+
+    /** Фамилия, имя либо никнейм юзера, которого приглашают */
+    public userName!: string;
+
+    /** Эмейл юзера, которого приглашают */
+    public userEmail!: string;
 }

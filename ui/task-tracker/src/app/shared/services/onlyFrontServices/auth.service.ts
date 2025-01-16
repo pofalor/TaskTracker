@@ -78,10 +78,6 @@ export class AuthService implements OnInit {
   SignOut() {
     window.stop();
     this.authData = null;
-    //TODO: сделать clear сервисов
-    // this.cryptoUserService.clear();
-    this.userService.clear();
-    // this.statsService.clear();
     this.eventService.logout();
     localStorage.clear(); //сбрасывает язык в localStorage (по дефолту 'en')
     this.router.navigate(['/login']);

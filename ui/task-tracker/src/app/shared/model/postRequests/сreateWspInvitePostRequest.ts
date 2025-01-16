@@ -5,7 +5,7 @@ export class CreateWspInvitePostRequest {
 
     userId!: number;
 
-    inviterId!: number;
+    inviterId : number | undefined;
 
     /** Дата, когда был создан запрос в UTC */
     date!: string;
