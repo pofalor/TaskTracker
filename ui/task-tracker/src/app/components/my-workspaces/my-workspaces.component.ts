@@ -15,6 +15,10 @@ import { UserTeamRole } from '../../shared/enums/user-team-role';
 import { DatepickerUtils } from '../../shared/utils/ngbDatepickerUtils';
 import { Router } from '@angular/router';
 import { UserWspStatusChangeModel } from '../../shared/model/userWspStatusChangeModel';
+import { ModalInfoModel } from '../../shared/model/onlyFrontModels/modalInfo.model';
+import { AcceptInvitePR } from '../../shared/model/postRequests/acceptInvitePR';
+import { UserStatusChangeType } from '../../shared/enums/user-status-change-type';
+import { UserService } from '../../shared/services/user.service';
 
 @Component({
   selector: 'app-my-workspaces',
@@ -28,6 +32,7 @@ export class MyWorkspacesComponent extends BaseComponent {
   modalRef!: NgbModalRef;
   UserTeamRole = UserTeamRole;
   allMyInvitations: UserWspStatusChangeModel[] = [];
+  UserStatusChangeType = UserStatusChangeType;
 
   constructor(
     public authService: AuthService,
@@ -35,6 +40,7 @@ export class MyWorkspacesComponent extends BaseComponent {
     private workSpaceService: WorkspaceService,
     private translate: TranslateService,
     private router: Router,
+    private userService: UserService,
   ) {
     super(modalService, translate);
   }
@@ -46,9 +52,9 @@ export class MyWorkspacesComponent extends BaseComponent {
       t.getMyWorkspaces(false),
       t.getMyInvitations(false)
     ])
-    .then(()=>{
-      t.setLoading(false);
-    });
+      .then(() => {
+        t.setLoading(false);
+      });
   }
 
   public async getMyWorkspaces(needLoader: boolean = true) {
@@ -110,8 +116,8 @@ export class MyWorkspacesComponent extends BaseComponent {
 
 
   viewWorkspace(workspace: WorkSpaceModel) {
-    this.router.navigate(['/workspace-info'], 
-      { 
+    this.router.navigate(['/workspace-info'],
+      {
         queryParams: {
           "name": workspace.name,
           "workspaceId": workspace.id
@@ -139,7 +145,43 @@ export class MyWorkspacesComponent extends BaseComponent {
     t.modalRef.result.then(async (result) => t.processModalResult(result));
   }
 
-  setRequestStatus(accept: boolean){
-    
+  setRequestStatus(accept: boolean, inviteId: number) {
+    var t = this;
+    var modalInfo = new ModalInfoModel();
+    var result = accept ? "accept" : "decline";
+    modalInfo.title = `Are you sure you want to ${result} the request to join the workspace?`;
+    modalInfo.showDescription = false;
+    modalInfo.buttonConfirm = "Yes";
+    modalInfo.buttonDecline = "No";
+    t.showModal(modalInfo).then(async (result) => {
+      if (result)
+        await t.acceptInvite(accept, inviteId);
+    });
+  }
+
+  async acceptInvite(accept: boolean, inviteId: number){
+    var t = this;
+    t.setLoading(true);
+    var postRequest: AcceptInvitePR = {
+      id: inviteId,
+      requestStatus: accept ? UserStatusChangeType.UserConfirmed : UserStatusChangeType.UserDeclined,
+      userId: t.userService.get()?.id
+    };
+
+    await t.workSpaceService.acceptInvitationRequest(postRequest)
+      .then(async (resp: any) => {
+        if(resp){
+          await t.getMyWorkspaces(false);
+          await t.getMyInvitations(false);
+          var result = accept ? "accepted" : "declined";
+          t.showSuccess(`Request successfully ${result}`, "Success");
+        }
+      })
+      .catch((e) => {
+        t.showResponseError(e);
+      })
+      .finally(() => {
+        t.setLoading(false);
+      });
   }
 }

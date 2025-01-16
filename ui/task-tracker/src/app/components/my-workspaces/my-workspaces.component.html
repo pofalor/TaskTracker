@@ -103,15 +103,26 @@
                                 <span class="mb-0">{{ invitation.date }}</span>
                             </p>
                         </div>
-                        <div class="col-12 pb-3">
+                        <div class="col-12 pb-2" *ngIf="invitation.requestStatus != UserStatusChangeType.Default">
+                            <div class="text-left">
+                                <p class="mb-0">{{ "Status" | lang}}:
+                                    <span
+                                        [ngClass]="{ 'c-red': invitation.requestStatus == UserStatusChangeType.UserDeclined,
+                                        'c-green': invitation.requestStatus == UserStatusChangeType.UserConfirmed}">
+                                        {{ 'wspInviteStatus.' + invitation.requestStatus | lang}}
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-12 pb-3" *ngIf="invitation.requestStatus == UserStatusChangeType.Default">
                             <div class="row">
                                 <div class="col-6">
-                                    <button class="btn btn-danger w-100" type="button" (click)="setRequestStatus(false)">
+                                    <button class="btn btn-danger w-100" type="button" (click)="setRequestStatus(false, invitation.id)">
                                         {{ "buttons.decline" | lang }}
                                     </button>
                                 </div>
                                 <div class="col-6">
-                                    <button class="btn btn-primary w-100" type="button" (click)="setRequestStatus(true)">
+                                    <button class="btn btn-primary w-100" type="button" (click)="setRequestStatus(true, invitation.id)">
                                         {{ "buttons.confirm" | lang }}
                                     </button>
                                 </div>

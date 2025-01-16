@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
+using System.IO.Pipes;
 using TaskTracker.Core.src.DataAccess;
 using TaskTracker.Core.src.DataResult;
 using TaskTracker.Core.src.Entities;
@@ -396,5 +397,70 @@ namespace TaskTracker.Core.src.Services.Impl
             }
         }
 
+        public async Task<IDataResult<bool>> AcceptInvitationRequest(AcceptInvitePR request)
+        {
+            var result = new DataResult<bool>();
+            try
+            {
+                //TODO: в контроллере проверить, что юзер - член рабочего пространства
+                var errorStatuses = new UserStatusChangeType[] { UserStatusChangeType.All, UserStatusChangeType.Default };
+                if (request.Id <= 0)
+                {
+                    return result.WithError(WorkSpaceErrorCodes.InviteIdNotSet);
+                }
+                else if (errorStatuses.Contains(request.RequestStatus))
+                {
+                    return result.WithError(WorkSpaceErrorCodes.InvalidStatusInvite);
+                }
+
+                var activeRequest = await _dbContext.Set<UserWorkspaceStatusChangeRequest>()
+                    .Where(x => x.Id == request.Id)
+                    .Where(x=> x.RequestStatus == UserStatusChangeType.Default)
+                    .Where(x=> x.UserId ==  request.UserId)
+                    .FirstOrDefaultAsync();
+
+                if (activeRequest == null)
+                    return result.WithError(WorkSpaceErrorCodes.InviteNotExists);
+
+                activeRequest.RequestStatus = request.RequestStatus;
+
+               if(request.RequestStatus == UserStatusChangeType.UserConfirmed)
+               {
+                    var workspaceMember = await _dbContext.Set<WorkSpaceMember>()
+                        .AsNoTracking()
+                        .Where(x => !x.IsDeleted)
+                        .Where(x=> !x.WorkSpace.IsDeleted)
+                        .Where(x => x.WorkSpaceId == activeRequest.WorkSpaceId)
+                        .Where(x=> x.UserId == activeRequest.UserId)
+                        .FirstOrDefaultAsync();
+
+                    if (workspaceMember != null)
+                        workspaceMember.UserStatus = UserWorkSpaceStatus.Active;
+                    else
+                    {
+                        //TODO: создавать WorkspaceMember в таске
+                        workspaceMember = new WorkSpaceMember()
+                        {
+                            TeamRole = UserTeamRole.NotSet,
+                            UserStatus = UserWorkSpaceStatus.Active,
+                            UserId = request.UserId ?? 0,
+                            WorkSpaceId = activeRequest.WorkSpaceId
+                        };
+
+                        await _dbContext.AddAsync(workspaceMember);
+                    }
+               }
+
+                await _dbContext.SaveChangesAsync();
+
+                return result.WithData(true);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while accepting invite to WSP.{NewLine}{Parameter}: {Request}{NewLine2}",
+                    Environment.NewLine, nameof(request), request?.ToJson(), Environment.NewLine);
+                return result.WithError(WorkSpaceErrorCodes.CannotAcceptInviteWsp);
+            }
+        }
     }
 }

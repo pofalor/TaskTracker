@@ -8,6 +8,7 @@ import { UserWspStatusChangeModel } from '../model/userWspStatusChangeModel';
 import { CreateWspInvitePostRequest } from '../model/postRequests/сreateWspInvitePostRequest';
 import { SearchUserForInvitePR } from '../model/postRequests/searchUserForInvitePR';
 import { UserModel } from '../model/userModel';
+import { AcceptInvitePR } from '../model/postRequests/acceptInvitePR';
 
 const serviceApiUrl = 'api/workspace/';
 
@@ -53,4 +54,8 @@ export class WorkspaceService {
     return await lastValueFrom(res);
   }
 
+  public async acceptInvitationRequest(postRequest: AcceptInvitePR): Promise<IResponse<boolean>> {
+    var res = this.api.post<boolean>(serviceApiUrl + 'acceptInvitationRequest', postRequest);
+    return await lastValueFrom(res);
+  }
 }

@@ -186,4 +186,16 @@
   <data name="CannotFindUserForInvite" xml:space="preserve">
     <value>Unable to find any users. Please contact support</value>
   </data>
+  <data name="InviteIdNotSet" xml:space="preserve">
+    <value>Error processing request. Please contact support</value>
+  </data>
+  <data name="InvalidStatusInvite" xml:space="preserve">
+    <value>Error processing request. Please contact support</value>
+  </data>
+  <data name="InviteNotExists" xml:space="preserve">
+    <value>This invite does not exist. Please contact support</value>
+  </data>
+  <data name="CannotAcceptInviteWsp" xml:space="preserve">
+    <value>Failed to accept request. Please contact support</value>
+  </data>
 </root>

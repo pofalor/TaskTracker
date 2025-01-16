@@ -1,6 +1,6 @@
 <div class="container-fluid">
     <div class="row">
-        <div class="col-12 col-sm">
+        <div class="col-12 col-sm px-3">
             <div class="text-left text-uppercase f-30 f-w-700 my-3">
                 {{"Projects" | lang}}
             </div>
@@ -8,7 +8,7 @@
     </div>
     <div class="row">
         <ng-container *ngFor="let project of allProjects">
-            <div *ngIf="!!allProjects && allProjects.length > 0" class="col-auto col-xxl-3 mb-4">
+            <div *ngIf="!!allProjects && allProjects.length > 0" class="col-auto col-xxl-3 mb-4 px-3">
                 <div class="card h-100 mb-0">
                     <div class="card-body pb-0 pr-0">
                         <div class="row">
@@ -52,76 +52,85 @@
                 </div>
             </div>
         </div>
-    </div>
-
-    <div class="row">
-        <div class="col-12 col-sm">
-            <div class="text-left text-uppercase f-30 f-w-700 my-3">
-                {{"Invitations created by me in this workspace" | lang}}
+        <div class="col px-3" *ngIf="!isWorkspaceOwner && (!allProjects || allProjects.length == 0)">
+            <div class="card">
+                <div class="card-body f-20 f-w-600" style="min-height: 260px; line-height: 200px; text-align: center;">
+                    {{'This workspace does not have any projects yet' | lang}}
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="row">
-        <ng-container *ngFor="let invitation of invitesMeCreated">
-            <div class="col-auto col-xxl-3 mb-4" *ngIf="!!invitesMeCreated && invitesMeCreated.length > 0">
-                <div class="card h-100 mb-0">
-                    <div class="card-body pb-0 pr-0">
-                        <div class="row">
-                            <div class="col-12 pb-3">
-                                <div class="text-left text-uppercase f-22 f-w-700">
-                                    {{invitation.date}}
+    <div *ngIf="isWorkspaceOwner">
+        <div class="row">
+            <div class="col-12 col-sm">
+                <div class="text-left text-uppercase f-30 f-w-700 my-3">
+                    {{"Invitations created by me in this workspace" | lang}}
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <ng-container *ngFor="let invitation of invitesMeCreated">
+                <div class="col-auto col-xxl-3 mb-4" *ngIf="!!invitesMeCreated && invitesMeCreated.length > 0">
+                    <div class="card h-100 mb-0">
+                        <div class="card-body pb-0 pr-0">
+                            <div class="row">
+                                <div class="col-12 pb-3">
+                                    <div class="text-left text-uppercase f-22 f-w-700">
+                                        {{invitation.date}}
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-12 pb-2">
-                                <div class="text-left">
-                                    {{invitation.workSpaceName}}
+                                <div class="col-12 pb-2">
+                                    <div class="text-left">
+                                        {{invitation.workSpaceName}}
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-12 pb-2">
-                                <p class="mb-0">{{ "User name" | lang}}:
-                                    <span class="mb-0">{{ invitation.userName }}</span>
-                                </p>
-                            </div>
-                            <div class="col-12 pb-2">
-                                <p class="mb-0">{{ "User email" | lang}}:
-                                    <span class="mb-0">{{ invitation.userEmail }}</span>
-                                </p>
-                            </div>
-                            <div class="col-12 pb-2">
-                                <div class="text-left">
-                                    <p class="mb-0">{{ "Status" | lang}}:
-                                        <span [ngClass]="{ 'c-red': invitation.requestStatus == UserStatusChangeType.UserDeclined,
-                                            'c-blue': invitation.requestStatus == UserStatusChangeType.Default,
-                                            'c-green': invitation.requestStatus == UserStatusChangeType.UserConfirmed}">
-                                            {{ 'wspInviteStatus.' + invitation.requestStatus | lang}}
-                                        </span>
+                                <div class="col-12 pb-2">
+                                    <p class="mb-0">{{ "User name" | lang}}:
+                                        <span class="mb-0">{{ invitation.userName }}</span>
                                     </p>
                                 </div>
+                                <div class="col-12 pb-2">
+                                    <p class="mb-0">{{ "User email" | lang}}:
+                                        <span class="mb-0">{{ invitation.userEmail }}</span>
+                                    </p>
+                                </div>
+                                <div class="col-12 pb-2">
+                                    <div class="text-left">
+                                        <p class="mb-0">{{ "Status" | lang}}:
+                                            <span
+                                                [ngClass]="{ 'c-red': invitation.requestStatus == UserStatusChangeType.UserDeclined,
+                                                'c-blue': invitation.requestStatus == UserStatusChangeType.Default,
+                                                'c-green': invitation.requestStatus == UserStatusChangeType.UserConfirmed}">
+                                                {{ 'wspInviteStatus.' + invitation.requestStatus | lang}}
+                                            </span>
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="col-12 pb-2">
+                                    <p class="mb-0">{{ "Inviter" | lang}}:
+                                        <span class="mb-0">{{ invitation.inviterName }}</span>
+                                    </p>
+                                </div>
+                                <!-- В будущем не только директор сможет приглашать, пока скрыто -->
+                                <!-- <div class="col-12 pb-2">
+                                    <p class="mb-0">{{ "Workspace director" | lang}}:
+                                        <span class="mb-0">{{ invitation.directorWspName }}</span>
+                                    </p>
+                                </div> -->
                             </div>
-                            <div class="col-12 pb-2">
-                                <p class="mb-0">{{ "Inviter" | lang}}:
-                                    <span class="mb-0">{{ invitation.inviterName }}</span>
-                                </p>
-                            </div>
-                            <!-- В будущем не только директор сможет приглашать, пока скрыто -->
-                            <!-- <div class="col-12 pb-2">
-                                <p class="mb-0">{{ "Workspace director" | lang}}:
-                                    <span class="mb-0">{{ invitation.directorWspName }}</span>
-                                </p>
-                            </div> -->
                         </div>
                     </div>
                 </div>
-            </div>
-        </ng-container>
-        <div class="col-auto mb-4" *ngIf="isWorkspaceOwner">
-            <div class="card h-100 mb-0" style="min-width: 200px; min-height: 200px;">
-                <div class="card-body h-100 pb-0 pr-0">
-                    <div class="row h-100">
-                        <div class="col d-flex flex-column flex-center">
-                            <img style="width: 60px;" src="/assets/icons/plus_icon.png" type="button"
-                                class="cursor-pointer" (click)="createInvite()" draggable="false" class="mb-2">
+            </ng-container>
+            <div class="col-auto mb-4">
+                <div class="card h-100 mb-0" style="min-width: 200px; min-height: 200px;">
+                    <div class="card-body h-100 pb-0 pr-0">
+                        <div class="row h-100">
+                            <div class="col d-flex flex-column flex-center">
+                                <img style="width: 60px;" src="/assets/icons/plus_icon.png" type="button"
+                                    class="cursor-pointer" (click)="createInvite()" draggable="false" class="mb-2">
+                            </div>
                         </div>
                     </div>
                 </div>

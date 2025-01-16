@@ -4,6 +4,8 @@ namespace TaskTracker.Core.src.Models.ResponseModels
 {
     public class UserWspStatusChangeModel
     {
+        public int Id { get; set; }
+
         /// <summary>
         /// Юзер, которого приглашают или удаляют из рабочего пространства
         /// </summary>

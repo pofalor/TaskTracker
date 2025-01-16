@@ -150,5 +150,28 @@ namespace TaskTracker.Core.src.ErrorCodes
         [ErrorMessage(typeof(WorkSpaceErrorCodeResources), nameof(CannotCheckOwner))]
         CannotCheckOwner = CannotFindUserForInvite + 1,
 
+        /// <summary>
+        /// Не задано айди инвайта при прниятии инвайта
+        /// </summary>
+        [ErrorMessage(typeof(WorkSpaceErrorCodeResources), nameof(InviteIdNotSet))]
+        InviteIdNotSet = CannotCheckOwner + 1,
+
+        /// <summary>
+        /// Неверный статус при принятии инвайта
+        /// </summary>
+        [ErrorMessage(typeof(WorkSpaceErrorCodeResources), nameof(InvalidStatusInvite))]
+        InvalidStatusInvite = InviteIdNotSet + 1,
+
+        /// <summary>
+        /// Активный инвайт в базе не найден
+        /// </summary>
+        [ErrorMessage(typeof(WorkSpaceErrorCodeResources), nameof(InviteNotExists))]
+        InviteNotExists = InvalidStatusInvite + 1,
+
+        /// <summary>
+        /// Не удаётся принять инвайт
+        /// </summary>
+        [ErrorMessage(typeof(WorkSpaceErrorCodeResources), nameof(CannotAcceptInviteWsp))]
+        CannotAcceptInviteWsp = InviteNotExists + 1,
     }
 }

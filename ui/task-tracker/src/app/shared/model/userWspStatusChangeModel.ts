@@ -2,6 +2,8 @@
 import { UserStatusChangeType } from '../enums/user-status-change-type'
 
 export class UserWspStatusChangeModel {
+    public id!: number;
+
     /** Юзер, которого приглашают или удаляют из рабочего пространства*/
     public userId!: number;
 
