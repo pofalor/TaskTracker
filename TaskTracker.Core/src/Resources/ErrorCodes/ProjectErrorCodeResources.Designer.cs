@@ -61,6 +61,24 @@ namespace TaskTracker.Core.src.Resources.ErrorCodes {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Access denied.
+        /// </summary>
+        internal static string AccessDenied {
+            get {
+                return ResourceManager.GetString("AccessDenied", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Unable to verify the current user&apos;s permissions. Please contact support.
+        /// </summary>
+        internal static string CannotCheckOwner {
+            get {
+                return ResourceManager.GetString("CannotCheckOwner", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Unable to retrieve project information. Please contact support.
         /// </summary>
         internal static string CannotGetProjects {
