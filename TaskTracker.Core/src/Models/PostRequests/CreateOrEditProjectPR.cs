@@ -36,7 +36,7 @@ namespace TaskTracker.Core.src.Models.PostRequests
         /// <summary>
         /// Автор проекта
         /// </summary>
-        public int AuthorId { get; set; }
+        public int? AuthorId { get; set; }
 
         /// <summary>
         /// Ответственный за проект

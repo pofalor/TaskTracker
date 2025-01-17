@@ -137,34 +137,40 @@ export class WorkspaceInfoComponent extends BaseComponent {
         centered: true,
         size: 'lg'
       });
-      t.modalRef.componentInstance.workspaceId = +t.workspaceId;
-      t.modalRef.componentInstance.projectAuthorId = t.getUser().id;
+    t.modalRef.componentInstance.workspaceId = +t.workspaceId;
+    t.modalRef.componentInstance.projectAuthorId = t.getUser().id;
 
     t.modalRef.result.then(async (result) => t.processProjectModalResult(result));
   }
 
-  public editProject(project: ProjectModel){
+  public editProject(project: ProjectModel) {
     var t = this;
     t.modalRef = t.modalService.open(CreateProjectComponent,
       {
         centered: true,
         size: 'lg'
       });
-      t.modalRef.componentInstance.projectId = project.id;
-      t.modalRef.componentInstance.projectName = project.name;
-      t.modalRef.componentInstance.projectDescr = project.description;
-      t.modalRef.componentInstance.projectCode = project.code;
-      t.modalRef.componentInstance.projectStartDate = DatepickerUtils.dateFromStr(project.startDate);
-      t.modalRef.componentInstance.projectEndDate = DatepickerUtils.dateFromStr(project.endDate);
-      t.modalRef.componentInstance.projectAuthorId = project.authorId;
-      t.modalRef.componentInstance.projectMgrId = project.projectMgrId;
-      t.modalRef.componentInstance.workspaceId = +t.workspaceId;
+    t.modalRef.componentInstance.projectId = project.id;
+    t.modalRef.componentInstance.projectName = project.name;
+    t.modalRef.componentInstance.projectDescr = project.description;
+    t.modalRef.componentInstance.projectCode = project.code;
+    t.modalRef.componentInstance.projectStartDate = DatepickerUtils.dateFromStr(project.startDate);
+    t.modalRef.componentInstance.projectEndDate = DatepickerUtils.dateFromStr(project.endDate);
+    t.modalRef.componentInstance.projectAuthorId = project.authorId;
+    t.modalRef.componentInstance.projectMgrId = project.projectMgrId;
+    t.modalRef.componentInstance.workspaceId = +t.workspaceId;
 
     t.modalRef.result.then(async (result) => t.processProjectModalResult(result));
   }
 
-  public goToIssues(){
-
+  public goToIssues(projectId: number) {
+    this.router.navigate(['/all-issues'],
+      {
+        queryParams: {
+          "workspaceId": this.workspaceId,
+          "projectId": projectId
+        }
+      });
   }
 
   public createInvite() {

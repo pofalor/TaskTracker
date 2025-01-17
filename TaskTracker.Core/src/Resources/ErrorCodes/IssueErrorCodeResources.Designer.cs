@@ -22,14 +22,14 @@ namespace TaskTracker.Core.src.Resources.ErrorCodes {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class AuthenticationErrorCodeResources {
+    internal class IssueErrorCodeResources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal AuthenticationErrorCodeResources() {
+        internal IssueErrorCodeResources() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace TaskTracker.Core.src.Resources.ErrorCodes {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("TaskTracker.Core.src.Resources.ErrorCodes.AuthenticationErrorCodeResources", typeof(AuthenticationErrorCodeResources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("TaskTracker.Core.src.Resources.ErrorCodes.IssueErrorCodeResources", typeof(IssueErrorCodeResources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,15 +61,6 @@ namespace TaskTracker.Core.src.Resources.ErrorCodes {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Failed to log in.
-        /// </summary>
-        internal static string AuthError {
-            get {
-                return ResourceManager.GetString("AuthError", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Ищет локализованную строку, похожую на Unable to retrieve task information. Please contact support.
         /// </summary>
         internal static string CannotGetIssues {
@@ -79,56 +70,11 @@ namespace TaskTracker.Core.src.Resources.ErrorCodes {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Error creating user.
+        ///   Ищет локализованную строку, похожую на Access to organization issues is restricted. Contact the owner of your organization.
         /// </summary>
-        internal static string ErrorCreatingUser {
+        internal static string UserNotMemberWsp {
             get {
-                return ResourceManager.GetString("ErrorCreatingUser", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на Invalid username.
-        /// </summary>
-        internal static string ErrorFirstName {
-            get {
-                return ResourceManager.GetString("ErrorFirstName", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на Invalid user last name.
-        /// </summary>
-        internal static string ErrorLastName {
-            get {
-                return ResourceManager.GetString("ErrorLastName", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на Invalid email.
-        /// </summary>
-        internal static string InvalidEmail {
-            get {
-                return ResourceManager.GetString("InvalidEmail", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на Invalid email or password.
-        /// </summary>
-        internal static string InvalidEmailOrPassword {
-            get {
-                return ResourceManager.GetString("InvalidEmailOrPassword", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на User already exists.
-        /// </summary>
-        internal static string UserAlreadyExists {
-            get {
-                return ResourceManager.GetString("UserAlreadyExists", resourceCulture);
+                return ResourceManager.GetString("UserNotMemberWsp", resourceCulture);
             }
         }
     }

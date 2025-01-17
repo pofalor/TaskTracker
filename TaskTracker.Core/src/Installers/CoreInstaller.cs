@@ -24,6 +24,7 @@ namespace TaskTracker.Core.src.Installers
             services.AddScoped<ISosService, SosService>();
             services.AddScoped<IWorkSpaceService, WorkSpaceService>();
             services.AddScoped<IProjectService, ProjectService>();
+            services.AddScoped<IIssueService, IssueService>();
 
             return services;
         }

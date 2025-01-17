@@ -1,0 +1,54 @@
+<div class="container-fluid">
+    <div class="row">
+        <div class="col col-sm px-3">
+            <div class="text-left text-uppercase f-30 f-w-700 my-3">
+                {{"All issues" | lang}}
+            </div>
+        </div>
+        <div class="col-auto">
+            <button type="button" class="btn btn-primary" (click)="createIssue()">
+                {{'Create issue'| lang}}
+            </button>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12" *ngIf="!!allIssues && allIssues.length > 0">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">{{"Name" | lang}}</th>
+                        <th scope="col">{{"Description" | lang}}</th>
+                        <th scope="col">{{"Type" | lang}}</th>
+                        <th scope="col">{{"Status" | lang}}</th>
+                        <th scope="col">{{"Priority" | lang}}</th>
+                        <th scope="col">{{"Author" | lang}}</th>
+                        <th scope="col">{{"Assignee" | lang}}</th>
+                        <th scope="col">{{"Time track" | lang}}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let issue of allIssues let i = index">
+                        <th scope="row">{{issue.projectCode + '-' + issue.index}}</th>
+                        <td>{{issue.name}}</td>
+                        <td>{{issue.description}}</td>
+                        <td>{{'issueType.' + issue.type | lang}}</td>
+                        <td>{{'issueStatus.' + issue.status | lang}}</td>
+                        <td>{{'issuePriority.' + issue.priority | lang}}</td>
+                        <td>{{issue.authorName}}</td>
+                        <td>{{issue.assigneeName ?? ("Not set" | lang)}}</td>
+                        <td>{{issue.timeTrack}}</td>
+                        <td>
+                            <a class="cursor-pointer">
+                                <i class="fa fa-edit p-2" (click)="editIssue(issue)"></i>
+                            </a>
+                            <a class="cursor-pointer">
+                                <i class="fa fa-calendar p-2" (click)="trackTime(issue.id)"></i>
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+</div>

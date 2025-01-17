@@ -1,0 +1,101 @@
+<div class="card mb-0">
+    <div class="card-body">
+        <div class="row mb-4">
+            <div class="col text-center">
+                <h4 *ngIf="!issueId" class="f-28">{{"Create issue" | lang}}</h4>
+                <h4 *ngIf="!!issueId" class="f-28">{{"Edit issue" | lang}}</h4>
+            </div>
+        </div>
+
+        <form [formGroup]="issueForm" class="form-group m-0">
+            <div class="row">
+                <div class="col-12 pb-3">
+                    <label class="mb-1">{{ "Issue name" | lang }}</label>
+                    <input type="text" class="form-control" formControlName="formIssueName"
+                        placeholder="{{'Issue name' | lang}}" />
+                    <div *ngIf="elemIsInvalid(issueForm.get('formIssueName'))" class="text text-danger mt-1">
+                        {{textErrorStr(issueForm.get('formIssueName')) | lang}}
+                    </div>
+                </div>
+                <div class="col-12 pb-3">
+                    <label class="mb-1">{{ "Issue description" | lang }}</label>
+                    <input type="text" class="form-control" formControlName="formIssueDescr"
+                        placeholder="{{'Issue description' | lang}}"/>
+                    <div *ngIf="elemIsInvalid(issueForm.get('formIssueDescr'))" class="text text-danger mt-1">
+                        {{textErrorStr(issueForm.get('formIssueDescr')) | lang}}
+                    </div>
+                </div>
+                <div class="col-12 pb-3">
+                    <label class="mb-1">{{ "Assignee" | lang }}</label>
+                    <ng-select appearance="outline" class="br-10" id="mgr-input-field" formControlName="formIssueAssigneeId">
+                        <ng-option *ngFor="let user of assigneeCandidates" class="br-10" [value]="user.id">
+                            {{ user.name }}
+                        </ng-option>
+                    </ng-select>
+                    <div *ngIf="elemIsInvalid(issueForm.get('formIssueAssigneeId'))" class="text text-danger mt-1">
+                        {{textErrorStr(issueForm.get('formIssueAssigneeId')) | lang}}
+                    </div>
+                </div>
+                <div class="col-12 pb-3">
+                    <label class="mb-1">{{ "Issue type" | lang }}</label>
+                    <ng-select appearance="outline" class="br-10" id="mgr-input-field" formControlName="formIssueType">
+                        <ng-option *ngFor="let type of issueTypeArray" class="br-10" [value]="type.value">
+                            {{ type.label }}
+                        </ng-option>
+                    </ng-select>
+                    <div *ngIf="elemIsInvalid(issueForm.get('formIssueType'))" class="text text-danger mt-1">
+                        {{textErrorStr(issueForm.get('formIssueType')) | lang}}
+                    </div>
+                </div>
+                <div class="col-12 pb-3">
+                    <label class="mb-1">{{ "Issue status" | lang }}</label>
+                    <ng-select appearance="outline" class="br-10" id="mgr-input-field" formControlName="formIssueStatus">
+                        <ng-option *ngFor="let status of IssueStatuses" class="br-10" [value]="status.key">
+                            {{ status.value }}
+                        </ng-option>
+                    </ng-select>
+                    <div *ngIf="elemIsInvalid(issueForm.get('formIssueStatus'))" class="text text-danger mt-1">
+                        {{textErrorStr(issueForm.get('formIssueStatus')) | lang}}
+                    </div>
+                </div>
+                <div class="col-12 pb-3">
+                    <label class="mb-1">{{ "Issue priority" | lang }}</label>
+                    <ng-select appearance="outline" class="br-10" id="mgr-input-field" formControlName="formIssuePriority">
+                        <ng-option *ngFor="let priority of issuePriorityArray" class="br-10" [value]="priority.value">
+                            {{ priority.label }}
+                        </ng-option>
+                    </ng-select>
+                    <div *ngIf="elemIsInvalid(issueForm.get('formIssuePriority'))" class="text text-danger mt-1">
+                        {{textErrorStr(issueForm.get('formIssuePriority')) | lang}}
+                    </div>
+                </div>
+                <!-- Оценки пока нету -->
+                <!-- <div class="col-12 pb-3">
+                    <label>{{ "Project manager" | lang }}</label>
+                    <ng-select appearance="outline" class="br-10" id="mgr-input-field" formControlName="formIssueEstimate">
+                        <ng-option *ngFor="let mgr of projectMgrCandidates" class="br-10" [value]="mgr.id">
+                            {{ mgr.name }}
+                        </ng-option>
+                    </ng-select>
+                    <div *ngIf="elemIsInvalid(issueForm.get('formIssueEstimate'))" class="text text-danger mt-1">
+                        {{textErrorStr(issueForm.get('formIssueEstimate')) | lang}}
+                    </div>
+                </div> -->
+            </div>
+        </form>
+        <div class="row">
+            <div class="col">
+                <button data-target="#modal-confirm" data-toggle="modal" class="btn btn-outline-info btn-soft w-100"
+                    type="button" (click)="back()">
+                    {{ "buttons.cancel" | lang }}
+                </button>
+            </div>
+            <div class="col">
+                <button data-target="#modal-confirm" data-toggle="modal" class="btn btn-primary btn-soft w-100"
+                    type="button" (click)="createOrEditIssue()">
+                    {{ "buttons.save" | lang }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
