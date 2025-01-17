@@ -384,7 +384,7 @@ namespace TaskTracker.Core.src.Services.Impl
                     .Where(x=> !usersAlreadyInWsp.Contains(x.Id))
                     .Where(x => !x.IsDeleted)
                     .Where(x=> x.Email == searchUser.Search 
-                    || x.NickName == searchUser.Search)
+                    || !string.IsNullOrEmpty(x.NickName) && x.NickName == searchUser.Search)
                     .ToListAsync();
 
                 return result.WithData(users);

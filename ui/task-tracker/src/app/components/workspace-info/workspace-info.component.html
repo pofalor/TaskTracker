@@ -36,7 +36,7 @@
                         <td>{{project.endDate ?? ("Not set" | lang)}}</td>
                         <td>{{project.projectMgrName}}</td>
                         <td>
-                            <a class="cursor-pointer">
+                            <a class="cursor-pointer" *ngIf="project.projectMgrId == getUser().id || isWorkspaceOwner">
                                 <i class="fa fa-edit p-2" (click)="editProject(project)"></i>
                             </a>
                             <a class="cursor-pointer">

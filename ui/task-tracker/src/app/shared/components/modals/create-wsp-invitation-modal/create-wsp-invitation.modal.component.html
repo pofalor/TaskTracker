@@ -30,7 +30,7 @@
                 <div class="col-12 pb-3">
                     <label>{{ "Select user" | lang }}</label>
                     <ng-select appearance="outline" class="br-10" id="allusers-input-field" formControlName="userId"
-                    (search)="searchUsersForInvite($event)">
+                    (search)="searchEvent($event)" clearable="false" appearance="outline">
                     <ng-container *ngFor="let user of allUsers">
                         <ng-option class="br-10" [value]="user.id">
                             {{ user.name }}
