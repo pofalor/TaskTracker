@@ -34,15 +34,5 @@ namespace TaskTracker.Core.src.Models.PostRequests
         /// Задача, по которой списали часы
         /// </summary>
         public int IssueId { get; set; }
-
-        public TimeSpan GetTimeSpan()
-        {
-            var values = TimeSpent.Split(' ');
-            var day = values[0].Replace("h", "");
-            var hour = values[1].Replace("m", "");
-            var minute = values[2].Replace("s", "");
-            var val = new TimeSpan(int.Parse(day), int.Parse(hour), int.Parse(minute));
-            return val;
-        } 
     }
 }

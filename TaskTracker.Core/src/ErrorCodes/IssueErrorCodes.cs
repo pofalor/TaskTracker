@@ -35,5 +35,11 @@ namespace TaskTracker.Core.src.ErrorCodes
 
         [ErrorMessage(typeof(IssueErrorCodeResources), nameof(CannotCreateTimeTrack))]
         CannotCreateTimeTrack = IssueNotSet + 1,
+
+        /// <summary>
+        /// Не удаётся трекнуть часы с нулевым значением
+        /// </summary>
+        [ErrorMessage(typeof(IssueErrorCodeResources), nameof(TimeTrackIsZero))]
+        TimeTrackIsZero = CannotCreateTimeTrack + 1,
     }
 }

@@ -26,7 +26,7 @@ import { DatepickerUtils } from '../../shared/utils/ngbDatepickerUtils';
   styleUrl: './workspace-info.component.scss'
 })
 export class WorkspaceInfoComponent extends BaseComponent {
-  public workspaceId!: string;
+  public workspaceId!: string;  
   allProjects: ProjectModel[] = [];
   public getUser: () => UserModel;
   public isWorkspaceOwner: boolean = false;

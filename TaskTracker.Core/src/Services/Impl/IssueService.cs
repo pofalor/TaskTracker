@@ -160,6 +160,11 @@ namespace TaskTracker.Core.src.Services.Impl
 
             try
             {
+                if (request.TimeSpent == TimeSpan.Zero) 
+                {
+                    return result.WithError(IssueErrorCodes.TimeTrackIsZero);
+                }
+
                 var existingIssue = await _dbContext.Set<Issue>()
                       .Where(x => request.IssueId == x.Id)
                       .Where(x => !x.IsDeleted)

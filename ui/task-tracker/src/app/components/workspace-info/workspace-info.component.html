@@ -5,7 +5,7 @@
                 {{"Projects" | lang}}
             </div>
         </div>
-        <div class="col-auto">
+        <div class="col-auto" *ngIf="isWorkspaceOwner">
             <button type="button" class="btn btn-primary" (click)="createProject()">
                 {{'Create project'| lang}}
             </button>
@@ -48,7 +48,7 @@
             </table>
         </div>
 
-        <div class="col px-3" *ngIf="!isWorkspaceOwner && (!allProjects || allProjects.length == 0)">
+        <div class="col px-3" *ngIf="!allProjects || allProjects.length == 0">
             <div class="card">
                 <div class="card-body f-20 f-w-600" style="min-height: 260px; line-height: 200px; text-align: center;">
                     {{'This workspace does not have any projects yet' | lang}}

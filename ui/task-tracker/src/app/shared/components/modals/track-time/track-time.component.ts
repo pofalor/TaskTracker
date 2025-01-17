@@ -46,7 +46,7 @@ export class TrackTimeComponent extends BaseComponent {
     var t = this;
     this.timeTrackForm = t.fb.group({
       formTimeSpent: [t.timeSpent, [Validators.required, Validators.pattern(t.timeTrackPattern)]],
-      formDateBegin: [t.dateBegin, [Validators.required, t.baseDateValidator.bind(t)]],
+      formDateBegin: [t.dateBegin, [t.baseDateValidator.bind(t)]],
       formComment: [t.comment, [Validators.maxLength(500)]]
     });
   }
@@ -65,7 +65,7 @@ export class TrackTimeComponent extends BaseComponent {
 
     t.timeTrack.issueId = t.issueId;
     t.timeTrack.timeSpent =  t.formTimeSpent?.value;
-    t.timeTrack.dateBegin =  DatepickerUtils.dateToStr(t.formDateBegin?.value);
+    t.timeTrack.dateBegin = !!t.formDateBegin?.value ? DatepickerUtils.dateToStr(t.formDateBegin?.value) : undefined;
     t.timeTrack.comment = t.formComment?.value;
 
     await t.issueService.trackTime(t.timeTrack)

@@ -50,7 +50,7 @@ namespace TaskTracker.Core.src.Context
                 .ForMember(dist => dist.EndDate, opt => opt.MapFrom(x => x.ConvertEndDate()));
             CreateMap<TimeTrackPR, TimeTracking>()
                 .ForMember(dist => dist.DateBegin, opt => opt.MapFrom(x => DateTime.ParseExact(x.DateBegin, DateFormatConstants.FrontInputFormat, CultureInfo.InvariantCulture)))
-                .ForMember(dist => dist.TimeSpent, opt => opt.MapFrom(x => x.GetTimeSpan()));
+                .ForMember(dist => dist.TimeSpent, opt => opt.MapFrom(x => x.TimeSpent.ConvertToTimespan()));
             CreateMap<CreateOrEditIssuePR, Issue>()
                 //костыль, чтобы не отваливался бек
                 .ForMember(dist => dist.Estimate, opt => opt.MapFrom(x => new TimeSpan()));
