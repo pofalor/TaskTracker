@@ -40,6 +40,11 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>BaseErrorCodeResources.resx</DependentUpon>
     </Compile>
+    <Compile Update="src\Resources\ErrorCodes\IssueErrorCodeResources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>IssueErrorCodeResources.resx</DependentUpon>
+    </Compile>
     <Compile Update="src\Resources\ErrorCodes\ProjectErrorCodeResources.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -75,6 +80,10 @@
     <EmbeddedResource Update="src\Resources\ErrorCodes\BaseErrorCodeResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>BaseErrorCodeResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="src\Resources\ErrorCodes\IssueErrorCodeResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>IssueErrorCodeResources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Update="src\Resources\ErrorCodes\ProjectErrorCodeResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

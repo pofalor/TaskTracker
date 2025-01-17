@@ -1,55 +1,78 @@
 {
-    "errors": {
-        "required": "All fields are required",
-        "onlyLatinAndNum": "Only latin characters and numbers",
-        "onlyText": "You must enter only text without number",
-        "password": {
-          "atLeastOneUpperCase": "Password must contain at least one capital letter in Latin",
-          "atLeastOneLowerCase": "Password must contain at least one lowercase letter in Latin",
-          "noCyrillic": "Password can not contain any characters in Cyrillic",
-          "atLeastOneDigit": "Password must contain at least one number",
-          "minLength": "Password must be longer than 5 characters",
-          "maxLength": "Password must be less than 100 characters",
-          "alphaNumeric":"Password must contain at least one alphanumeric character"
-        },
-        "passwordConfirmation": {
-          "notMatch": "Password confirmation does not match password"
-        },
-        "inputFloatNumber": "Required format '0.0'",
-        "invalidField": "Field filled in incorrectly",
-        "mismatch": "Password mismatch",
-        "min": "Minimum ",
-        "minLength": "Minimum length ",
-        "maxLength": "Maximum length ",
-        "futureDate": "The date must not be later than the current date"
-        
+  "errors": {
+    "required": "All fields are required",
+    "onlyLatinAndNum": "Only latin characters and numbers",
+    "onlyText": "You must enter only text without number",
+    "password": {
+      "atLeastOneUpperCase": "Password must contain at least one capital letter in Latin",
+      "atLeastOneLowerCase": "Password must contain at least one lowercase letter in Latin",
+      "noCyrillic": "Password can not contain any characters in Cyrillic",
+      "atLeastOneDigit": "Password must contain at least one number",
+      "minLength": "Password must be longer than 5 characters",
+      "maxLength": "Password must be less than 100 characters",
+      "alphaNumeric": "Password must contain at least one alphanumeric character"
     },
-    "workSpaceType":{
-        "0": "Personal",
-        "1": "Company"
+    "passwordConfirmation": {
+      "notMatch": "Password confirmation does not match password"
     },
-    "buttons":{
-        "save": "Save",
-        "cancel":"Cancel",
-        "viewProjects":"View projects",
-        "change":"Change",
-        "edit":"Edit",
-        "view":"View",
-        "confirm":"Confirm",
-        "decline":"Decline"
-    },
-    "teamRoles":{
-      "0": "Not set",
-      "1":"Developer",
-      "2":"Tester",
-      "3":"Director",
-      "4":"Project manager",
-      "5":"Owner"
-    },
-    "wspInviteStatus": {
-      "0": "Waiting for confirmation",
-      "1":"Confirmed",
-      "2":"Declined"
-    }
-
+    "inputFloatNumber": "Required format '0.0'",
+    "invalidField": "Field filled in incorrectly",
+    "mismatch": "Password mismatch",
+    "min": "Minimum ",
+    "minLength": "Minimum length ",
+    "maxLength": "Maximum length ",
+    "futureDate": "The date must not be later than the current date",
+    "invalidTimeTrack":"Required format: 2h 3m 11s"
+  },
+  "workSpaceType": {
+    "0": "Personal",
+    "1": "Company"
+  },
+  "buttons": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "viewProjects": "View projects",
+    "change": "Change",
+    "edit": "Edit",
+    "view": "View",
+    "confirm": "Confirm",
+    "decline": "Decline"
+  },
+  "teamRoles": {
+    "0": "Not set",
+    "1": "Developer",
+    "2": "Tester",
+    "3": "Director",
+    "4": "Project manager",
+    "5": "Owner"
+  },
+  "wspInviteStatus": {
+    "0": "Waiting for confirmation",
+    "1": "Confirmed",
+    "2": "Declined"
+  },
+  "issueType": {
+    "0": "Task",
+    "1": "Story",
+    "2": "Bug",
+    "3": "Epic"
+  },
+  "issueStatus": {
+    "0": "Backlog",
+    "1": "Selected for development",
+    "2": "In progress",
+    "3": "Pull request",
+    "4": "To deploy",
+    "5": "Test",
+    "6": "Declined",
+    "7": "Done",
+    "8": "Deferred"
+  },
+  "issuePriority": {
+    "0": "Lowest",
+    "1": "Low",
+    "2": "Medium",
+    "3": "High",
+    "4": "Highest"
+  }
 }

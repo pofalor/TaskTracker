@@ -85,6 +85,9 @@ namespace TaskTracker.Web.Api.Controllers
 
             try
             {
+                if (!request.AuthorId.HasValue)
+                    request.AuthorId = UserId;
+
                 if (request.AuthorId != UserId)
                 {
                     await _logNotificatorService.SendTelegramAdminAsync($"The user has sent a request to create a project with a user Id " +

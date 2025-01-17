@@ -117,28 +117,10 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="UserAlreadyExists" xml:space="preserve">
-    <value>User already exists</value>
-  </data>
-  <data name="ErrorCreatingUser" xml:space="preserve">
-    <value>Error creating user</value>
-  </data>
-  <data name="ErrorFirstName" xml:space="preserve">
-    <value>Invalid username</value>
-  </data>
-  <data name="ErrorLastName" xml:space="preserve">
-    <value>Invalid user last name</value>
-  </data>
-  <data name="InvalidEmail" xml:space="preserve">
-    <value>Invalid email</value>
-  </data>
-  <data name="InvalidEmailOrPassword" xml:space="preserve">
-    <value>Invalid email or password</value>
-  </data>
-  <data name="AuthError" xml:space="preserve">
-    <value>Failed to log in</value>
-  </data>
   <data name="CannotGetIssues" xml:space="preserve">
     <value>Unable to retrieve task information. Please contact support</value>
+  </data>
+  <data name="UserNotMemberWsp" xml:space="preserve">
+    <value>Access to organization issues is restricted. Contact the owner of your organization</value>
   </data>
 </root>

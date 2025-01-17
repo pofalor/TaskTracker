@@ -26,6 +26,7 @@ export abstract class BaseComponent {
     /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/;
   public phonePattern = /^(?:[+]?\d+(?:\s?\(\d+\))?|\d{3}(?:\s?\(\d+\))?)(?:[-\s]?\d+)+$/;
   public numberPattern = /^[0-9]+$/;
+  public timeTrackPattern = /^[0-9]+h [0-9]+m [0-9]+s$/;
 
   //с помощью этого создается модалка
   private modalRefBase: NgbModalRef | undefined;
@@ -270,6 +271,7 @@ export abstract class BaseComponent {
         elem.errors.pattern != undefined && namepattern != null && namepattern == this.latinAndNumberPattern ? "errors.onlyLatinAndNum" :
         elem.errors.pattern != undefined && namepattern != null && namepattern == this.emailPattern ? "errors.invalidField" :
         elem.errors.pattern != undefined && namepattern != null && namepattern == this.namePattern ? "errors.invalidField" :
+        elem.errors.pattern != undefined && namepattern != null && namepattern == this.timeTrackPattern ? "errors.invalidTimeTrack" :
         elem.errors.pattern != undefined && namepattern != null && namepattern == this.floatNumberPattern ? "errors.inputFloatNumber" :
         elem.errors.email != undefined ? "errors.invalidField" :
         elem.errors.mismatch != undefined ? "errors.mismatch" :

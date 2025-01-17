@@ -15,6 +15,11 @@ export const routes: Routes = [
         loadComponent: () => import('./components/workspace-info/workspace-info.component').then(c => c.WorkspaceInfoComponent),
         canActivate: [UserGuard],
     },
+    { 
+        path: "all-issues",
+        loadComponent: () => import('./components/all-issues/all-issues.component').then(c => c.AllIssuesComponent),
+        canActivate: [UserGuard],
+    },
 
     { path: "*", redirectTo: 'my-workspaces' },
 ];
