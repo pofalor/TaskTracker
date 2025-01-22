@@ -74,7 +74,8 @@ namespace TaskTracker.Core.src.Services.Impl
                     AuthorName = x.Author.GetUserName(),
                     AssigneeName = x.Assignee?.GetUserName() ?? string.Empty
                 })
-                    .OrderByDescending(x=> x.Id)
+                    .OrderByDescending(x=> x.Priority)
+                    .ThenByDescending(x=> x.Id)
                     .ToList();
 
                 return result.WithData(models);
