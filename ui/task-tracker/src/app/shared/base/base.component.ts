@@ -26,7 +26,7 @@ export abstract class BaseComponent {
     /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/;
   public phonePattern = /^(?:[+]?\d+(?:\s?\(\d+\))?|\d{3}(?:\s?\(\d+\))?)(?:[-\s]?\d+)+$/;
   public numberPattern = /^[0-9]+$/;
-  public timeTrackPattern = /^[0-9]+h [0-9]+m [0-9]+s$/;
+  public timeTrackPattern = /^([0-9]+h\s?)?([0-9]+m\s?)?([0-9]+s\s?)?$/;
 
   //с помощью этого создается модалка
   private modalRefBase: NgbModalRef | undefined;

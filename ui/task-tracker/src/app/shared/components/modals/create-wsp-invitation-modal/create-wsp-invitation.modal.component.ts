@@ -34,6 +34,8 @@ export class CreateWspInvitationModalComponent extends BaseComponent {
   public invitationForm!: FormGroup;
   newInvitation: CreateWspInvitePostRequest = new CreateWspInvitePostRequest();
   public allUsers: UserModel[] | undefined;
+  public timer: any;
+  searchText: string = "";
 
   constructor(
     private modalService: NgbModal,
@@ -46,6 +48,9 @@ export class CreateWspInvitationModalComponent extends BaseComponent {
     super(modalService, translate);
 
   }
+
+  get workspaceId() { return this.invitationForm.get('workspaceId'); }
+  get userId() { return this.invitationForm.get('userId'); }
 
   ngOnInit() {
     var t = this;
@@ -64,11 +69,21 @@ export class CreateWspInvitationModalComponent extends BaseComponent {
     });
   }
 
-  get workspaceId() { return this.invitationForm.get('workspaceId'); }
-  get userId() { return this.invitationForm.get('userId'); }
-
-  public async searchUsersForInvite(event: any) {
+  searchEvent(event: any) {
     var t = this;
+    var timeOutTime = 1000;
+    t.searchText = event.term;
+
+    if (t.timer) {
+      clearTimeout(t.timer);
+      t.timer = setTimeout(t.searchUsersForInvite, timeOutTime, t);
+    }
+    else {
+      t.timer = setTimeout(t.searchUsersForInvite, timeOutTime, t);
+    }
+  }
+
+  public async searchUsersForInvite(t: any) {
     var wspId = t.workspaceId?.value;
 
     if (!wspId) {
@@ -83,14 +98,14 @@ export class CreateWspInvitationModalComponent extends BaseComponent {
     var postRequest: SearchUserForInvitePR = {
       workSpaceId: wspId,
       inviterId: t.userService.get()?.id,
-      search: event.term
+      search: t.searchText
     };
 
     await t.workSpaceService.searchUsersForInvite(postRequest)
       .then((resp: any) => {
         t.allUsers = resp.data;
       })
-      .catch((e) => {
+      .catch((e: any) => {
         t.showResponseError(e);
       })
   }
