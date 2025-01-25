@@ -228,7 +228,6 @@ namespace TaskTracker.Core.src.Services.Impl
                     UserStatusChangeType.UserConfirmed, 
                     UserStatusChangeType.UserDeclined
                 };
-                //TODO: добавить проверку в контроллер, что текущий юзер делает запрос
                 //Вытаскиваем все запросы, в которых юзер - приглашающий
                 var statusChanges = await _dbContext.Set<UserWorkspaceStatusChangeRequest>()
                     .AsNoTracking()
@@ -287,6 +286,7 @@ namespace TaskTracker.Core.src.Services.Impl
                     .AsNoTracking()
                     .Where(x => !x.IsDeleted)
                     .Where(x=> x.UserId == request.UserId)
+                    .Where(x=> x.WorkSpaceId == request.WorkSpaceId)
                     .Where(x=> x.RequestStatus == UserStatusChangeType.Default)
                     .AnyAsync();
 
