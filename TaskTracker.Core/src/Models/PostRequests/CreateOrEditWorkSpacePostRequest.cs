@@ -1,4 +1,6 @@
-﻿using TaskTracker.Core.src.Enums;
+﻿using System.Globalization;
+using TaskTracker.Core.src.Constants;
+using TaskTracker.Core.src.Enums;
 
 namespace TaskTracker.Core.src.Models.PostRequests
 {
@@ -34,5 +36,13 @@ namespace TaskTracker.Core.src.Models.PostRequests
         public string? Address { get; set; }
 
         public string? INN { get; set; }
+
+        public DateTime? RegistrationDateTime
+        { 
+            get
+            {
+                return !string.IsNullOrEmpty(RegistrationDate) ? DateTime.ParseExact(RegistrationDate, DateFormatConstants.FrontInputFormat, CultureInfo.InvariantCulture) : null;
+            } 
+        }
     }
 }
