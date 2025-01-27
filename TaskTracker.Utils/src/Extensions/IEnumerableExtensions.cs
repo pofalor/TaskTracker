@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace TaskTracker.Utils.src.Extensions
+﻿namespace TaskTracker.Utils.src.Extensions
 {
     public static class IEnumerableExtensions
     {

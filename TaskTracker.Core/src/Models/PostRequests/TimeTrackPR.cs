@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Globalization;
 using TaskTracker.Core.src.Constants;
-using TaskTracker.Core.src.Entities;
+using TaskTracker.Utils.src.Extensions;
 
 namespace TaskTracker.Core.src.Models.PostRequests
 {
@@ -18,7 +14,7 @@ namespace TaskTracker.Core.src.Models.PostRequests
         /// <summary>
         /// Дата начала работы
         /// </summary>
-        public string DateBegin { get; set; } = DateTime.UtcNow.ToString(DateFormatConstants.FrontInputFormat);
+        public string DateBegin { get; set; } = string.Empty;
 
         /// <summary>
         /// Комментарий к списанным часам
@@ -34,5 +30,12 @@ namespace TaskTracker.Core.src.Models.PostRequests
         /// Задача, по которой списали часы
         /// </summary>
         public int IssueId { get; set; }
+
+        public DateTime GetBeginDate()
+        {
+            return DateBegin.IsEmpty() 
+                ? DateTime.UtcNow - TimeSpent.ConvertToTimespan()
+                : DateTime.ParseExact(DateBegin, DateFormatConstants.FrontInputFormat, CultureInfo.InvariantCulture);
+        }
     }
 }

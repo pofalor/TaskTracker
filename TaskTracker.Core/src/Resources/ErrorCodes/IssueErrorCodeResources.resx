@@ -123,4 +123,49 @@
   <data name="UserNotMemberWsp" xml:space="preserve">
     <value>Access to organization issues is restricted. Contact the owner of your organization</value>
   </data>
+  <data name="ProjectNotSet" xml:space="preserve">
+    <value>Failed to retrieve project information. Please contact support</value>
+  </data>
+  <data name="AuthorNotSet" xml:space="preserve">
+    <value>Unable to retrieve user information. Please contact support</value>
+  </data>
+  <data name="EmptyName" xml:space="preserve">
+    <value>Issue name cannot be empty</value>
+  </data>
+  <data name="CannotCreateIssue" xml:space="preserve">
+    <value>Failed to create issue. Please contact support</value>
+  </data>
+  <data name="IssueNotSet" xml:space="preserve">
+    <value>Unable to retrieve issue information. Please contact support</value>
+  </data>
+  <data name="CannotCreateTimeTrack" xml:space="preserve">
+    <value>Failed to create time track. Please contact support</value>
+  </data>
+  <data name="TimeTrackIsZero" xml:space="preserve">
+    <value>The time track must not have a zero value</value>
+  </data>
+  <data name="EmptyDescr" xml:space="preserve">
+    <value>Fill in the issue description</value>
+  </data>
+  <data name="IssueTypeInvalid" xml:space="preserve">
+    <value>Please select another issue type</value>
+  </data>
+  <data name="IssueStatusInvalid" xml:space="preserve">
+    <value>Please select another issue status</value>
+  </data>
+  <data name="IssuePriorityInvalid" xml:space="preserve">
+    <value>Please select a different issue priority</value>
+  </data>
+  <data name="IssueAssigneeInvalid" xml:space="preserve">
+    <value>The issue assignee is specified incorrectly. Please contact support.</value>
+  </data>
+  <data name="AssigneeNotMemberWsp" xml:space="preserve">
+    <value>Failed to create task with specified assignee. Please select another assignee or contact support</value>
+  </data>
+  <data name="TrackDateNotSet" xml:space="preserve">
+    <value>System error: begin date is incorrect. Please contact support</value>
+  </data>
+  <data name="TrackDateInFuture" xml:space="preserve">
+    <value>Begin date is in the future. Change the begin date and try again</value>
+  </data>
 </root>

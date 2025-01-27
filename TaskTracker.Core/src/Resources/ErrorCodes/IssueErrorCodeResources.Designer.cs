@@ -61,11 +61,146 @@ namespace TaskTracker.Core.src.Resources.ErrorCodes {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Failed to create task with specified assignee. Please select another assignee or contact support.
+        /// </summary>
+        internal static string AssigneeNotMemberWsp {
+            get {
+                return ResourceManager.GetString("AssigneeNotMemberWsp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Unable to retrieve user information. Please contact support.
+        /// </summary>
+        internal static string AuthorNotSet {
+            get {
+                return ResourceManager.GetString("AuthorNotSet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Failed to create issue. Please contact support.
+        /// </summary>
+        internal static string CannotCreateIssue {
+            get {
+                return ResourceManager.GetString("CannotCreateIssue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Failed to create time track. Please contact support.
+        /// </summary>
+        internal static string CannotCreateTimeTrack {
+            get {
+                return ResourceManager.GetString("CannotCreateTimeTrack", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Unable to retrieve task information. Please contact support.
         /// </summary>
         internal static string CannotGetIssues {
             get {
                 return ResourceManager.GetString("CannotGetIssues", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Fill in the issue description.
+        /// </summary>
+        internal static string EmptyDescr {
+            get {
+                return ResourceManager.GetString("EmptyDescr", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Issue name cannot be empty.
+        /// </summary>
+        internal static string EmptyName {
+            get {
+                return ResourceManager.GetString("EmptyName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на The issue assignee is specified incorrectly. Please contact support..
+        /// </summary>
+        internal static string IssueAssigneeInvalid {
+            get {
+                return ResourceManager.GetString("IssueAssigneeInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Unable to retrieve issue information. Please contact support.
+        /// </summary>
+        internal static string IssueNotSet {
+            get {
+                return ResourceManager.GetString("IssueNotSet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Please select a different issue priority.
+        /// </summary>
+        internal static string IssuePriorityInvalid {
+            get {
+                return ResourceManager.GetString("IssuePriorityInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Please select another issue status.
+        /// </summary>
+        internal static string IssueStatusInvalid {
+            get {
+                return ResourceManager.GetString("IssueStatusInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Please select another issue type.
+        /// </summary>
+        internal static string IssueTypeInvalid {
+            get {
+                return ResourceManager.GetString("IssueTypeInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Failed to retrieve project information. Please contact support.
+        /// </summary>
+        internal static string ProjectNotSet {
+            get {
+                return ResourceManager.GetString("ProjectNotSet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на The time track must not have a zero value.
+        /// </summary>
+        internal static string TimeTrackIsZero {
+            get {
+                return ResourceManager.GetString("TimeTrackIsZero", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Begin date is in the future. Change the begin date and try again.
+        /// </summary>
+        internal static string TrackDateInFuture {
+            get {
+                return ResourceManager.GetString("TrackDateInFuture", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на System error: begin date is incorrect. Please contact support.
+        /// </summary>
+        internal static string TrackDateNotSet {
+            get {
+                return ResourceManager.GetString("TrackDateNotSet", resourceCulture);
             }
         }
         

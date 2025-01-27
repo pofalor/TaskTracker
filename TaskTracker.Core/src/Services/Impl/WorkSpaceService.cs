@@ -1,7 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System;
-using System.IO.Pipes;
 using TaskTracker.Core.src.DataAccess;
 using TaskTracker.Core.src.DataResult;
 using TaskTracker.Core.src.Entities;
@@ -9,7 +7,6 @@ using TaskTracker.Core.src.Enums;
 using TaskTracker.Core.src.ErrorCodes;
 using TaskTracker.Core.src.Models.Filters;
 using TaskTracker.Core.src.Models.PostRequests;
-using TaskTracker.Core.src.Models.ResponseModels;
 using TaskTracker.Utils.src.Extensions;
 
 namespace TaskTracker.Core.src.Services.Impl

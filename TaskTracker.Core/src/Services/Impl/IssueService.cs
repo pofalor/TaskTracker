@@ -1,6 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using NLog.Filters;
 using System.Collections.Immutable;
+using System.Linq;
+using TaskTracker.Core.src.Constants;
 using TaskTracker.Core.src.DataAccess;
 using TaskTracker.Core.src.DataResult;
 using TaskTracker.Core.src.Entities;
@@ -18,13 +21,16 @@ namespace TaskTracker.Core.src.Services.Impl
         private readonly ApplicationDbContext _dbContext;
         private readonly ILogger<IssueService> _logger;
         private readonly IWorkSpaceService _workSpaceService;
+        private readonly ILogNotificatorService _logNotificatorService;
 
-        public IssueService(ApplicationDbContext dbContext, ILogger<IssueService> logger, IWorkSpaceService workSpaceService) :
+        public IssueService(ApplicationDbContext dbContext, ILogger<IssueService> logger, IWorkSpaceService workSpaceService, 
+            ILogNotificatorService logNotificatorService) :
             base(dbContext, logger)
         {
             _dbContext = dbContext;
             _logger = logger;
             _workSpaceService = workSpaceService;
+            _logNotificatorService = logNotificatorService;
         }
 
         public async Task<IDataResult<List<IssueModel>>> GetProjectIssues(IssueFilter filter)
@@ -93,6 +99,7 @@ namespace TaskTracker.Core.src.Services.Impl
             var result = new DataResult<bool>();
             try
             {
+                //TODO: добавить проверку на EpicId
                 if (request.ProjectId <= 0)
                 {
                     return result.WithError(IssueErrorCodes.ProjectNotSet);
@@ -105,11 +112,59 @@ namespace TaskTracker.Core.src.Services.Impl
                 {
                     return result.WithError(IssueErrorCodes.EmptyName);
                 }
+                else if (request.Description.IsEmpty())
+                {
+                    return result.WithError(IssueErrorCodes.EmptyDescr);
+                }
+                else if (!IssueConstants.ValidIssueTypes.Contains(request.Type))
+                {
+                    return result.WithError(IssueErrorCodes.IssueTypeInvalid);
+                }
+                else if (!IssueConstants.ValidIssuePriorities.Contains(request.Priority))
+                {
+                    return result.WithError(IssueErrorCodes.IssuePriorityInvalid);
+                }
+                else if (request.AssigneeId.HasValue && request.AssigneeId.Value <= 0)
+                {
+                    return result.WithError(IssueErrorCodes.IssueAssigneeInvalid);
+                }
+
+                var wspId = await _dbContext.Set<Project>()
+                    .Where(x => request.ProjectId == x.Id)
+                    .Where(x => !x.IsDeleted)
+                    .Where(x => !x.WorkSpace.IsDeleted)
+                    .Select(x => x.WorkSpaceId)
+                    .DefaultIfEmpty()
+                    .FirstOrDefaultAsync();
+
+                var isWorkspaceMember = await _workSpaceService.IsWorkspaceMember(request.AuthorId, wspId);
+                if (!isWorkspaceMember)
+                {
+                    await _logNotificatorService.SendTelegramAdminAsync($"The user has sent a request to create issue, " +
+                        $"but he not workspace membership{Environment.NewLine} " +
+                        $"Project id: {request.ProjectId}{Environment.NewLine} " +
+                        $"User id: {request.AuthorId}.");
+                    return result.WithError(IssueErrorCodes.UserNotMemberWsp);
+                }
+
+                if (request.AssigneeId.HasValue)
+                {
+                    var isAssigneeWorkspaceMember = await _workSpaceService.IsWorkspaceMember(request.AssigneeId.Value, wspId);
+                    if (!isAssigneeWorkspaceMember)
+                    {
+                        await _logNotificatorService.SendTelegramAdminAsync($"The user submitted a request to create an issue with an assignee " +
+                            $"who is not a member of the workspace{Environment.NewLine}" +
+                            $"Project id: {request.ProjectId}{Environment.NewLine} " +
+                            $"User id: {request.AuthorId}{Environment.NewLine}" +
+                            $"Assignee id: {request.AssigneeId}.");
+                        return result.WithError(IssueErrorCodes.AssigneeNotMemberWsp);
+                    }
+                }
 
                 var existingIssue = await _dbContext.Set<Issue>()
-                      .Where(x => request.Id == x.Id)
-                      .Where(x => !x.IsDeleted)
-                      .FirstOrDefaultAsync();
+                    .Where(x => request.Id == x.Id)
+                    .Where(x => !x.IsDeleted)
+                    .FirstOrDefaultAsync();
 
                 var newIssue = new Issue();
 
@@ -123,9 +178,9 @@ namespace TaskTracker.Core.src.Services.Impl
                     var lastIssueIndex = await _dbContext.Set<Issue>()
                         .AsNoTracking()
                         .Where(x => !x.IsDeleted)
-                        .Where(x=> x.ProjectId ==  request.ProjectId)
-                        .OrderByDescending(x=> x.Index)
-                        .Select(x=> x.Index)
+                        .Where(x => x.ProjectId == request.ProjectId)
+                        .OrderByDescending(x => x.Index)
+                        .Select(x => x.Index)
                         .FirstOrDefaultAsync();
 
                     newIssue.AuthorId = request.AuthorId;
@@ -165,15 +220,35 @@ namespace TaskTracker.Core.src.Services.Impl
                 {
                     return result.WithError(IssueErrorCodes.TimeTrackIsZero);
                 }
+                else if(request.DateBegin == DateTime.MinValue)
+                {
+                    return result.WithError(IssueErrorCodes.TrackDateNotSet);
+                }
+                else if (request.DateBegin > DateTime.UtcNow)
+                {
+                    return result.WithError(IssueErrorCodes.TrackDateInFuture);
+                }
 
                 var existingIssue = await _dbContext.Set<Issue>()
-                      .Where(x => request.IssueId == x.Id)
-                      .Where(x => !x.IsDeleted)
-                      .FirstOrDefaultAsync();
+                    .Include(x=> x.Project)
+                    .Where(x => request.IssueId == x.Id)
+                    .Where(x => !x.IsDeleted)
+                    .FirstOrDefaultAsync();
 
                 if(existingIssue == null)
                 {
                     return result.WithError(IssueErrorCodes.IssueNotSet);
+                }
+
+                var isWorkspaceMember = await _workSpaceService.IsWorkspaceMember(request.UserId, existingIssue.Project.WorkSpaceId);
+                if (!isWorkspaceMember)
+                {
+                    await _logNotificatorService.SendTelegramAdminAsync($"The user has sent a request to track time, " +
+                        $"but he not workspace membership{Environment.NewLine}" +
+                        $"Issue id: {request.IssueId}{Environment.NewLine}" +
+                        $"Workspace id: {existingIssue.Project.WorkSpaceId}{Environment.NewLine}" +
+                        $"User id: {request.UserId}.");
+                    return result.WithError(IssueErrorCodes.UserNotMemberWsp);
                 }
 
                 await _dbContext.AddAsync(request);
