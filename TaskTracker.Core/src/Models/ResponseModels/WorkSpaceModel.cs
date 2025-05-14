@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TaskTracker.Core.src.Entities;
-using TaskTracker.Core.src.Enums;
+﻿using TaskTracker.Core.src.Enums;
 
 namespace TaskTracker.Core.src.Models.ResponseModels
 {

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace TaskTracker.Core.src.Models.Filters
+﻿namespace TaskTracker.Core.src.Models.Filters
 {
     public class IssueFilter : BaseFilter
     {

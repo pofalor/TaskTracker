@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using NLog.Filters;
 using TaskTracker.Core.src.Constants;
 using TaskTracker.Core.src.Entities;
 using TaskTracker.Core.src.ErrorCodes;
@@ -95,7 +96,7 @@ namespace TaskTracker.Web.Api.Controllers
                         $"different from his user Id in claims{Environment.NewLine} " +
                         $"User id from request: {request.AuthorId}{Environment.NewLine} " +
                         $"User id from claims: {UserId}.");
-                    return response.WithError(ProjectErrorCodes.AccessDenied);
+                    return response.WithError(IssueErrorCodes.AccessDenied);
                 }
 
                 var mapRes = _mapper.Map<Issue>(request);
@@ -124,6 +125,15 @@ namespace TaskTracker.Web.Api.Controllers
             {
                 if (!request.UserId.HasValue)
                     request.UserId = UserId;
+
+                if (request.UserId != UserId)
+                {
+                    await _logNotificatorService.SendTelegramAdminAsync($"The user has sent a request to track time with a user Id " +
+                        $"different from his user Id in claims{Environment.NewLine} " +
+                        $"User id from request: {request.UserId}{Environment.NewLine} " +
+                        $"User id from claims: {UserId}.");
+                    return response.WithError(IssueErrorCodes.AccessDenied);
+                }
 
                 var mapRes = _mapper.Map<TimeTracking>(request);
                 var result = await _issueService.TrackTime(mapRes);

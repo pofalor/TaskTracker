@@ -1,7 +1,5 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.IdentityModel.Tokens;
-using System;
 using System.Globalization;
 using TaskTracker.Core.src.Constants;
 using TaskTracker.Core.src.Entities;
@@ -49,11 +47,10 @@ namespace TaskTracker.Core.src.Context
                 .ForMember(dist => dist.StartDate, opt => opt.MapFrom(x => DateTime.ParseExact(x.StartDate, DateFormatConstants.FrontInputFormat, CultureInfo.InvariantCulture)))
                 .ForMember(dist => dist.EndDate, opt => opt.MapFrom(x => x.ConvertEndDate()));
             CreateMap<TimeTrackPR, TimeTracking>()
-                .ForMember(dist => dist.DateBegin, opt => opt.MapFrom(x => DateTime.ParseExact(x.DateBegin, DateFormatConstants.FrontInputFormat, CultureInfo.InvariantCulture)))
+                .ForMember(dist => dist.DateBegin, opt => opt.MapFrom(x => x.GetBeginDate()))
                 .ForMember(dist => dist.TimeSpent, opt => opt.MapFrom(x => x.TimeSpent.ConvertToTimespan()));
             CreateMap<CreateOrEditIssuePR, Issue>()
-                //костыль, чтобы не отваливался бек
-                .ForMember(dist => dist.Estimate, opt => opt.MapFrom(x => new TimeSpan()));
+                .ForMember(dist => dist.Estimate, opt => opt.MapFrom(x => x.Estimate.ConvertToTimespan()));
         }
     }
 }
