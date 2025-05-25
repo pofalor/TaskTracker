@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using NLog.Filters;
+using TaskTracker.Controllers.BaseControllers;
 using TaskTracker.Core.src.Constants;
 using TaskTracker.Core.src.Entities;
 using TaskTracker.Core.src.ErrorCodes;
@@ -10,14 +11,13 @@ using TaskTracker.Core.src.Models.ResponseModels;
 using TaskTracker.Core.src.Services;
 using TaskTracker.Core.src.Services.Impl;
 using TaskTracker.Utils.src.Extensions;
-using TaskTracker.Web.Api.Controllers.BaseControllers;
 using TaskTracker.Web.Api.Extensions;
 using TaskTracker.Web.Api.Responses;
 
 namespace TaskTracker.Web.Api.Controllers
 {
     [Route("api/issue")]
-    public class IssueController : BaseController<Issue, IssueModel, CreateOrEditIssuePR, IssueFilter>
+    public class IssueController : ProtectedApiController
     {
         private readonly ILogger<IssueController> _logger;
         private readonly IWorkSpaceService _workSpaceService;
@@ -27,7 +27,6 @@ namespace TaskTracker.Web.Api.Controllers
 
         public IssueController(ILogger<IssueController> logger, IWorkSpaceService workSpaceService,
             IMapper mapper, IUserService userService, ILogNotificatorService logNotificatorService, IIssueService issueService)
-            : base(logger, issueService, mapper, userService)
         {
             _logger = logger;
             _workSpaceService = workSpaceService;
@@ -69,20 +68,11 @@ namespace TaskTracker.Web.Api.Controllers
             }
         }
 
-        public override void InitRoles()
-        {
-            AddRole(nameof(CreateOrEdit), Permissions.UserRole);
-        }
-
         [Route("add")]
         [HttpPost]
-        public override async Task<DataResponse<bool>> CreateOrEdit(CreateOrEditIssuePR request)
+        public async Task<DataResponse<bool>> CreateOrEdit(CreateOrEditIssuePR request)
         {
             var response = new DataResponse<bool>();
-
-            var isSuccess = await CheckRoles(nameof(CreateOrEdit));
-            if (!isSuccess)
-                return response.WithError(SystemErrorCodes.AccessDenied);
 
             try
             {

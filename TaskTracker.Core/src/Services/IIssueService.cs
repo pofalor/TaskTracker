@@ -5,10 +5,12 @@ using TaskTracker.Core.src.Models.ResponseModels;
 
 namespace TaskTracker.Core.src.Services
 {
-    public interface IIssueService : IBaseService<Issue, IssueFilter>
+    public interface IIssueService
     {
         Task<IDataResult<List<IssueModel>>> GetProjectIssues(IssueFilter filter);
 
         Task<IDataResult<bool>> TrackTime(TimeTracking request);
+
+        Task<IDataResult<bool>> CreateOrEdit(Issue request);
     }
 }

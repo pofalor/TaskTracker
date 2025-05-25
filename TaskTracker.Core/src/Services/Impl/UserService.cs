@@ -11,7 +11,7 @@ using TaskTracker.Core.src.Models.ResponseModels;
 
 namespace TaskTracker.Core.src.Services.Impl
 {
-    public class UserService : BaseService<User, BaseFilter>, IUserService
+    public class UserService : IUserService
     {
         private readonly ApplicationDbContext _dbContext;
         private readonly ILogger<UserService> _logger;
@@ -20,8 +20,7 @@ namespace TaskTracker.Core.src.Services.Impl
         private readonly IMapper _mapper;
 
         public UserService(ApplicationDbContext dbContext, ILogger<UserService> logger, UserManager<IdentityUser> userManager,
-            ApplicationIdentityDbContext identityDbContext, IMapper mapper) :
-            base(dbContext, logger)
+            ApplicationIdentityDbContext identityDbContext, IMapper mapper)
         {
             _dbContext = dbContext;
             _logger = logger;
@@ -36,14 +35,14 @@ namespace TaskTracker.Core.src.Services.Impl
 
             try
             {
-                var userRes = await GetById(id);
+                var user = await _dbContext.Set<User>()
+                    .AsNoTracking()
+                    .Where(x => !x.IsDeleted && x.Id == id)
+                    .FirstOrDefaultAsync();
 
-                if (!userRes.Success)
-                {
-                    return result.WithError(userRes.Errors[0].Message);
-                }
+                if (user == null)
+                    return result.WithError(UserErrorCodes.CannotGetUser);
 
-                var user = userRes.Data;
                 var identityUser = await GetIdentityUser(user.UserId);
                 var userModel = _mapper.Map<UserModel>(user);
                 userModel.Roles = await _userManager.GetRolesAsync(identityUser);

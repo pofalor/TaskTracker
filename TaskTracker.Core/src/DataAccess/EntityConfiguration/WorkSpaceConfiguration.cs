@@ -18,6 +18,7 @@ namespace TaskTracker.Core.src.DataAccess.EntityConfiguration
             builder.Property(p => p.RegistrationDate).HasColumnName("registration_date").IsRequired(false);
             builder.Property(p => p.Address).HasColumnName("address").IsRequired(false);
             builder.Property(p => p.INN).HasColumnName("inn").IsRequired(false);
+            builder.Property(p => p.ReviewStatus).HasColumnName("review_status").IsRequired(true);
         }
     }
 }

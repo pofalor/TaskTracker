@@ -35,5 +35,11 @@ namespace TaskTracker.Core.src.Entities
         public string? Address { get; set; }
 
         public string? INN { get; set; }
+
+        /// <summary>
+        /// Статус проверки рабочего пространства администратором
+        /// </summary>
+        public WorkspaceReviewStatus ReviewStatus { get; set; }
+
     }
 }

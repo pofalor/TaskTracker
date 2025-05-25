@@ -1,6 +1,6 @@
 ﻿namespace TaskTracker.Core.src.Enums
 {
-    public enum UserStatusChangeType
+    public enum InviteStatus
     {
         All = -1,
 

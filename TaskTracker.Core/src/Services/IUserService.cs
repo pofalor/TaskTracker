@@ -5,7 +5,7 @@ using TaskTracker.Core.src.Models.ResponseModels;
 
 namespace TaskTracker.Core.src.Services
 {
-    public interface IUserService : IBaseService<User, BaseFilter>
+    public interface IUserService
     {
         /// <summary>
         /// Получить юзера по айди

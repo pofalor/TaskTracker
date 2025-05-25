@@ -6,7 +6,7 @@ namespace TaskTracker.Core.src.Entities
     /// <summary>
     /// Запросы на смену статусов юзерам в рабочих пространствах(либо приглашение в рабочее пространство, либо удаление из него)
     /// </summary>
-    public class UserWorkspaceStatusChangeRequest : PersistentEntity
+    public class WorkspaceInvite : PersistentEntity
     {
         /// <summary>
         /// Ссылка на рабочее пространство, 
@@ -39,7 +39,7 @@ namespace TaskTracker.Core.src.Entities
         /// <summary>
         /// Подтвердил юзер приглашение или нет
         /// </summary>
-        public UserStatusChangeType RequestStatus { get; set; }
+        public InviteStatus RequestStatus { get; set; }
 
         /// <summary>
         /// Просмотрел ли бек жоб 

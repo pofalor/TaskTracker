@@ -10,14 +10,13 @@ using TaskTracker.Utils.src.Extensions;
 
 namespace TaskTracker.Core.src.Services.Impl
 {
-    public class ProjectService : BaseService<Project, BaseFilter>, IProjectService
+    public class ProjectService : IProjectService
     {
         private readonly ApplicationDbContext _dbContext;
         private readonly ILogger<ProjectService> _logger;
         private readonly IWorkSpaceService _workSpaceService;
 
-        public ProjectService(ApplicationDbContext dbContext, ILogger<ProjectService> logger, IWorkSpaceService workSpaceService) :
-            base(dbContext, logger)
+        public ProjectService(ApplicationDbContext dbContext, ILogger<ProjectService> logger, IWorkSpaceService workSpaceService)
         {
             _dbContext = dbContext;
             _logger = logger;
@@ -49,7 +48,7 @@ namespace TaskTracker.Core.src.Services.Impl
             }
         }
 
-        public override async Task<IDataResult<bool>> CreateOrEdit(Project request)
+        public async Task<IDataResult<bool>> CreateOrEdit(Project request)
         {
             var result = new DataResult<bool>();
             try

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TaskTracker.Core.src.DataAccess;
@@ -11,9 +12,11 @@ using TaskTracker.Core.src.DataAccess;
 namespace TaskTracker.Core.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250524100138_TimeTrackAutoStatus")]
+    partial class TimeTrackAutoStatus
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -317,6 +320,86 @@ namespace TaskTracker.Core.Migrations
                     b.ToTable("User", (string)null);
                 });
 
+            modelBuilder.Entity("TaskTracker.Core.src.Entities.UserWorkspaceStatusChangeRequest", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("Date");
+
+                    b.Property<int>("InviterId")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsChecked")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_checked");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_deleted");
+
+                    b.Property<bool>("IsHidden")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_hidden");
+
+                    b.Property<int>("NewStatus")
+                        .HasColumnType("integer")
+                        .HasColumnName("new_status");
+
+                    b.Property<DateTime>("ObjectCreateDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("object_create_date");
+
+                    b.Property<DateTime>("ObjectEditDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("object_edit_date");
+
+                    b.Property<int?>("PreviousStatus")
+                        .HasColumnType("integer")
+                        .HasColumnName("previous_status");
+
+                    b.Property<int>("RequestStatus")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0)
+                        .HasColumnName("request_status");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.Property<byte[]>("Version")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("bytea")
+                        .HasColumnName("version");
+
+                    b.Property<int>("WorkSpaceId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InviterId");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("WorkSpaceId");
+
+                    b.ToTable("UserWorkspaceStatusChangeRequest", (string)null);
+                });
+
             modelBuilder.Entity("TaskTracker.Core.src.Entities.WorkSpace", b =>
                 {
                     b.Property<int>("Id")
@@ -441,86 +524,6 @@ namespace TaskTracker.Core.Migrations
                     b.ToTable("WorkSpaceMember", (string)null);
                 });
 
-            modelBuilder.Entity("TaskTracker.Core.src.Entities.WorkspaceInvite", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("Date");
-
-                    b.Property<int>("InviterId")
-                        .HasColumnType("integer");
-
-                    b.Property<bool>("IsChecked")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(false)
-                        .HasColumnName("is_checked");
-
-                    b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(false)
-                        .HasColumnName("is_deleted");
-
-                    b.Property<bool>("IsHidden")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(false)
-                        .HasColumnName("is_hidden");
-
-                    b.Property<int>("NewStatus")
-                        .HasColumnType("integer")
-                        .HasColumnName("new_status");
-
-                    b.Property<DateTime>("ObjectCreateDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("object_create_date");
-
-                    b.Property<DateTime>("ObjectEditDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("object_edit_date");
-
-                    b.Property<int?>("PreviousStatus")
-                        .HasColumnType("integer")
-                        .HasColumnName("previous_status");
-
-                    b.Property<int>("RequestStatus")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(0)
-                        .HasColumnName("request_status");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
-                    b.Property<byte[]>("Version")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("bytea")
-                        .HasColumnName("version");
-
-                    b.Property<int>("WorkSpaceId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("InviterId");
-
-                    b.HasIndex("UserId");
-
-                    b.HasIndex("WorkSpaceId");
-
-                    b.ToTable("WorkspaceInvite", (string)null);
-                });
-
             modelBuilder.Entity("TaskTracker.Core.src.Entities.Issue", b =>
                 {
                     b.HasOne("TaskTracker.Core.src.Entities.User", "Assignee")
@@ -598,6 +601,33 @@ namespace TaskTracker.Core.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("TaskTracker.Core.src.Entities.UserWorkspaceStatusChangeRequest", b =>
+                {
+                    b.HasOne("TaskTracker.Core.src.Entities.User", "Inviter")
+                        .WithMany()
+                        .HasForeignKey("InviterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TaskTracker.Core.src.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TaskTracker.Core.src.Entities.WorkSpace", "WorkSpace")
+                        .WithMany()
+                        .HasForeignKey("WorkSpaceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Inviter");
+
+                    b.Navigation("User");
+
+                    b.Navigation("WorkSpace");
+                });
+
             modelBuilder.Entity("TaskTracker.Core.src.Entities.WorkSpace", b =>
                 {
                     b.HasOne("TaskTracker.Core.src.Entities.User", "DirectorUser")
@@ -622,33 +652,6 @@ namespace TaskTracker.Core.Migrations
                         .HasForeignKey("WorkSpaceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("User");
-
-                    b.Navigation("WorkSpace");
-                });
-
-            modelBuilder.Entity("TaskTracker.Core.src.Entities.WorkspaceInvite", b =>
-                {
-                    b.HasOne("TaskTracker.Core.src.Entities.User", "Inviter")
-                        .WithMany()
-                        .HasForeignKey("InviterId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("TaskTracker.Core.src.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("TaskTracker.Core.src.Entities.WorkSpace", "WorkSpace")
-                        .WithMany()
-                        .HasForeignKey("WorkSpaceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Inviter");
 
                     b.Navigation("User");
 

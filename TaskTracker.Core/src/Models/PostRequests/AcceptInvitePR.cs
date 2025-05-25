@@ -6,7 +6,7 @@ namespace TaskTracker.Core.src.Models.PostRequests
     {
         public int Id { get; set; }
 
-        public UserStatusChangeType RequestStatus { get; set; }
+        public InviteStatus RequestStatus { get; set; }
 
         /// <summary>
         /// Тот, кто принимает запрос

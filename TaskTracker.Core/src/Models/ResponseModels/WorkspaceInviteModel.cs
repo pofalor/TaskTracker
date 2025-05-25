@@ -2,7 +2,7 @@
 
 namespace TaskTracker.Core.src.Models.ResponseModels
 {
-    public class UserWspStatusChangeModel
+    public class WorkspaceInviteModel
     {
         public int Id { get; set; }
 
@@ -24,7 +24,7 @@ namespace TaskTracker.Core.src.Models.ResponseModels
         /// <summary>
         /// Подтвердил юзер приглашение или нет
         /// </summary>
-        public UserStatusChangeType RequestStatus { get; set; }
+        public InviteStatus RequestStatus { get; set; }
 
         /// <summary>
         /// Скрыл ли юзер с фронта этот запрос(пока не используется, функционал на будущее)

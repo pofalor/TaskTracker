@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using TaskTracker.Controllers.BaseControllers;
 using TaskTracker.Core.src.Constants;
 using TaskTracker.Core.src.Entities;
 using TaskTracker.Core.src.ErrorCodes;
@@ -9,14 +10,13 @@ using TaskTracker.Core.src.Models.ResponseModels;
 using TaskTracker.Core.src.Services;
 using TaskTracker.Core.src.Services.Impl;
 using TaskTracker.Utils.src.Extensions;
-using TaskTracker.Web.Api.Controllers.BaseControllers;
 using TaskTracker.Web.Api.Extensions;
 using TaskTracker.Web.Api.Responses;
 
 namespace TaskTracker.Web.Api.Controllers
 {
     [Route("api/workspace")]
-    public class WorkSpaceController : BaseController<WorkSpace, WorkSpaceModel, CreateOrEditWorkSpacePostRequest, WorkSpaceFilter>
+    public class WorkSpaceController : ProtectedApiController
     {
         private readonly ILogger<WorkSpaceController> _logger;
         private readonly IWorkSpaceService _workSpaceService;
@@ -24,21 +24,12 @@ namespace TaskTracker.Web.Api.Controllers
         private readonly ILogNotificatorService _logNotificatorService;
 
         public WorkSpaceController(ILogger<WorkSpaceController> logger, IWorkSpaceService workSpaceService,
-            IMapper mapper, IUserService userService, ILogNotificatorService logNotificatorService) : base(logger, workSpaceService, mapper, userService)
+            IMapper mapper, IUserService userService, ILogNotificatorService logNotificatorService)
         {
             _logger = logger;
             _workSpaceService = workSpaceService;
             _mapper = mapper;
             _logNotificatorService = logNotificatorService;
-        }
-
-        public override void InitRoles()
-        {
-            AddRole(nameof(CreateOrEdit), Permissions.UserRole);
-            AddRole(nameof(CreateWspInvite), Permissions.UserRole);
-            AddRole(nameof(SearchUsersForInvite), Permissions.UserRole);
-            AddRole(nameof(IsUserWorkspaceOwner), Permissions.UserRole);
-            AddRole(nameof(AcceptInvitationRequest), Permissions.UserRole);
         }
 
         [Route("getMyWorkspaces")]
@@ -68,13 +59,9 @@ namespace TaskTracker.Web.Api.Controllers
 
         [Route("add")]
         [HttpPost]
-        public override async Task<DataResponse<bool>> CreateOrEdit(CreateOrEditWorkSpacePostRequest request)
+        public async Task<DataResponse<bool>> CreateOrEdit(CreateOrEditWorkSpacePostRequest request)
         {
             var response = new DataResponse<bool>();
-
-            var isSuccess = await CheckRoles(nameof(CreateOrEdit));
-            if (!isSuccess)
-                return response.WithError(SystemErrorCodes.AccessDenied);
 
             try
             {
@@ -107,9 +94,9 @@ namespace TaskTracker.Web.Api.Controllers
 
         [Route("getUserInvitations")]
         [HttpGet]
-        public async Task<DataResponse<List<UserWspStatusChangeModel>>> GetUserInvitations()
+        public async Task<DataResponse<List<WorkspaceInviteModel>>> GetUserInvitations()
         {
-            var response = new DataResponse<List<UserWspStatusChangeModel>>();
+            var response = new DataResponse<List<WorkspaceInviteModel>>();
 
             try
             {
@@ -119,7 +106,7 @@ namespace TaskTracker.Web.Api.Controllers
                     return response.WithError(result.Errors[0]);
                 }
 
-                var models = result.Data.Select(x => _mapper.Map<UserWspStatusChangeModel>(x)).ToList();
+                var models = result.Data.Select(x => _mapper.Map<WorkspaceInviteModel>(x)).ToList();
                 return response.WithData(models);
             }
             catch (Exception ex)
@@ -135,10 +122,6 @@ namespace TaskTracker.Web.Api.Controllers
         {
             var response = new DataResponse<bool>();
 
-            var isSuccess = await CheckRoles(nameof(CreateWspInvite));
-            if (!isSuccess)
-                return response.WithError(SystemErrorCodes.AccessDenied);
-
             try
             {
                 if (request.InviterId != UserId) 
@@ -150,7 +133,7 @@ namespace TaskTracker.Web.Api.Controllers
                     return response.WithError(WorkSpaceErrorCodes.AccessDenied);
                 }
 
-                var mapRes = _mapper.Map<UserWorkspaceStatusChangeRequest>(request);
+                var mapRes = _mapper.Map<WorkspaceInvite>(request);
                 var result = await _workSpaceService.CreateWpsInvitationRequest(mapRes);
 
                 if (result.Success)
@@ -171,10 +154,6 @@ namespace TaskTracker.Web.Api.Controllers
         public async Task<DataResponse<List<UserModel>>> SearchUsersForInvite(SearchUserForInvitePR request)
         {
             var response = new DataResponse<List<UserModel>>();
-
-            var isSuccess = await CheckRoles(nameof(SearchUsersForInvite));
-            if (!isSuccess)
-                return response.WithError(SystemErrorCodes.AccessDenied);
 
             try
             {
@@ -224,10 +203,6 @@ namespace TaskTracker.Web.Api.Controllers
         {
             var response = new DataResponse<bool>();
 
-            var isSuccess = await CheckRoles(nameof(IsUserWorkspaceOwner));
-            if (!isSuccess)
-                return response.WithError(SystemErrorCodes.AccessDenied);
-
             try
             {
                 var isWspOwner = await _workSpaceService.IsWorkspaceOwner(UserId, workspaceId);
@@ -243,9 +218,9 @@ namespace TaskTracker.Web.Api.Controllers
 
         [Route("getUserCreatedInvites")]
         [HttpGet]
-        public async Task<DataResponse<List<UserWspStatusChangeModel>>> GetUserCreatedInvites(int workspaceId)
+        public async Task<DataResponse<List<WorkspaceInviteModel>>> GetUserCreatedInvites(int workspaceId)
         {
-            var response = new DataResponse<List<UserWspStatusChangeModel>>();
+            var response = new DataResponse<List<WorkspaceInviteModel>>();
 
             try
             {
@@ -255,7 +230,7 @@ namespace TaskTracker.Web.Api.Controllers
                     return response.WithError(result.Errors[0]);
                 }
 
-                var models = result.Data.Select(x => _mapper.Map<UserWspStatusChangeModel>(x)).ToList();
+                var models = result.Data.Select(x => _mapper.Map<WorkspaceInviteModel>(x)).ToList();
                 return response.WithData(models);
             }
             catch (Exception ex)
@@ -270,10 +245,6 @@ namespace TaskTracker.Web.Api.Controllers
         public async Task<DataResponse<bool>> AcceptInvitationRequest(AcceptInvitePR request)
         {
             var response = new DataResponse<bool>();
-
-            var isSuccess = await CheckRoles(nameof(CreateWspInvite));
-            if (!isSuccess)
-                return response.WithError(SystemErrorCodes.AccessDenied);
 
             try
             {

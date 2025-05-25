@@ -16,7 +16,7 @@ using TaskTracker.Utils.src.Extensions;
 
 namespace TaskTracker.Core.src.Services.Impl
 {
-    public class IssueService : BaseService<Issue, IssueFilter>, IIssueService
+    public class IssueService : IIssueService
     {
         private readonly ApplicationDbContext _dbContext;
         private readonly ILogger<IssueService> _logger;
@@ -24,8 +24,7 @@ namespace TaskTracker.Core.src.Services.Impl
         private readonly ILogNotificatorService _logNotificatorService;
 
         public IssueService(ApplicationDbContext dbContext, ILogger<IssueService> logger, IWorkSpaceService workSpaceService, 
-            ILogNotificatorService logNotificatorService) :
-            base(dbContext, logger)
+            ILogNotificatorService logNotificatorService)
         {
             _dbContext = dbContext;
             _logger = logger;
@@ -94,7 +93,7 @@ namespace TaskTracker.Core.src.Services.Impl
             }
         }
 
-        public override async Task<IDataResult<bool>> CreateOrEdit(Issue request)
+        public async Task<IDataResult<bool>> CreateOrEdit(Issue request)
         {
             var result = new DataResult<bool>();
             try

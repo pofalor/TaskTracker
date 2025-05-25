@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using TaskTracker.Controllers.BaseControllers;
 using TaskTracker.Core.src.Constants;
 using TaskTracker.Core.src.Entities;
 using TaskTracker.Core.src.ErrorCodes;
@@ -8,14 +9,13 @@ using TaskTracker.Core.src.Models.PostRequests;
 using TaskTracker.Core.src.Models.ResponseModels;
 using TaskTracker.Core.src.Services;
 using TaskTracker.Utils.src.Extensions;
-using TaskTracker.Web.Api.Controllers.BaseControllers;
 using TaskTracker.Web.Api.Extensions;
 using TaskTracker.Web.Api.Responses;
 
 namespace TaskTracker.Web.Api.Controllers
 {
     [Route("api/project")]
-    public class ProjectController : BaseController<Project, ProjectModel, CreateOrEditProjectPR, BaseFilter>
+    public class ProjectController : ProtectedApiController
     {
         private readonly ILogger<ProjectController> _logger;
         private readonly IWorkSpaceService _workSpaceService;
@@ -25,7 +25,6 @@ namespace TaskTracker.Web.Api.Controllers
 
         public ProjectController(ILogger<ProjectController> logger, IWorkSpaceService workSpaceService,
             IMapper mapper, IUserService userService, ILogNotificatorService logNotificatorService, IProjectService projectService) 
-            : base(logger, projectService, mapper, userService)
         {
             _logger = logger;
             _workSpaceService = workSpaceService;
@@ -68,20 +67,11 @@ namespace TaskTracker.Web.Api.Controllers
             }
         }
 
-        public override void InitRoles()
-        {
-            AddRole(nameof(CreateOrEdit), Permissions.UserRole);
-        }
-
         [Route("add")]
         [HttpPost]
-        public override async Task<DataResponse<bool>> CreateOrEdit(CreateOrEditProjectPR request)
+        public async Task<DataResponse<bool>> CreateOrEdit(CreateOrEditProjectPR request)
         {
             var response = new DataResponse<bool>();
-
-            var isSuccess = await CheckRoles(nameof(CreateOrEdit));
-            if (!isSuccess)
-                return response.WithError(SystemErrorCodes.AccessDenied);
 
             try
             {

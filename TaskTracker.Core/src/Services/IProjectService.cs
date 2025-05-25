@@ -4,10 +4,12 @@ using TaskTracker.Core.src.Models.Filters;
 
 namespace TaskTracker.Core.src.Services
 {
-    public interface IProjectService : IBaseService<Project, BaseFilter>
+    public interface IProjectService
     {
         Task<IDataResult<List<Project>>> GetWorkspaceProjects(int workspaceId);
 
         Task<IDataResult<List<User>>> GetProjectMgrCandidates(int workspaceId);
+
+        Task<IDataResult<bool>> CreateOrEdit(Project request);
     }
 }

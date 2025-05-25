@@ -15,6 +15,7 @@ namespace TaskTracker.Core.src.DataAccess.EntityConfiguration
             builder.Property(p => p.Comment).HasColumnName("comment");
             builder.HasOne(p => p.User).WithMany().HasForeignKey(p => p.UserId).IsRequired();
             builder.HasOne(p => p.Issue).WithMany().HasForeignKey(p => p.IssueId).IsRequired();
+            builder.Property(p => p.AutoTrackStatus).HasColumnName("auto_track_status").IsRequired(false);
         }
     }
 }

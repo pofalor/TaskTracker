@@ -11,13 +11,12 @@ using TaskTracker.Utils.src.Extensions;
 
 namespace TaskTracker.Core.src.Services.Impl
 {
-    public class WorkSpaceService : BaseService<WorkSpace, WorkSpaceFilter>, IWorkSpaceService
+    public class WorkSpaceService : IWorkSpaceService
     {
         private readonly ApplicationDbContext _dbContext;
         private readonly ILogger<WorkSpaceService> _logger;
 
-        public WorkSpaceService(ApplicationDbContext dbContext, ILogger<WorkSpaceService> logger) :
-            base(dbContext, logger)
+        public WorkSpaceService(ApplicationDbContext dbContext, ILogger<WorkSpaceService> logger)
         {
             _dbContext = dbContext;
             _logger = logger;
@@ -50,7 +49,7 @@ namespace TaskTracker.Core.src.Services.Impl
             }
         }
 
-        public override async Task<IDataResult<bool>> CreateOrEdit(WorkSpace request)
+        public async Task<IDataResult<bool>> CreateOrEdit(WorkSpace request)
         {
             var result = new DataResult<bool>();
             try
@@ -178,19 +177,19 @@ namespace TaskTracker.Core.src.Services.Impl
             }
         }
 
-        public async Task<IDataResult<List<UserWorkspaceStatusChangeRequest>>> GetUserInvitations(int userId)
+        public async Task<IDataResult<List<WorkspaceInvite>>> GetUserInvitations(int userId)
         {
-            var result = new DataResult<List<UserWorkspaceStatusChangeRequest>>();
+            var result = new DataResult<List<WorkspaceInvite>>();
 
             try
             {
-                var statusesNeedShow = new UserStatusChangeType[]
+                var statusesNeedShow = new InviteStatus[]
                 {
-                    UserStatusChangeType.Default, UserStatusChangeType.UserDeclined
+                    InviteStatus.Default, InviteStatus.UserDeclined
                 };
 
                 //Вытаскиваем все запросы, в которые приглашают юзера
-                var statusChanges = await _dbContext.Set<UserWorkspaceStatusChangeRequest>()
+                var statusChanges = await _dbContext.Set<WorkspaceInvite>()
                     .AsNoTracking()
                     .Include(x => x.WorkSpace)
                     .Include(x=> x.WorkSpace.DirectorUser)
@@ -213,20 +212,20 @@ namespace TaskTracker.Core.src.Services.Impl
             }
         }
 
-        public async Task<IDataResult<List<UserWorkspaceStatusChangeRequest>>> GetUserCreatedInvites(int userId, int workspaceId)
+        public async Task<IDataResult<List<WorkspaceInvite>>> GetUserCreatedInvites(int userId, int workspaceId)
         {
-            var result = new DataResult<List<UserWorkspaceStatusChangeRequest>>();
+            var result = new DataResult<List<WorkspaceInvite>>();
 
             try
             {
-                var statusesNeedShow = new UserStatusChangeType[]
+                var statusesNeedShow = new InviteStatus[]
                 {
-                    UserStatusChangeType.Default, 
-                    UserStatusChangeType.UserConfirmed, 
-                    UserStatusChangeType.UserDeclined
+                    InviteStatus.Default, 
+                    InviteStatus.UserConfirmed, 
+                    InviteStatus.UserDeclined
                 };
                 //Вытаскиваем все запросы, в которых юзер - приглашающий
-                var statusChanges = await _dbContext.Set<UserWorkspaceStatusChangeRequest>()
+                var statusChanges = await _dbContext.Set<WorkspaceInvite>()
                     .AsNoTracking()
                     .Include(x => x.WorkSpace)
                     .Include(x=> x.User)
@@ -252,7 +251,7 @@ namespace TaskTracker.Core.src.Services.Impl
             }
         }
 
-        public async Task<IDataResult<bool>> CreateWpsInvitationRequest(UserWorkspaceStatusChangeRequest request)
+        public async Task<IDataResult<bool>> CreateWpsInvitationRequest(WorkspaceInvite request)
         {
             var result = new DataResult<bool>();
             try
@@ -279,12 +278,12 @@ namespace TaskTracker.Core.src.Services.Impl
                 }
 
                 //два активных реквеста не может быть
-                var activeRequestForUserExists = await _dbContext.Set<UserWorkspaceStatusChangeRequest>()
+                var activeRequestForUserExists = await _dbContext.Set<WorkspaceInvite>()
                     .AsNoTracking()
                     .Where(x => !x.IsDeleted)
                     .Where(x=> x.UserId == request.UserId)
                     .Where(x=> x.WorkSpaceId == request.WorkSpaceId)
-                    .Where(x=> x.RequestStatus == UserStatusChangeType.Default)
+                    .Where(x=> x.RequestStatus == InviteStatus.Default)
                     .AnyAsync();
 
                 if(activeRequestForUserExists)
@@ -312,7 +311,7 @@ namespace TaskTracker.Core.src.Services.Impl
                 if (lastUserMemberInfoExists && lastUserMemberInfo.UserStatus == request.NewStatus)
                     return result.WithError(WorkSpaceErrorCodes.UserAlreadyInWsp);
 
-                var newWpsInviteRequest = new UserWorkspaceStatusChangeRequest()
+                var newWpsInviteRequest = new WorkspaceInvite()
                 { 
                     UserId = request.UserId,
                     WorkSpaceId = request.WorkSpaceId,
@@ -320,7 +319,7 @@ namespace TaskTracker.Core.src.Services.Impl
                     Date = request.Date,
                     PreviousStatus = lastUserMemberInfo?.UserStatus,
                     NewStatus = request.NewStatus,
-                    RequestStatus = UserStatusChangeType.Default
+                    RequestStatus = InviteStatus.Default
                 };
 
                 await _dbContext.AddAsync(newWpsInviteRequest);
@@ -400,7 +399,7 @@ namespace TaskTracker.Core.src.Services.Impl
             try
             {
                 //TODO: в контроллере проверить, что юзер - член рабочего пространства
-                var errorStatuses = new UserStatusChangeType[] { UserStatusChangeType.All, UserStatusChangeType.Default };
+                var errorStatuses = new InviteStatus[] { InviteStatus.All, InviteStatus.Default };
                 if (request.Id <= 0)
                 {
                     return result.WithError(WorkSpaceErrorCodes.InviteIdNotSet);
@@ -410,9 +409,9 @@ namespace TaskTracker.Core.src.Services.Impl
                     return result.WithError(WorkSpaceErrorCodes.InvalidStatusInvite);
                 }
 
-                var activeRequest = await _dbContext.Set<UserWorkspaceStatusChangeRequest>()
+                var activeRequest = await _dbContext.Set<WorkspaceInvite>()
                     .Where(x => x.Id == request.Id)
-                    .Where(x=> x.RequestStatus == UserStatusChangeType.Default)
+                    .Where(x=> x.RequestStatus == InviteStatus.Default)
                     .Where(x=> x.UserId ==  request.UserId)
                     .FirstOrDefaultAsync();
 
@@ -421,7 +420,7 @@ namespace TaskTracker.Core.src.Services.Impl
 
                 activeRequest.RequestStatus = request.RequestStatus;
 
-               if(request.RequestStatus == UserStatusChangeType.UserConfirmed)
+               if(request.RequestStatus == InviteStatus.UserConfirmed)
                {
                     var workspaceMember = await _dbContext.Set<WorkSpaceMember>()
                         .AsNoTracking()
