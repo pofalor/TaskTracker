@@ -38,8 +38,9 @@ namespace TaskTracker.Core.src.Entities
 
         /// <summary>
         /// Статус проверки рабочего пространства администратором
+        /// Null означает, что рабочее пространство не требует проверки администратором (у личных)
         /// </summary>
-        public WorkspaceReviewStatus ReviewStatus { get; set; }
+        public WorkspaceReviewStatus? ReviewStatus { get; set; }
 
     }
 }

@@ -30,7 +30,6 @@ namespace TaskTracker.Core.src.Services.Impl
         private readonly ApplicationIdentityDbContext _identityDbContext;
         readonly IdentityConfiguration IdentityConfig;
 
-
         public AuthenticationService(UserManager<IdentityUser> userManager,
         SignInManager<IdentityUser> signInManager, ILogger<AuthenticationService> logger, 
         IMapper mapper, ApplicationDbContext dbContext, IConfiguration config, 

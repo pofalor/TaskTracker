@@ -11,12 +11,12 @@ using TaskTracker.Utils.src.Extensions;
 
 namespace TaskTracker.Core.src.Services.Impl
 {
-    public class WorkSpaceService : IWorkSpaceService
+    public class WorkspaceService : IWorkspaceService
     {
         private readonly ApplicationDbContext _dbContext;
-        private readonly ILogger<WorkSpaceService> _logger;
+        private readonly ILogger<WorkspaceService> _logger;
 
-        public WorkSpaceService(ApplicationDbContext dbContext, ILogger<WorkSpaceService> logger)
+        public WorkspaceService(ApplicationDbContext dbContext, ILogger<WorkspaceService> logger)
         {
             _dbContext = dbContext;
             _logger = logger;
@@ -45,7 +45,7 @@ namespace TaskTracker.Core.src.Services.Impl
             {
                 _logger.LogError(ex, "Error while getting my workspaces.{NewLine}{Parameter}: {UserId}{NewLine2}",
                     Environment.NewLine, nameof(userId), userId, Environment.NewLine);
-                return result.WithError(WorkSpaceErrorCodes.CannotGetMyWorkspaces);
+                return result.WithError(WorkspaceErrorCodes.CannotGetMyWorkspaces);
             }
         }
 
@@ -72,23 +72,36 @@ namespace TaskTracker.Core.src.Services.Impl
                     {
                         if (!request.Country.HasValue)
                         {
-                            return result.WithError(WorkSpaceErrorCodes.CountryNull);
+                            return result.WithError(WorkspaceErrorCodes.CountryNull);
                         }
                         else if (string.IsNullOrEmpty(request.INN))
                         {
-                            return result.WithError(WorkSpaceErrorCodes.INNNull);
+                            return result.WithError(WorkspaceErrorCodes.INNNull);
                         }
                         else if (string.IsNullOrEmpty(request.Address))
                         {
-                            return result.WithError(WorkSpaceErrorCodes.AddressNull);
+                            return result.WithError(WorkspaceErrorCodes.AddressNull);
                         }
                         else if (!request.RegistrationDate.HasValue)
                         {
-                            return result.WithError(WorkSpaceErrorCodes.RegistrationDateNull);
+                            return result.WithError(WorkspaceErrorCodes.RegistrationDateNull);
                         }
-                        //У рабочего пространства компании должно быть уникальное имя(в разрезе управляющего,
-                        //т.е. один управляющий может создавать рабочие пространства только с разными именами)
-                        var workspaceWithSameName = await _dbContext.Set<WorkSpace>()
+                        else if (!request.ReviewStatus.HasValue)
+                        {
+                            _logger.LogError("Review status is null. UserId: {UserId}. WorkspaceName: {Name}. ReviewStatus: {Status}",
+                                request.DirectorUserId, request.Name, request.ReviewStatus);
+                            return result.WithError(WorkspaceErrorCodes.ReviewStatusNull);
+                        }
+                        else if (request.ReviewStatus != WorkspaceReviewStatus.OnReview)
+                        {
+                            _logger.LogError("The review status is different from what is required. UserId: {UserId}. " +
+                                "WorkspaceName: {Name}. ReviewStatus: {Status}",
+                                request.DirectorUserId, request.Name, request.ReviewStatus);
+                            return result.WithError(WorkspaceErrorCodes.ReviewStatusWrong);
+                        }
+                            //У рабочего пространства компании должно быть уникальное имя(в разрезе управляющего,
+                            //т.е. один управляющий может создавать рабочие пространства только с разными именами)
+                            var workspaceWithSameName = await _dbContext.Set<WorkSpace>()
                             .AsNoTracking()
                             .Where(x => x.Name == request.Name)
                             .Where(x => x.DirectorUserId == request.DirectorUserId)
@@ -110,18 +123,27 @@ namespace TaskTracker.Core.src.Services.Impl
 
                             if (existingWorkspaceByCompanyFields != null)
                             {
-                                var errorCode = request.INN == existingWorkspaceByCompanyFields.INN ? WorkSpaceErrorCodes.CompanyWithInnAlreadyExists
-                                    : WorkSpaceErrorCodes.CompanyWithDataAlreadyExists;
+                                var errorCode = request.INN == existingWorkspaceByCompanyFields.INN ? WorkspaceErrorCodes.CompanyWithInnAlreadyExists
+                                    : WorkspaceErrorCodes.CompanyWithDataAlreadyExists;
                                 return result.WithError(errorCode);
                             }
                         }
                         else
                         {
-                            return result.WithError(WorkSpaceErrorCodes.CompanyWithNameAlreadyExists);
+                            return result.WithError(WorkspaceErrorCodes.CompanyWithNameAlreadyExists);
                         }
                     }
                     else if (request.WorkSpaceType == WorkSpaceType.Personal)
                     {
+                        //для личного рабочего пространства ReviewStatus всегда проставляется NULL
+                        if (request.ReviewStatus.HasValue)
+                        {
+                            _logger.LogError("The review status is set for personal workspace. UserId: {UserId}. " +
+                                "WorkspaceName: {Name}. ReviewStatus: {Status}",
+                                request.DirectorUserId, request.Name, request.ReviewStatus);
+                            request.ReviewStatus = null;
+                        }
+
                         var existsPersonalWorkspace = await _dbContext.Set<WorkSpace>()
                             .AsNoTracking()
                             .Where(x => x.WorkSpaceType == request.WorkSpaceType)
@@ -131,7 +153,7 @@ namespace TaskTracker.Core.src.Services.Impl
 
                         if (existsPersonalWorkspace)
                         {
-                            return result.WithError(WorkSpaceErrorCodes.CanCreateOnlyOnePersonalWorkspace);
+                            return result.WithError(WorkspaceErrorCodes.CanCreateOnlyOnePersonalWorkspace);
                         }
                     }
                     newWorkSpace.WorkSpaceType = request.WorkSpaceType;
@@ -143,6 +165,7 @@ namespace TaskTracker.Core.src.Services.Impl
                 newWorkSpace.RegistrationDate = request.RegistrationDate;
                 newWorkSpace.Address = request.Address;
                 newWorkSpace.INN = request.INN;
+                newWorkSpace.ReviewStatus = request.ReviewStatus;
 
                 using (var transaction = await _dbContext.Database.BeginTransactionAsync())
                 {
@@ -173,7 +196,7 @@ namespace TaskTracker.Core.src.Services.Impl
             {
                 _logger.LogError(ex, "Error while creating or changing workspace.{NewLine}{Parameter}: {Request}{NewLine2}",
                     Environment.NewLine, nameof(request), request?.ToJson(), Environment.NewLine);
-                return result.WithError(WorkSpaceErrorCodes.CannotCreateOrEditWorkspace);
+                return result.WithError(WorkspaceErrorCodes.CannotCreateOrEditWorkspace);
             }
         }
 
@@ -208,7 +231,7 @@ namespace TaskTracker.Core.src.Services.Impl
             {
                 _logger.LogError(ex, "Error while getting user workspace invations.{NewLine}{Parameter}: {UserId}{NewLine2}",
                     Environment.NewLine, nameof(userId), userId, Environment.NewLine);
-                return result.WithError(WorkSpaceErrorCodes.CannotGetWpsRequests);
+                return result.WithError(WorkspaceErrorCodes.CannotGetWpsRequests);
             }
         }
 
@@ -247,7 +270,7 @@ namespace TaskTracker.Core.src.Services.Impl
                 _logger.LogError(ex, "Error while getting user created invites.{NewLine}{Parameter}: {UserId}{NewLine2}" +
                     "{Parameter2}: {WorkspaceId}{NewLine3}",
                     Environment.NewLine, nameof(userId), userId, Environment.NewLine, nameof(workspaceId), workspaceId, Environment.NewLine);
-                return result.WithError(WorkSpaceErrorCodes.CannotGetWpsRequests);
+                return result.WithError(WorkspaceErrorCodes.CannotGetWpsRequests);
             }
         }
 
@@ -258,23 +281,23 @@ namespace TaskTracker.Core.src.Services.Impl
             {
                 if (request.WorkSpaceId <= 0)
                 {
-                    return result.WithError(WorkSpaceErrorCodes.WorkspaceNotSet);
+                    return result.WithError(WorkspaceErrorCodes.WorkspaceNotSet);
                 }
                 else if (request.UserId <= 0)
                 {
-                    return result.WithError(WorkSpaceErrorCodes.WpsInviteUserIdNotSet);
+                    return result.WithError(WorkspaceErrorCodes.WpsInviteUserIdNotSet);
                 }
                 else if (request.InviterId <= 0)
                 {
-                    return result.WithError(WorkSpaceErrorCodes.WpsInviterIdNotSet);
+                    return result.WithError(WorkspaceErrorCodes.WpsInviterIdNotSet);
                 }
                 else if (request.Date == DateTime.MinValue)
                 {
-                    return result.WithError(WorkSpaceErrorCodes.WpsInviteReqDateNotSet);
+                    return result.WithError(WorkspaceErrorCodes.WpsInviteReqDateNotSet);
                 }
                 else if (request.Date > DateTime.UtcNow)
                 {
-                    return result.WithError(WorkSpaceErrorCodes.WpsInviteReqDateFuture);
+                    return result.WithError(WorkspaceErrorCodes.WpsInviteReqDateFuture);
                 }
 
                 //два активных реквеста не может быть
@@ -287,7 +310,7 @@ namespace TaskTracker.Core.src.Services.Impl
                     .AnyAsync();
 
                 if(activeRequestForUserExists)
-                    return result.WithError(WorkSpaceErrorCodes.ActiveInviteAlreadyExists);
+                    return result.WithError(WorkspaceErrorCodes.ActiveInviteAlreadyExists);
 
                 var workspaceExists = await _dbContext.Set<WorkSpace>()
                     .AsNoTracking()
@@ -297,7 +320,7 @@ namespace TaskTracker.Core.src.Services.Impl
                     .AnyAsync();
 
                 if (!workspaceExists)
-                    return result.WithError(WorkSpaceErrorCodes.WpsForInviteNotExists);
+                    return result.WithError(WorkspaceErrorCodes.WpsForInviteNotExists);
 
                  var lastUserMemberInfo = await _dbContext.Set<WorkSpaceMember>()
                     .AsNoTracking()
@@ -309,7 +332,7 @@ namespace TaskTracker.Core.src.Services.Impl
 
                 var lastUserMemberInfoExists = lastUserMemberInfo != null;
                 if (lastUserMemberInfoExists && lastUserMemberInfo.UserStatus == request.NewStatus)
-                    return result.WithError(WorkSpaceErrorCodes.UserAlreadyInWsp);
+                    return result.WithError(WorkspaceErrorCodes.UserAlreadyInWsp);
 
                 var newWpsInviteRequest = new WorkspaceInvite()
                 { 
@@ -331,7 +354,7 @@ namespace TaskTracker.Core.src.Services.Impl
             {
                 _logger.LogError(ex, "Error while creating invite to WSP.{NewLine}{Parameter}: {Request}{NewLine2}",
                     Environment.NewLine, nameof(request), request?.ToJson(), Environment.NewLine);
-                return result.WithError(WorkSpaceErrorCodes.CannotCreateOrEditInviteWsp);
+                return result.WithError(WorkspaceErrorCodes.CannotCreateOrEditInviteWsp);
             }
         }
 
@@ -389,7 +412,7 @@ namespace TaskTracker.Core.src.Services.Impl
             {
                 _logger.LogError(ex, "Error while searching user for invite.{NewLine}{Parameter}: {SearchUser}{NewLine2}",
                     Environment.NewLine, nameof(searchUser), searchUser?.ToJson(), Environment.NewLine);
-                return result.WithError(WorkSpaceErrorCodes.CannotFindUserForInvite);
+                return result.WithError(WorkspaceErrorCodes.CannotFindUserForInvite);
             }
         }
 
@@ -402,21 +425,22 @@ namespace TaskTracker.Core.src.Services.Impl
                 var errorStatuses = new InviteStatus[] { InviteStatus.All, InviteStatus.Default };
                 if (request.Id <= 0)
                 {
-                    return result.WithError(WorkSpaceErrorCodes.InviteIdNotSet);
+                    return result.WithError(WorkspaceErrorCodes.InviteIdNotSet);
                 }
                 else if (errorStatuses.Contains(request.RequestStatus))
                 {
-                    return result.WithError(WorkSpaceErrorCodes.InvalidStatusInvite);
+                    return result.WithError(WorkspaceErrorCodes.InvalidStatusInvite);
                 }
 
                 var activeRequest = await _dbContext.Set<WorkspaceInvite>()
+                    .Where(x=> !x.IsDeleted)
                     .Where(x => x.Id == request.Id)
                     .Where(x=> x.RequestStatus == InviteStatus.Default)
                     .Where(x=> x.UserId ==  request.UserId)
                     .FirstOrDefaultAsync();
 
                 if (activeRequest == null)
-                    return result.WithError(WorkSpaceErrorCodes.InviteNotExists);
+                    return result.WithError(WorkspaceErrorCodes.InviteNotExists);
 
                 activeRequest.RequestStatus = request.RequestStatus;
 
@@ -455,7 +479,7 @@ namespace TaskTracker.Core.src.Services.Impl
             {
                 _logger.LogError(ex, "Error while accepting invite to WSP.{NewLine}{Parameter}: {Request}{NewLine2}",
                     Environment.NewLine, nameof(request), request?.ToJson(), Environment.NewLine);
-                return result.WithError(WorkSpaceErrorCodes.CannotAcceptInviteWsp);
+                return result.WithError(WorkspaceErrorCodes.CannotAcceptInviteWsp);
             }
         }
     }

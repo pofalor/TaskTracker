@@ -20,10 +20,10 @@ namespace TaskTracker.Core.src.Services.Impl
     {
         private readonly ApplicationDbContext _dbContext;
         private readonly ILogger<IssueService> _logger;
-        private readonly IWorkSpaceService _workSpaceService;
+        private readonly IWorkspaceService _workSpaceService;
         private readonly ILogNotificatorService _logNotificatorService;
 
-        public IssueService(ApplicationDbContext dbContext, ILogger<IssueService> logger, IWorkSpaceService workSpaceService, 
+        public IssueService(ApplicationDbContext dbContext, ILogger<IssueService> logger, IWorkspaceService workSpaceService, 
             ILogNotificatorService logNotificatorService)
         {
             _dbContext = dbContext;

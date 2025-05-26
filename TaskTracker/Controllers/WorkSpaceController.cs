@@ -16,14 +16,14 @@ using TaskTracker.Web.Api.Responses;
 namespace TaskTracker.Web.Api.Controllers
 {
     [Route("api/workspace")]
-    public class WorkSpaceController : ProtectedApiController
+    public class WorkspaceController : ProtectedApiController
     {
-        private readonly ILogger<WorkSpaceController> _logger;
-        private readonly IWorkSpaceService _workSpaceService;
+        private readonly ILogger<WorkspaceController> _logger;
+        private readonly IWorkspaceService _workSpaceService;
         private readonly IMapper _mapper;
         private readonly ILogNotificatorService _logNotificatorService;
 
-        public WorkSpaceController(ILogger<WorkSpaceController> logger, IWorkSpaceService workSpaceService,
+        public WorkspaceController(ILogger<WorkspaceController> logger, IWorkspaceService workSpaceService,
             IMapper mapper, IUserService userService, ILogNotificatorService logNotificatorService)
         {
             _logger = logger;
@@ -34,9 +34,9 @@ namespace TaskTracker.Web.Api.Controllers
 
         [Route("getMyWorkspaces")]
         [HttpGet]
-        public async Task<DataResponse<List<WorkSpaceModel>>> GetMyWorkspaces()
+        public async Task<DataResponse<List<WorkspaceModel>>> GetMyWorkspaces()
         {
-            var response = new DataResponse<List<WorkSpaceModel>>();
+            var response = new DataResponse<List<WorkspaceModel>>();
 
             try
             {
@@ -46,20 +46,20 @@ namespace TaskTracker.Web.Api.Controllers
                     return response.WithError(result.Errors[0]);
                 }
 
-                var models = result.Data.Select(x => _mapper.Map<WorkSpaceModel>(x)).ToList();
+                var models = result.Data.Select(x => _mapper.Map<WorkspaceModel>(x)).ToList();
                 return response.WithData(models);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error while getting my workspaces => {Parameter1}: {UserId},", nameof(UserId), UserId);
-                return response.WithError(WorkSpaceErrorCodes.CannotGetMyWorkspaces);
+                return response.WithError(WorkspaceErrorCodes.CannotGetMyWorkspaces);
             }
         }
 
 
         [Route("add")]
         [HttpPost]
-        public async Task<DataResponse<bool>> CreateOrEdit(CreateOrEditWorkSpacePostRequest request)
+        public async Task<DataResponse<bool>> CreateOrEdit(CreateOrEditWorkspacePostRequest request)
         {
             var response = new DataResponse<bool>();
 
@@ -74,7 +74,7 @@ namespace TaskTracker.Web.Api.Controllers
                         $"different from his user Id in claims{Environment.NewLine} " +
                         $"User id from request: {request.DirectorUserId}{Environment.NewLine} " +
                         $"User id from claims: {UserId}.");
-                    return response.WithError(WorkSpaceErrorCodes.AccessDenied);
+                    return response.WithError(WorkspaceErrorCodes.AccessDenied);
                 }
                 var mapRes = _mapper.Map<WorkSpace>(request);
                 var result = await _workSpaceService.CreateOrEdit(mapRes);
@@ -88,7 +88,7 @@ namespace TaskTracker.Web.Api.Controllers
             {
                 _logger.LogError(ex, "Error while sending request to add or change element.{NewLine}{Parameter}:{Request}{NewLine2}",
                    Environment.NewLine, nameof(request), request?.ToJson(), Environment.NewLine);
-                return response.WithError(WorkSpaceErrorCodes.CannotCreateOrEditWorkspace);
+                return response.WithError(WorkspaceErrorCodes.CannotCreateOrEditWorkspace);
             }
         }
 
@@ -112,7 +112,7 @@ namespace TaskTracker.Web.Api.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error while getting user invitation => {Parameter1}: {UserId},", nameof(UserId), UserId);
-                return response.WithError(WorkSpaceErrorCodes.CannotGetWpsRequests);
+                return response.WithError(WorkspaceErrorCodes.CannotGetWpsRequests);
             }
         }
 
@@ -130,7 +130,7 @@ namespace TaskTracker.Web.Api.Controllers
                        $"different from his user Id in claims{Environment.NewLine} " +
                        $"Inviter id from request: {request.InviterId}{Environment.NewLine} " +
                        $"User id from claims: {UserId}.");
-                    return response.WithError(WorkSpaceErrorCodes.AccessDenied);
+                    return response.WithError(WorkspaceErrorCodes.AccessDenied);
                 }
 
                 var mapRes = _mapper.Map<WorkspaceInvite>(request);
@@ -145,7 +145,7 @@ namespace TaskTracker.Web.Api.Controllers
             {
                 _logger.LogError(ex, "Error while sending request to create workspace invite.{NewLine}{Parameter}:{Request}{NewLine2}",
                    Environment.NewLine, nameof(request), request?.ToJson(), Environment.NewLine);
-                return response.WithError(WorkSpaceErrorCodes.CannotCreateOrEditInviteWsp);
+                return response.WithError(WorkspaceErrorCodes.CannotCreateOrEditInviteWsp);
             }
         }
 
@@ -166,7 +166,7 @@ namespace TaskTracker.Web.Api.Controllers
                        $"different from his user Id in claims{Environment.NewLine} " +
                        $"Inviter id from request: {request.InviterId}{Environment.NewLine} " +
                        $"User id from claims: {UserId}.");
-                    return response.WithError(WorkSpaceErrorCodes.AccessDenied);
+                    return response.WithError(WorkspaceErrorCodes.AccessDenied);
                 }
 
                 var isWspMember = await _workSpaceService.IsWorkspaceMember(request.InviterId.Value, request.WorkSpaceId);
@@ -177,7 +177,7 @@ namespace TaskTracker.Web.Api.Controllers
                         $"even though they are not a member of the workspace.{Environment.NewLine}" +
                       $"Inviter id: {request.InviterId}{Environment.NewLine} " +
                       $"Workspace id: {request.WorkSpaceId}.");
-                    return response.WithError(WorkSpaceErrorCodes.AccessDenied);
+                    return response.WithError(WorkspaceErrorCodes.AccessDenied);
                 }
 
                 var result = await _workSpaceService.SearchUsersForInvite(request);
@@ -193,7 +193,7 @@ namespace TaskTracker.Web.Api.Controllers
             {
                 _logger.LogError(ex, "Error while sending request to search user for invite.{NewLine}{Parameter}:{Request}{NewLine2}",
                    Environment.NewLine, nameof(request), request?.ToJson(), Environment.NewLine);
-                return response.WithError(WorkSpaceErrorCodes.CannotFindUserForInvite);
+                return response.WithError(WorkspaceErrorCodes.CannotFindUserForInvite);
             }
         }
 
@@ -212,7 +212,7 @@ namespace TaskTracker.Web.Api.Controllers
             {
                 _logger.LogError(ex, "Error while sending request to check is user owner.{NewLine}{Parameter}:{WorkspaceId}{NewLine2}",
                    Environment.NewLine, nameof(workspaceId), workspaceId, Environment.NewLine);
-                return response.WithError(WorkSpaceErrorCodes.CannotCheckOwner);
+                return response.WithError(WorkspaceErrorCodes.CannotCheckOwner);
             }
         }
 
@@ -236,7 +236,7 @@ namespace TaskTracker.Web.Api.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error while getting user created invites => {Parameter1}: {UserId},", nameof(UserId), UserId);
-                return response.WithError(WorkSpaceErrorCodes.CannotGetWpsRequests);
+                return response.WithError(WorkspaceErrorCodes.CannotGetWpsRequests);
             }
         }
 
@@ -257,7 +257,7 @@ namespace TaskTracker.Web.Api.Controllers
                        $"different from his user Id in claims{Environment.NewLine} " +
                        $"User id from request: {request.UserId}{Environment.NewLine} " +
                        $"User id from claims: {UserId}.");
-                    return response.WithError(WorkSpaceErrorCodes.AccessDenied);
+                    return response.WithError(WorkspaceErrorCodes.AccessDenied);
                 }
 
                 var result = await _workSpaceService.AcceptInvitationRequest(request);
@@ -271,7 +271,7 @@ namespace TaskTracker.Web.Api.Controllers
             {
                 _logger.LogError(ex, "Error while sending request to accept workspace invite.{NewLine}{Parameter}:{Request}{NewLine2}",
                    Environment.NewLine, nameof(request), request?.ToJson(), Environment.NewLine);
-                return response.WithError(WorkSpaceErrorCodes.CannotAcceptInviteWsp);
+                return response.WithError(WorkspaceErrorCodes.CannotAcceptInviteWsp);
             }
         }
     }

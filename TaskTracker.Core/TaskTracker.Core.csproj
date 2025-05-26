@@ -65,10 +65,10 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>UserErrorCodeResources.resx</DependentUpon>
     </Compile>
-    <Compile Update="src\Resources\ErrorCodes\WorkSpaceErrorCodeResources.Designer.cs">
+    <Compile Update="src\Resources\ErrorCodes\WorkspaceErrorCodeResources.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
-      <DependentUpon>WorkSpaceErrorCodeResources.resx</DependentUpon>
+      <DependentUpon>WorkspaceErrorCodeResources.resx</DependentUpon>
     </Compile>
   </ItemGroup>
 
@@ -101,9 +101,9 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>UserErrorCodeResources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Update="src\Resources\ErrorCodes\WorkSpaceErrorCodeResources.resx">
+    <EmbeddedResource Update="src\Resources\ErrorCodes\WorkspaceErrorCodeResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>WorkSpaceErrorCodeResources.Designer.cs</LastGenOutput>
+      <LastGenOutput>WorkspaceErrorCodeResources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
 

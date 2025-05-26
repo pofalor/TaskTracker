@@ -13,6 +13,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { UserModel } from '../../../model/userModel';
 import { UserService } from '../../../services/user.service';
 import { DatepickerUtils } from '../../../utils/ngbDatepickerUtils';
+import { WorkspaceReviewStatus } from '../../../enums/workspace-review-status';
 
 
 @Component({
@@ -104,12 +105,14 @@ export class CreateWorkspaceModalComponent extends BaseComponent {
       t.workSpace.registrationDate = undefined;
       t.workSpace.address = undefined;
       t.workSpace.iNN = undefined;
+      t.workSpace.reviewStatus = undefined;
     }
     else {
       t.workSpace.country = t.country?.value;
       t.workSpace.registrationDate = DatepickerUtils.dateToStr(t.registrationDate?.value);
       t.workSpace.address = t.address?.value;
       t.workSpace.iNN = t.TIN?.value;
+      t.workSpace.reviewStatus = WorkspaceReviewStatus.OnReview;
     }
 
     await t.workSpaceService.createOrEdit(t.workSpace)

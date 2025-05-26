@@ -14,9 +14,9 @@ namespace TaskTracker.Core.src.Services.Impl
     {
         private readonly ApplicationDbContext _dbContext;
         private readonly ILogger<ProjectService> _logger;
-        private readonly IWorkSpaceService _workSpaceService;
+        private readonly IWorkspaceService _workSpaceService;
 
-        public ProjectService(ApplicationDbContext dbContext, ILogger<ProjectService> logger, IWorkSpaceService workSpaceService)
+        public ProjectService(ApplicationDbContext dbContext, ILogger<ProjectService> logger, IWorkspaceService workSpaceService)
         {
             _dbContext = dbContext;
             _logger = logger;

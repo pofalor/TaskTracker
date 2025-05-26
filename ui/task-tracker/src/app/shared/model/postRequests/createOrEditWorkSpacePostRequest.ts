@@ -1,4 +1,5 @@
 import { WorkSpaceType } from "../../enums/work-space-type";
+import { WorkspaceReviewStatus } from "../../enums/workspace-review-status";
 
 export class CreateOrEditWorkSpacePostRequest{
 
@@ -24,4 +25,6 @@ export class CreateOrEditWorkSpacePostRequest{
     public address : string | undefined;
     
     public iNN : number | undefined;
+
+    public reviewStatus : WorkspaceReviewStatus | undefined;
 }

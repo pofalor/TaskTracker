@@ -6,7 +6,7 @@ using TaskTracker.Core.src.Models.ResponseModels;
 
 namespace TaskTracker.Core.src.Services
 {
-    public interface IWorkSpaceService
+    public interface IWorkspaceService
     {
         Task<IDataResult<List<WorkSpaceMember>>> GetMyWorkspaces(int userId);
 

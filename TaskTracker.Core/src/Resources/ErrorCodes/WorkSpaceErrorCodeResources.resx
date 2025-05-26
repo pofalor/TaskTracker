@@ -198,4 +198,10 @@
   <data name="CannotAcceptInviteWsp" xml:space="preserve">
     <value>Failed to accept request. Please contact support</value>
   </data>
+  <data name="ReviewStatusNull" xml:space="preserve">
+    <value>System error. Please contact technical support</value>
+  </data>
+  <data name="ReviewStatusWrong" xml:space="preserve">
+    <value>System error. Please refresh the page and try again. If unsuccessful, contact technical support</value>
+  </data>
 </root>

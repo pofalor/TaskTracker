@@ -2,7 +2,7 @@
 
 namespace TaskTracker.Core.src.Models.ResponseModels
 {
-    public class WorkSpaceModel
+    public class WorkspaceModel
     {
         public int Id { get; set; }
 
@@ -19,7 +19,7 @@ namespace TaskTracker.Core.src.Models.ResponseModels
 
         public UserTeamRole TeamRole { get; set; }
 
-        //Все поля ниже заполняются, если WorkSpaceType - Company
+        //Все поля ниже заполняются, если WorkspaceType - Company
 
         /// <summary>
         /// Страна, в которой компания зарегистрирована
@@ -37,5 +37,7 @@ namespace TaskTracker.Core.src.Models.ResponseModels
         public string? Address { get; set; }
 
         public string? INN { get; set; }
+
+        public WorkspaceReviewStatus? ReviewStatus { get; set; }
     }
 }

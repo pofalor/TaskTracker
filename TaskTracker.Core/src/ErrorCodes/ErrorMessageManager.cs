@@ -14,7 +14,7 @@ namespace TaskTracker.Core.src.ErrorCodes
             RegisterEnum<AuthenticationErrorCodes>();
             RegisterEnum<SosErrorCodes>();
             RegisterEnum<UserErrorCodes>();
-            RegisterEnum<WorkSpaceErrorCodes>();
+            RegisterEnum<WorkspaceErrorCodes>();
             RegisterEnum<ProjectErrorCodes>();
             RegisterEnum<IssueErrorCodes>();
         }

@@ -22,14 +22,14 @@ namespace TaskTracker.Core.src.Resources.ErrorCodes {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class WorkSpaceErrorCodeResources {
+    internal class WorkspaceErrorCodeResources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal WorkSpaceErrorCodeResources() {
+        internal WorkspaceErrorCodeResources() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace TaskTracker.Core.src.Resources.ErrorCodes {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("TaskTracker.Core.src.Resources.ErrorCodes.WorkSpaceErrorCodeResources", typeof(WorkSpaceErrorCodeResources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("TaskTracker.Core.src.Resources.ErrorCodes.WorkspaceErrorCodeResources", typeof(WorkspaceErrorCodeResources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -228,6 +228,24 @@ namespace TaskTracker.Core.src.Resources.ErrorCodes {
         internal static string RegistrationDateNull {
             get {
                 return ResourceManager.GetString("RegistrationDateNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на System error. Please contact technical support.
+        /// </summary>
+        internal static string ReviewStatusNull {
+            get {
+                return ResourceManager.GetString("ReviewStatusNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на System error. Please refresh the page and try again. If unsuccessful, contact technical support.
+        /// </summary>
+        internal static string ReviewStatusWrong {
+            get {
+                return ResourceManager.GetString("ReviewStatusWrong", resourceCulture);
             }
         }
         

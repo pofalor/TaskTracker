@@ -1,5 +1,6 @@
 import { UserTeamRole } from "../enums/user-team-role";
 import { WorkSpaceType } from "../enums/work-space-type";
+import { WorkspaceReviewStatus } from "../enums/workspace-review-status";
 
 export class WorkSpaceModel{
 
@@ -27,4 +28,6 @@ export class WorkSpaceModel{
     public address : string | undefined;
     
     public inn : string | undefined;
+
+    public reviewStatus: WorkspaceReviewStatus | undefined;
 }

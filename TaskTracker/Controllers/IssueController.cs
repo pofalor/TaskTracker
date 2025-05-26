@@ -20,12 +20,12 @@ namespace TaskTracker.Web.Api.Controllers
     public class IssueController : ProtectedApiController
     {
         private readonly ILogger<IssueController> _logger;
-        private readonly IWorkSpaceService _workSpaceService;
+        private readonly IWorkspaceService _workSpaceService;
         private readonly IIssueService _issueService;
         private readonly IMapper _mapper;
         private readonly ILogNotificatorService _logNotificatorService;
 
-        public IssueController(ILogger<IssueController> logger, IWorkSpaceService workSpaceService,
+        public IssueController(ILogger<IssueController> logger, IWorkspaceService workSpaceService,
             IMapper mapper, IUserService userService, ILogNotificatorService logNotificatorService, IIssueService issueService)
         {
             _logger = logger;

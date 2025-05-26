@@ -18,7 +18,7 @@ namespace TaskTracker.Core.src.Context
             CreateMap<CreateUserPostRequest, User>();
             CreateMap<User, UserModel>()
                 .ForMember(dist => dist.Name, opt => opt.MapFrom(x => x.GetUserName(false)));
-            CreateMap<WorkSpaceMember, WorkSpaceModel>()
+            CreateMap<WorkSpaceMember, WorkspaceModel>()
                 .ForMember(dist => dist.Id, opt => opt.MapFrom(x => x.WorkSpace.Id))
                 .ForMember(dist => dist.Name, opt => opt.MapFrom(x => x.WorkSpace.Name))
                 .ForMember(dist => dist.WorkSpaceType, opt => opt.MapFrom(x => x.WorkSpace.WorkSpaceType))
@@ -26,8 +26,9 @@ namespace TaskTracker.Core.src.Context
                 .ForMember(dist => dist.Country, opt => opt.MapFrom(x => x.WorkSpace.Country))
                 .ForMember(dist => dist.RegistrationDate, opt => opt.MapFrom(x => x.WorkSpace.RegistrationDate.HasValue ? x.WorkSpace.RegistrationDate.Value.ToString(DateFormatConstants.FrontInputFormat) : null))
                 .ForMember(dist => dist.Address, opt => opt.MapFrom(x => x.WorkSpace.Address))
-                .ForMember(dist => dist.INN, opt => opt.MapFrom(x => x.WorkSpace.INN));
-            CreateMap<CreateOrEditWorkSpacePostRequest, WorkSpace>()
+                .ForMember(dist => dist.INN, opt => opt.MapFrom(x => x.WorkSpace.INN))
+                .ForMember(dist => dist.ReviewStatus, opt => opt.MapFrom(x => x.WorkSpace.ReviewStatus));
+            CreateMap<CreateOrEditWorkspacePostRequest, WorkSpace>()
                 .ForMember(dist => dist.RegistrationDate, opt => opt.MapFrom(x => x.RegistrationDateTime));
             CreateMap<WorkspaceInvite, WorkspaceInviteModel>()
                 .ForMember(dist => dist.Date, opt => opt.MapFrom(x => x.Date.ToString(DateFormatConstants.FullDateTimeShort)))

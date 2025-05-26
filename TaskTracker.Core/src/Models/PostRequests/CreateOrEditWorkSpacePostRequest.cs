@@ -4,7 +4,7 @@ using TaskTracker.Core.src.Enums;
 
 namespace TaskTracker.Core.src.Models.PostRequests
 {
-    public class CreateOrEditWorkSpacePostRequest : BasePostRequest
+    public class CreateOrEditWorkspacePostRequest : BasePostRequest
     {
         public int Id { get; set; }
         /// <summary>
@@ -44,5 +44,7 @@ namespace TaskTracker.Core.src.Models.PostRequests
                 return !string.IsNullOrEmpty(RegistrationDate) ? DateTime.ParseExact(RegistrationDate, DateFormatConstants.FrontInputFormat, CultureInfo.InvariantCulture) : null;
             } 
         }
+
+        public WorkspaceReviewStatus? ReviewStatus { get; set; }
     }
 }
