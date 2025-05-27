@@ -1,7 +1,7 @@
 ﻿namespace TaskTracker.Core.src.Models.Filters
 {
-    public class WorkSpaceFilter : BaseFilter
+    public class WorkspaceFilter : BaseFilter
     {
-        public int WorkSpaceId { get; set; }
+        public int WorkspaceId { get; set; }
     }
 }

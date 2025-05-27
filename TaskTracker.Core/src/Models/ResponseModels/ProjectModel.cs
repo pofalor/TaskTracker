@@ -41,6 +41,6 @@
         /// <summary>
         /// Рабочее пространство проекта
         /// </summary>
-        public int WorkSpaceId { get; set; }
+        public int WorkspaceId { get; set; }
     }
 }

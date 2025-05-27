@@ -2,7 +2,7 @@
 {
     public class SearchUserForInvitePR
     {
-        public int WorkSpaceId { get; set; }
+        public int WorkspaceId { get; set; }
 
         public int? InviterId { get; set; }
 

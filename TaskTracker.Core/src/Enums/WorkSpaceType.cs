@@ -1,6 +1,6 @@
 ﻿namespace TaskTracker.Core.src.Enums
 {
-    public enum WorkSpaceType
+    public enum WorkspaceType
     {
         /// <summary>
         /// Для фильтрации

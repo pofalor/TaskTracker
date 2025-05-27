@@ -7,11 +7,25 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace TaskTracker.Core.Migrations
 {
     /// <inheritdoc />
-    public partial class AddingEntities : Migration
+    public partial class NewDatabase : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.Sql("CREATE EXTENSION IF NOT EXISTS pgcrypto;");
+
+            migrationBuilder.AlterColumn<byte[]>(
+                name: "version",
+                table: "User",
+                type: "bytea",
+                rowVersion: true,
+                nullable: false,
+                defaultValueSql: "gen_random_bytes(8)",
+                oldClrType: typeof(byte[]),
+                oldType: "bytea",
+                oldRowVersion: true,
+                oldNullable: true);
+
             migrationBuilder.AddColumn<string>(
                 name: "nick_name",
                 table: "User",
@@ -20,7 +34,7 @@ namespace TaskTracker.Core.Migrations
                 defaultValue: "");
 
             migrationBuilder.CreateTable(
-                name: "WorkSpace",
+                name: "Workspace",
                 columns: table => new
                 {
                     id = table.Column<int>(type: "integer", nullable: false)
@@ -31,17 +45,18 @@ namespace TaskTracker.Core.Migrations
                     country = table.Column<int>(type: "integer", nullable: true),
                     registration_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     address = table.Column<string>(type: "text", nullable: true),
-                    inn = table.Column<int>(type: "integer", nullable: true),
+                    inn = table.Column<string>(type: "text", nullable: true),
+                    review_status = table.Column<int>(type: "integer", nullable: true),
                     object_create_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     object_edit_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    version = table.Column<byte[]>(type: "bytea", rowVersion: true, nullable: true),
+                    version = table.Column<byte[]>(type: "bytea", rowVersion: true, nullable: false, defaultValueSql: "gen_random_bytes(8)"),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_WorkSpace", x => x.id);
+                    table.PrimaryKey("PK_Workspace", x => x.id);
                     table.ForeignKey(
-                        name: "FK_WorkSpace_User_DirectorUserId",
+                        name: "FK_Workspace_User_DirectorUserId",
                         column: x => x.DirectorUserId,
                         principalTable: "User",
                         principalColumn: "id",
@@ -57,14 +72,14 @@ namespace TaskTracker.Core.Migrations
                     name = table.Column<string>(type: "text", nullable: false),
                     description = table.Column<string>(type: "text", nullable: true),
                     code = table.Column<string>(type: "text", nullable: false),
-                    start_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValue: new DateTime(2024, 11, 18, 7, 38, 8, 436, DateTimeKind.Utc).AddTicks(8580)),
+                    start_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     end_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     AuthorId = table.Column<int>(type: "integer", nullable: false),
                     ProjectMgrId = table.Column<int>(type: "integer", nullable: false),
-                    WorkSpaceId = table.Column<int>(type: "integer", nullable: false),
+                    WorkspaceId = table.Column<int>(type: "integer", nullable: false),
                     object_create_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     object_edit_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    version = table.Column<byte[]>(type: "bytea", rowVersion: true, nullable: true),
+                    version = table.Column<byte[]>(type: "bytea", rowVersion: true, nullable: false, defaultValueSql: "gen_random_bytes(8)"),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false)
                 },
                 constraints: table =>
@@ -83,15 +98,58 @@ namespace TaskTracker.Core.Migrations
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Project_WorkSpace_WorkSpaceId",
-                        column: x => x.WorkSpaceId,
-                        principalTable: "WorkSpace",
+                        name: "FK_Project_Workspace_WorkspaceId",
+                        column: x => x.WorkspaceId,
+                        principalTable: "Workspace",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "WorkSpaceMember",
+                name: "WorkspaceInvite",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    WorkspaceId = table.Column<int>(type: "integer", nullable: false),
+                    UserId = table.Column<int>(type: "integer", nullable: false),
+                    InviterId = table.Column<int>(type: "integer", nullable: false),
+                    Date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    previous_status = table.Column<int>(type: "integer", nullable: true),
+                    new_status = table.Column<int>(type: "integer", nullable: false),
+                    request_status = table.Column<int>(type: "integer", nullable: false, defaultValue: 0),
+                    is_checked = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
+                    is_hidden = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
+                    object_create_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    object_edit_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    version = table.Column<byte[]>(type: "bytea", rowVersion: true, nullable: false, defaultValueSql: "gen_random_bytes(8)"),
+                    is_deleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WorkspaceInvite", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_WorkspaceInvite_User_InviterId",
+                        column: x => x.InviterId,
+                        principalTable: "User",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_WorkspaceInvite_User_UserId",
+                        column: x => x.UserId,
+                        principalTable: "User",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_WorkspaceInvite_Workspace_WorkspaceId",
+                        column: x => x.WorkspaceId,
+                        principalTable: "Workspace",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "WorkspaceMember",
                 columns: table => new
                 {
                     id = table.Column<int>(type: "integer", nullable: false)
@@ -99,25 +157,25 @@ namespace TaskTracker.Core.Migrations
                     team_role = table.Column<int>(type: "integer", nullable: false, defaultValue: 0),
                     user_status = table.Column<int>(type: "integer", nullable: false, defaultValue: 1),
                     UserId = table.Column<int>(type: "integer", nullable: false),
-                    WorkSpaceId = table.Column<int>(type: "integer", nullable: false),
+                    WorkspaceId = table.Column<int>(type: "integer", nullable: false),
                     object_create_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     object_edit_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    version = table.Column<byte[]>(type: "bytea", rowVersion: true, nullable: true),
+                    version = table.Column<byte[]>(type: "bytea", rowVersion: true, nullable: false, defaultValueSql: "gen_random_bytes(8)"),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_WorkSpaceMember", x => x.id);
+                    table.PrimaryKey("PK_WorkspaceMember", x => x.id);
                     table.ForeignKey(
-                        name: "FK_WorkSpaceMember_User_UserId",
+                        name: "FK_WorkspaceMember_User_UserId",
                         column: x => x.UserId,
                         principalTable: "User",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_WorkSpaceMember_WorkSpace_WorkSpaceId",
-                        column: x => x.WorkSpaceId,
-                        principalTable: "WorkSpace",
+                        name: "FK_WorkspaceMember_Workspace_WorkspaceId",
+                        column: x => x.WorkspaceId,
+                        principalTable: "Workspace",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -141,7 +199,7 @@ namespace TaskTracker.Core.Migrations
                     ProjectId = table.Column<int>(type: "integer", nullable: false),
                     object_create_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     object_edit_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    version = table.Column<byte[]>(type: "bytea", rowVersion: true, nullable: true),
+                    version = table.Column<byte[]>(type: "bytea", rowVersion: true, nullable: false, defaultValueSql: "gen_random_bytes(8)"),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false)
                 },
                 constraints: table =>
@@ -180,11 +238,12 @@ namespace TaskTracker.Core.Migrations
                     time_spent = table.Column<TimeSpan>(type: "interval", nullable: false, defaultValue: new TimeSpan(0, 0, 0, 0, 0)),
                     date_begin = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     comment = table.Column<string>(type: "text", nullable: true),
+                    auto_track_status = table.Column<int>(type: "integer", nullable: true),
                     UserId = table.Column<int>(type: "integer", nullable: false),
                     IssueId = table.Column<int>(type: "integer", nullable: false),
                     object_create_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     object_edit_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    version = table.Column<byte[]>(type: "bytea", rowVersion: true, nullable: true),
+                    version = table.Column<byte[]>(type: "bytea", rowVersion: true, nullable: false, defaultValueSql: "gen_random_bytes(8)"),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false)
                 },
                 constraints: table =>
@@ -207,8 +266,7 @@ namespace TaskTracker.Core.Migrations
             migrationBuilder.CreateIndex(
                 name: "index",
                 table: "Issue",
-                column: "Index",
-                unique: true);
+                column: "Index");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Issue_AssigneeId",
@@ -226,9 +284,10 @@ namespace TaskTracker.Core.Migrations
                 column: "EpicId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Issue_ProjectId",
+                name: "IX_Issue_ProjectId_Index",
                 table: "Issue",
-                column: "ProjectId");
+                columns: new[] { "ProjectId", "Index" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Project_AuthorId",
@@ -241,9 +300,9 @@ namespace TaskTracker.Core.Migrations
                 column: "ProjectMgrId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Project_WorkSpaceId",
+                name: "IX_Project_WorkspaceId",
                 table: "Project",
-                column: "WorkSpaceId");
+                column: "WorkspaceId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_TimeTracking_IssueId",
@@ -256,19 +315,34 @@ namespace TaskTracker.Core.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_WorkSpace_DirectorUserId",
-                table: "WorkSpace",
+                name: "IX_Workspace_DirectorUserId",
+                table: "Workspace",
                 column: "DirectorUserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_WorkSpaceMember_UserId",
-                table: "WorkSpaceMember",
+                name: "IX_WorkspaceInvite_InviterId",
+                table: "WorkspaceInvite",
+                column: "InviterId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WorkspaceInvite_UserId",
+                table: "WorkspaceInvite",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_WorkSpaceMember_WorkSpaceId",
-                table: "WorkSpaceMember",
-                column: "WorkSpaceId");
+                name: "IX_WorkspaceInvite_WorkspaceId",
+                table: "WorkspaceInvite",
+                column: "WorkspaceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WorkspaceMember_UserId",
+                table: "WorkspaceMember",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WorkspaceMember_WorkspaceId",
+                table: "WorkspaceMember",
+                column: "WorkspaceId");
         }
 
         /// <inheritdoc />
@@ -278,7 +352,10 @@ namespace TaskTracker.Core.Migrations
                 name: "TimeTracking");
 
             migrationBuilder.DropTable(
-                name: "WorkSpaceMember");
+                name: "WorkspaceInvite");
+
+            migrationBuilder.DropTable(
+                name: "WorkspaceMember");
 
             migrationBuilder.DropTable(
                 name: "Issue");
@@ -287,11 +364,22 @@ namespace TaskTracker.Core.Migrations
                 name: "Project");
 
             migrationBuilder.DropTable(
-                name: "WorkSpace");
+                name: "Workspace");
 
             migrationBuilder.DropColumn(
                 name: "nick_name",
                 table: "User");
+
+            migrationBuilder.AlterColumn<byte[]>(
+                name: "version",
+                table: "User",
+                type: "bytea",
+                rowVersion: true,
+                nullable: true,
+                oldClrType: typeof(byte[]),
+                oldType: "bytea",
+                oldRowVersion: true,
+                oldDefaultValueSql: "gen_random_bytes(8)");
         }
     }
 }

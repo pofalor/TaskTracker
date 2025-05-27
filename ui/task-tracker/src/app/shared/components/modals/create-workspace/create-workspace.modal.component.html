@@ -2,54 +2,54 @@
     <div class="card-body">
         <div class="row mb-4">
             <div class="col text-center">
-                <h4 *ngIf="!workSpaceId" class="f-28">{{"Create workspace" | lang}}</h4>
-                <h4 *ngIf="!!workSpaceId" class="f-28">{{"Edit workspace" | lang}}</h4>
+                <h4 *ngIf="!workspaceId" class="f-28">{{"Create workspace" | lang}}</h4>
+                <h4 *ngIf="!!workspaceId" class="f-28">{{"Edit workspace" | lang}}</h4>
             </div>
         </div>
 
-        <form [formGroup]="workSpaceForm" class="form-group m-0">
+        <form [formGroup]="workspaceForm" class="form-group m-0">
             <div class="row">
                 <div class="col-12 pb-3">
                     <label class="mb-1">{{ "Workspace name" | lang }}</label>
                     <input type="text" class="form-control" formControlName="name"
                         placeholder="{{'Workspace name' | lang}}"/>
-                    <div *ngIf="elemIsInvalid(workSpaceForm.get('name'))" class="text text-danger mt-1">
-                        {{textErrorStr(workSpaceForm.get('name'), namePattern) | lang}}
+                    <div *ngIf="elemIsInvalid(workspaceForm.get('name'))" class="text text-danger mt-1">
+                        {{textErrorStr(workspaceForm.get('name'), namePattern) | lang}}
                     </div>
                 </div>
-                <div *ngIf="!workSpaceId" class="col-12 pb-3">
+                <div *ngIf="!workspaceId" class="col-12 pb-3">
                     <div class="row">
                         <div class="col-12">
                             <label class="mb-1">{{ "Type of workspace" | lang}}</label>
                         </div>
                         <div class="col-12">
                             <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
-                                <input type="radio" class="btn-check" [name]="'btnradioMod_' + workSpaceId" [id]="'btnradioMod1_' + workSpaceId" autocomplete="off"
-                                checked (click)="changeWorkSpaceType(WorkSpaceType.Personal)">
-                                <label class="btn btn-outline-primary" [for]="'btnradioMod1_' + workSpaceId">
-                                    {{'workSpaceType.' + WorkSpaceType.Personal | lang}}
+                                <input type="radio" class="btn-check" [name]="'btnradioMod_' + workspaceId" [id]="'btnradioMod1_' + workspaceId" autocomplete="off"
+                                checked (click)="changeWorkspaceType(WorkspaceType.Personal)">
+                                <label class="btn btn-outline-primary" [for]="'btnradioMod1_' + workspaceId">
+                                    {{'workspaceType.' + WorkspaceType.Personal | lang}}
                                 </label>
-                                <input type="radio" class="btn-check" [name]="'btnradioMod_' + workSpaceId" [id]="'btnradioMod2_' + workSpaceId" autocomplete="off">
-                                <label class="btn btn-outline-primary" [for]="'btnradioMod2_' + workSpaceId" (click)="changeWorkSpaceType(WorkSpaceType.Company)">
-                                    {{'workSpaceType.' + WorkSpaceType.Company | lang}}
+                                <input type="radio" class="btn-check" [name]="'btnradioMod_' + workspaceId" [id]="'btnradioMod2_' + workspaceId" autocomplete="off">
+                                <label class="btn btn-outline-primary" [for]="'btnradioMod2_' + workspaceId" (click)="changeWorkspaceType(WorkspaceType.Company)">
+                                    {{'workspaceType.' + WorkspaceType.Company | lang}}
                                 </label>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div *ngIf="workSpace.workSpaceType == WorkSpaceType.Company" class="col-12 pb-3">
+                <div *ngIf="workspace.workspaceType == WorkspaceType.Company" class="col-12 pb-3">
                     <label>{{ "Country of registration" | lang }}</label>
                     <ng-select appearance="outline" class="br-10" id="country-input-field" formControlName="country">
                         <ng-option *ngFor="let country of countryList" class="br-10" [value]="country.value">
                             {{ country.name }}
                         </ng-option>
                     </ng-select>
-                    <div *ngIf="elemIsInvalid(workSpaceForm.get('country'))" class="text text-danger mt-1">
-                        {{textErrorStr(workSpaceForm.get('country')) | lang}}
+                    <div *ngIf="elemIsInvalid(workspaceForm.get('country'))" class="text text-danger mt-1">
+                        {{textErrorStr(workspaceForm.get('country')) | lang}}
                     </div>
                 </div>
 
-                <div *ngIf="workSpace.workSpaceType == WorkSpaceType.Company" class="col-12 pb-3">
+                <div *ngIf="workspace.workspaceType == WorkspaceType.Company" class="col-12 pb-3">
                     <label class="mb-1">{{ "Company registration date" | lang }}</label>
                     <div class="row">
                         <div class="col-11">
@@ -61,24 +61,24 @@
                             type="button"></button>
                         </div>
                     </div>
-                    <div *ngIf="elemIsInvalid(workSpaceForm.get('registrationDate'))" class="text text-danger mt-1">
-                        {{textErrorStr(workSpaceForm.get('registrationDate')) | lang}}
+                    <div *ngIf="elemIsInvalid(workspaceForm.get('registrationDate'))" class="text text-danger mt-1">
+                        {{textErrorStr(workspaceForm.get('registrationDate')) | lang}}
                     </div>
                 </div>
-                <div *ngIf="workSpace.workSpaceType == WorkSpaceType.Company" class="col-12 pb-3">
+                <div *ngIf="workspace.workspaceType == WorkspaceType.Company" class="col-12 pb-3">
                     <label class="mb-1">{{ "Legal address" | lang }}</label>
                     <input type="text" class="form-control" formControlName="address"
                         placeholder="{{'Legal address' | lang}}" />
-                    <div *ngIf="elemIsInvalid(workSpaceForm.get('address'))" class="text text-danger mt-1">
-                        {{textErrorStr(workSpaceForm.get('address')) | lang}}
+                    <div *ngIf="elemIsInvalid(workspaceForm.get('address'))" class="text text-danger mt-1">
+                        {{textErrorStr(workspaceForm.get('address')) | lang}}
                     </div>
                 </div>
-                <div *ngIf="workSpace.workSpaceType == WorkSpaceType.Company" class="col-12 pb-3">
+                <div *ngIf="workspace.workspaceType == WorkspaceType.Company" class="col-12 pb-3">
                     <label class="mb-1">{{ "TIN" | lang }}</label>
                     <input type="text" class="form-control" formControlName="TIN"
                         placeholder="{{'TIN' | lang}}" />
-                    <div *ngIf="elemIsInvalid(workSpaceForm.get('TIN'))" class="text text-danger mt-1">
-                        {{textErrorStr(workSpaceForm.get('TIN')) | lang}}
+                    <div *ngIf="elemIsInvalid(workspaceForm.get('TIN'))" class="text text-danger mt-1">
+                        {{textErrorStr(workspaceForm.get('TIN')) | lang}}
                     </div>
                 </div>
             </div>

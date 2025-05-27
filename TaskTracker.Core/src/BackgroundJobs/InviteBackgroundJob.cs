@@ -1,38 +1,31 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using TaskTracker.Core.src.DataAccess;
 using TaskTracker.Core.src.Entities;
 using TaskTracker.Core.src.Enums;
-using TaskTracker.Utils.src.Extensions;
+using TaskTracker.Core.src.Services;
+using TaskTracker.Core.src.Services.Impl;
 
 namespace TaskTracker.Core.src.BackgroundJobs
 {
     public class InviteBackgroundJob : BackgroundService
     {
         private readonly ILogger<InviteBackgroundJob> _logger;
-        private readonly ApplicationDbContext _dbContext;
-        public InviteBackgroundJob(ApplicationDbContext dbContext, ILogger<InviteBackgroundJob> logger)
+        private readonly IServiceScopeFactory _scopeFactory;
+        public InviteBackgroundJob(ILogger<InviteBackgroundJob> logger, IServiceScopeFactory scopeFactory)
         {
-            _dbContext = dbContext;
             _logger = logger;
+            _scopeFactory = scopeFactory;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                try
-                {
-                    await CreateWorkspaceMembersAsync(stoppingToken); // Предположим, что это асинхронная операция
-                    await Task.Delay(60000, stoppingToken); //Ожидание 1 минута
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "An error occurred while executing the background task.");
-                    // Обработка ошибки:  логирование, уведомления, задержка перед повторной попыткой и т.д.
-                    await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken); // Задержка перед повторной попыткой
-                }
+                await CreateWorkspaceMembersAsync(stoppingToken); 
+                await Task.Delay(2000, stoppingToken); //Ожидание 2 секунды
             }
         }
 
@@ -45,8 +38,11 @@ namespace TaskTracker.Core.src.BackgroundJobs
                     // Если отмена запрошена во время выполнения логики,
                     // немедленно прекращаем выполнение и возвращаемся
                     _logger.LogInformation($"{nameof(CreateWorkspaceMembersAsync)} cancelled.");
-                    return; 
+                    return;
                 }
+
+                using var scope = _scopeFactory.CreateScope();
+                var _dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
                 var activeRequests = await _dbContext.Set<WorkspaceInvite>()
                     .Where(x => !x.IsDeleted)
@@ -59,47 +55,56 @@ namespace TaskTracker.Core.src.BackgroundJobs
                     return;
                 }
 
-                var userIds = activeRequests.Select(x=> x.UserId).ToArray();
-                var wspIds = activeRequests.Select(x=> x.WorkSpaceId).ToArray();
-                var userAndWspIds = activeRequests.Select(x => $"{x.UserId}_{x.WorkSpaceId}");
+                var userIds = activeRequests.Select(x => x.UserId).ToArray();
+                var wspIds = activeRequests.Select(x => x.WorkspaceId).ToArray();
+                var userAndWspIds = activeRequests.Select(x => $"{x.UserId}_{x.WorkspaceId}").ToArray();
 
-                var workspaceMembers = await _dbContext.Set<WorkSpaceMember>()
-                        .AsNoTracking()
-                        .Where(x => !x.IsDeleted)
-                        .Where(x => !x.WorkSpace.IsDeleted)
-                        .Where(x => userIds.Contains(x.UserId))
-                        .Where(x => wspIds.Contains(x.WorkSpaceId))
-                        .GroupBy(x => x.UserId + "_" + x.WorkSpaceId)
-                        .ToDictionaryAsync(x=> x.Key, y=> y.FirstOrDefault(), stoppingToken);
+                var query = await _dbContext.Set<WorkspaceMember>()
+                    .Where(x => !x.IsDeleted)
+                    .Where(x => !x.Workspace.IsDeleted)
+                    .Where(x => userIds.Contains(x.UserId))
+                    .Where(x => wspIds.Contains(x.WorkspaceId))
+                    .ToArrayAsync(stoppingToken);
 
-                foreach(var request in activeRequests)
+                var workspaceMembers = query
+                    .Where(x => userAndWspIds.Contains($"{x.UserId}_{x.WorkspaceId}"))
+                    .GroupBy(x => new { x.UserId, x.WorkspaceId })
+                    .ToDictionary(x => x.Key, y => y.FirstOrDefault());
+
+                foreach (var request in activeRequests)
                 {
                     try
                     {
-                        if (workspaceMembers.TryGetValue($"{request.UserId}_{request.WorkSpaceId}", out var workspaceMember))
+                        if (workspaceMembers.TryGetValue(new { request.UserId, request.WorkspaceId }, out var workspaceMember))
                         {
-                            workspaceMember.UserStatus = UserWorkSpaceStatus.Active;
+                            workspaceMember.UserStatus = UserWorkspaceStatus.Active;
                         }
                         else
                         {
-                            workspaceMember = new WorkSpaceMember()
+                            workspaceMember = new WorkspaceMember()
                             {
                                 TeamRole = UserTeamRole.NotSet,
-                                UserStatus = UserWorkSpaceStatus.Active,
+                                UserStatus = UserWorkspaceStatus.Active,
                                 UserId = request.UserId,
-                                WorkSpaceId = request.WorkSpaceId
+                                WorkspaceId = request.WorkspaceId
                             };
 
+                            request.IsChecked = true;
                             await _dbContext.AddAsync(workspaceMember);
+                            await _dbContext.SaveChangesAsync(stoppingToken);
                         }
                     }
-                    catch { }
-                }   
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "An error occurred while creating WorkspaceMember. Invite id: {IviteId}.", request.Id);
+                    }
+                }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while executing the background task.");
-                // Обработка ошибки:  логирование, уведомления, задержка перед повторной попыткой и т.д.
+                using var scope = _scopeFactory.CreateScope();
+                var _logNotificatorService = scope.ServiceProvider.GetRequiredService<ILogNotificatorService>();
+                await _logNotificatorService.LogAndNotifyAdminsAsync($"An error occurred while executing the background task: {nameof(CreateWorkspaceMembersAsync)}", ex);
             }
         }
     }

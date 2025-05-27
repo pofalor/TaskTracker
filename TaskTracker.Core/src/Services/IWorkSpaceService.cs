@@ -8,7 +8,7 @@ namespace TaskTracker.Core.src.Services
 {
     public interface IWorkspaceService
     {
-        Task<IDataResult<List<WorkSpaceMember>>> GetMyWorkspaces(int userId);
+        Task<IDataResult<List<WorkspaceMember>>> GetMyWorkspaces(int userId);
 
         /// <summary>
         /// Получить приглашения юзера в воркспейсы. Т.е. куда меня как юзера пригласили
@@ -42,6 +42,6 @@ namespace TaskTracker.Core.src.Services
         /// </summary>
         Task<IDataResult<bool>> AcceptInvitationRequest(AcceptInvitePR request);
 
-        Task<IDataResult<bool>> CreateOrEdit(WorkSpace request);
+        Task<IDataResult<bool>> CreateOrEdit(Workspace request);
     }
 }

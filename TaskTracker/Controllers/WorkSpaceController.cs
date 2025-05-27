@@ -76,7 +76,7 @@ namespace TaskTracker.Web.Api.Controllers
                         $"User id from claims: {UserId}.");
                     return response.WithError(WorkspaceErrorCodes.AccessDenied);
                 }
-                var mapRes = _mapper.Map<WorkSpace>(request);
+                var mapRes = _mapper.Map<Workspace>(request);
                 var result = await _workSpaceService.CreateOrEdit(mapRes);
 
                 if (result.Success)
@@ -169,14 +169,14 @@ namespace TaskTracker.Web.Api.Controllers
                     return response.WithError(WorkspaceErrorCodes.AccessDenied);
                 }
 
-                var isWspMember = await _workSpaceService.IsWorkspaceMember(request.InviterId.Value, request.WorkSpaceId);
+                var isWspMember = await _workSpaceService.IsWorkspaceMember(request.InviterId.Value, request.WorkspaceId);
 
                 if (!isWspMember)
                 {
                     await _logNotificatorService.SendTelegramAdminAsync($"The inviter is looking for a user to create a workspace for, " +
                         $"even though they are not a member of the workspace.{Environment.NewLine}" +
                       $"Inviter id: {request.InviterId}{Environment.NewLine} " +
-                      $"Workspace id: {request.WorkSpaceId}.");
+                      $"Workspace id: {request.WorkspaceId}.");
                     return response.WithError(WorkspaceErrorCodes.AccessDenied);
                 }
 

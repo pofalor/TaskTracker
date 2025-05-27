@@ -18,23 +18,23 @@ namespace TaskTracker.Core.src.Context
             CreateMap<CreateUserPostRequest, User>();
             CreateMap<User, UserModel>()
                 .ForMember(dist => dist.Name, opt => opt.MapFrom(x => x.GetUserName(false)));
-            CreateMap<WorkSpaceMember, WorkspaceModel>()
-                .ForMember(dist => dist.Id, opt => opt.MapFrom(x => x.WorkSpace.Id))
-                .ForMember(dist => dist.Name, opt => opt.MapFrom(x => x.WorkSpace.Name))
-                .ForMember(dist => dist.WorkSpaceType, opt => opt.MapFrom(x => x.WorkSpace.WorkSpaceType))
-                .ForMember(dist => dist.DirectorUserId, opt => opt.MapFrom(x => x.WorkSpace.DirectorUserId))
-                .ForMember(dist => dist.Country, opt => opt.MapFrom(x => x.WorkSpace.Country))
-                .ForMember(dist => dist.RegistrationDate, opt => opt.MapFrom(x => x.WorkSpace.RegistrationDate.HasValue ? x.WorkSpace.RegistrationDate.Value.ToString(DateFormatConstants.FrontInputFormat) : null))
-                .ForMember(dist => dist.Address, opt => opt.MapFrom(x => x.WorkSpace.Address))
-                .ForMember(dist => dist.INN, opt => opt.MapFrom(x => x.WorkSpace.INN))
-                .ForMember(dist => dist.ReviewStatus, opt => opt.MapFrom(x => x.WorkSpace.ReviewStatus));
-            CreateMap<CreateOrEditWorkspacePostRequest, WorkSpace>()
+            CreateMap<WorkspaceMember, WorkspaceModel>()
+                .ForMember(dist => dist.Id, opt => opt.MapFrom(x => x.Workspace.Id))
+                .ForMember(dist => dist.Name, opt => opt.MapFrom(x => x.Workspace.Name))
+                .ForMember(dist => dist.WorkspaceType, opt => opt.MapFrom(x => x.Workspace.WorkspaceType))
+                .ForMember(dist => dist.DirectorUserId, opt => opt.MapFrom(x => x.Workspace.DirectorUserId))
+                .ForMember(dist => dist.Country, opt => opt.MapFrom(x => x.Workspace.Country))
+                .ForMember(dist => dist.RegistrationDate, opt => opt.MapFrom(x => x.Workspace.RegistrationDate.HasValue ? x.Workspace.RegistrationDate.Value.ToString(DateFormatConstants.FrontInputFormat) : null))
+                .ForMember(dist => dist.Address, opt => opt.MapFrom(x => x.Workspace.Address))
+                .ForMember(dist => dist.INN, opt => opt.MapFrom(x => x.Workspace.INN))
+                .ForMember(dist => dist.ReviewStatus, opt => opt.MapFrom(x => x.Workspace.ReviewStatus));
+            CreateMap<CreateOrEditWorkspacePostRequest, Workspace>()
                 .ForMember(dist => dist.RegistrationDate, opt => opt.MapFrom(x => x.RegistrationDateTime));
             CreateMap<WorkspaceInvite, WorkspaceInviteModel>()
                 .ForMember(dist => dist.Date, opt => opt.MapFrom(x => x.Date.ToString(DateFormatConstants.FullDateTimeShort)))
-                .ForMember(dist => dist.WorkSpaceName, opt => opt.MapFrom(x => x.WorkSpace.Name))
+                .ForMember(dist => dist.WorkspaceName, opt => opt.MapFrom(x => x.Workspace.Name))
                 .ForMember(dist => dist.InviterName, opt => opt.MapFrom(x => x.Inviter.GetUserName(false)))
-                .ForMember(dist => dist.DirectorWspName, opt => opt.MapFrom(x => x.WorkSpace.DirectorUser.GetUserName(false)))
+                .ForMember(dist => dist.DirectorWspName, opt => opt.MapFrom(x => x.Workspace.DirectorUser.GetUserName(false)))
                 .ForMember(dist => dist.UserName, opt => opt.MapFrom(x => x.User.GetUserName(false)))
                 .ForMember(dist => dist.UserEmail, opt => opt.MapFrom(x => x.User.Email))
                 .ForMember(dist => dist.InviterEmail, opt => opt.MapFrom(x => x.Inviter.Email));

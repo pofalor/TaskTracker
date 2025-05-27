@@ -5,8 +5,8 @@ import { NgbModal, NgbActiveModal, NgbAlertModule, NgbDatepickerModule } from '@
 import { TranslateService } from '@ngx-translate/core';
 import { UserService } from '../../../services/user.service';
 import { WorkspaceService } from '../../../services/workspace.service';
-import { WorkSpaceModel } from '../../../model/workSpaceModel';
-import { WorkSpaceType } from '../../../enums/work-space-type';
+import { WorkspaceModel } from '../../../model/workspaceModel';
+import { WorkspaceType } from '../../../enums/work-space-type';
 import { CreateWspInvitePostRequest } from '../../../model/postRequests/сreateWspInvitePostRequest';
 import { SearchUserForInvitePR } from '../../../model/postRequests/searchUserForInvitePR';
 import { UserModel } from '../../../model/userModel';
@@ -16,7 +16,7 @@ import { CommonModule } from '@angular/common';
 import { LangPipe } from '../../../pipes/lang.pipe';
 import { NgSelectComponent, NgOptionComponent } from '@ng-select/ng-select';
 import { DatepickerUtils } from '../../../utils/ngbDatepickerUtils';
-import { UserWorkSpaceStatus } from '../../../enums/user-workspace-status';
+import { UserWorkspaceStatus } from '../../../enums/user-workspace-status';
 import { DateUtils } from '../../../utils/dateUtils';
 
 @Component({
@@ -28,8 +28,8 @@ import { DateUtils } from '../../../utils/dateUtils';
 })
 export class CreateWspInvitationModalComponent extends BaseComponent {
   @Input() invitationId: number | undefined;
-  @Input() workspaces: WorkSpaceModel[] | undefined;
-  @Input() workspace: WorkSpaceModel | undefined;
+  @Input() workspaces: WorkspaceModel[] | undefined;
+  @Input() workspace: WorkspaceModel | undefined;
   @Input() useArray: boolean = false;
   public invitationForm!: FormGroup;
   newInvitation: CreateWspInvitePostRequest = new CreateWspInvitePostRequest();
@@ -41,7 +41,7 @@ export class CreateWspInvitationModalComponent extends BaseComponent {
     private modalService: NgbModal,
     private fb: FormBuilder,
     private activeModal: NgbActiveModal,
-    private workSpaceService: WorkspaceService,
+    private workspaceService: WorkspaceService,
     private translate: TranslateService,
     private userService: UserService,
   ) {
@@ -71,7 +71,7 @@ export class CreateWspInvitationModalComponent extends BaseComponent {
 
   searchEvent(event: any) {
     var t = this;
-    var timeOutTime = 1000;
+    var timeOutTime = 200;
     t.searchText = event.term;
 
     if (t.timer) {
@@ -96,12 +96,12 @@ export class CreateWspInvitationModalComponent extends BaseComponent {
     }
 
     var postRequest: SearchUserForInvitePR = {
-      workSpaceId: wspId,
+      workspaceId: wspId,
       inviterId: t.userService.get()?.id,
       search: t.searchText
     };
 
-    await t.workSpaceService.searchUsersForInvite(postRequest)
+    await t.workspaceService.searchUsersForInvite(postRequest)
       .then((resp: any) => {
         t.allUsers = resp.data;
       })
@@ -125,10 +125,10 @@ export class CreateWspInvitationModalComponent extends BaseComponent {
     t.newInvitation.userId = t.userId?.value;
     t.newInvitation.inviterId = t.userService.get()?.id;
     t.newInvitation.date = DateUtils.getNowDateStr(true);
-    t.newInvitation.newStatus = UserWorkSpaceStatus.Active;
-    t.newInvitation.workSpaceId = t.workspaceId?.value;
+    t.newInvitation.newStatus = UserWorkspaceStatus.Active;
+    t.newInvitation.workspaceId = t.workspaceId?.value;
 
-    await t.workSpaceService.createWspInvite(t.newInvitation)
+    await t.workspaceService.createWspInvite(t.newInvitation)
       .then(async (resp: any) => {
         if (!!resp && !!resp.data) {
           t.activeModal.close(t.newInvitation);

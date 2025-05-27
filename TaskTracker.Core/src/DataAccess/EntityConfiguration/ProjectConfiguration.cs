@@ -17,7 +17,7 @@ namespace TaskTracker.Core.src.DataAccess.EntityConfiguration
             builder.Property(p => p.EndDate).HasColumnName("end_date").IsRequired(false);
             builder.HasOne(p => p.Author).WithMany().HasForeignKey(p => p.AuthorId).IsRequired();
             builder.HasOne(p => p.ProjectMgr).WithMany().HasForeignKey(p => p.ProjectMgrId).IsRequired();
-            builder.HasOne(p => p.WorkSpace).WithMany().HasForeignKey(p => p.WorkSpaceId).IsRequired();
+            builder.HasOne(p => p.Workspace).WithMany().HasForeignKey(p => p.WorkspaceId).IsRequired();
         }
     }
 }

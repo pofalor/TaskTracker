@@ -22,20 +22,20 @@ namespace TaskTracker.Core.src.Services.Impl
             _logger = logger;
         }
 
-        public async Task<IDataResult<List<WorkSpaceMember>>> GetMyWorkspaces(int userId)
+        public async Task<IDataResult<List<WorkspaceMember>>> GetMyWorkspaces(int userId)
         {
-            var result = new DataResult<List<WorkSpaceMember>>();
+            var result = new DataResult<List<WorkspaceMember>>();
 
             try
             {
                 //Вытаскиваем все организации, где юзер - член рабочего пространства
                 //(здесь будут содержаться также организации, которые создал юзер,
-                //т.к. на юзера создаётся WorkSpaceMember UserTeamRole - Owner)
-                var workspaces = await _dbContext.Set<WorkSpaceMember>()
+                //т.к. на юзера создаётся WorkspaceMember UserTeamRole - Owner)
+                var workspaces = await _dbContext.Set<WorkspaceMember>()
                     .AsNoTracking()
-                    .Include(x=> x.WorkSpace)
+                    .Include(x=> x.Workspace)
                     .Where(x=> x.UserId == userId)
-                    .Where(x=> x.UserStatus != UserWorkSpaceStatus.Deleted)
+                    .Where(x=> x.UserStatus != UserWorkspaceStatus.Deleted)
                     .Where(x => !x.IsDeleted)
                     .ToListAsync();
 
@@ -49,26 +49,26 @@ namespace TaskTracker.Core.src.Services.Impl
             }
         }
 
-        public async Task<IDataResult<bool>> CreateOrEdit(WorkSpace request)
+        public async Task<IDataResult<bool>> CreateOrEdit(Workspace request)
         {
             var result = new DataResult<bool>();
             try
             {
-                var newWorkSpace = new WorkSpace();
+                var newWorkspace = new Workspace();
 
-                var existingWorkSpace = await _dbContext.Set<WorkSpace>()
+                var existingWorkspace = await _dbContext.Set<Workspace>()
                         .Where(x => request.Id == x.Id)
                         .Where(x => !x.IsDeleted)
                         .FirstOrDefaultAsync();
 
                 //если не пусто, значит изменяем, иначе добавляем новое рабочее пространство
-                if (existingWorkSpace != null) 
+                if (existingWorkspace != null) 
                 {
-                    newWorkSpace = existingWorkSpace;
+                    newWorkspace = existingWorkspace;
                 }
                 else
                 {
-                    if (request.WorkSpaceType == WorkSpaceType.Company)
+                    if (request.WorkspaceType == WorkspaceType.Company)
                     {
                         if (!request.Country.HasValue)
                         {
@@ -101,11 +101,11 @@ namespace TaskTracker.Core.src.Services.Impl
                         }
                             //У рабочего пространства компании должно быть уникальное имя(в разрезе управляющего,
                             //т.е. один управляющий может создавать рабочие пространства только с разными именами)
-                            var workspaceWithSameName = await _dbContext.Set<WorkSpace>()
+                            var workspaceWithSameName = await _dbContext.Set<Workspace>()
                             .AsNoTracking()
                             .Where(x => x.Name == request.Name)
                             .Where(x => x.DirectorUserId == request.DirectorUserId)
-                            .Where(x => x.WorkSpaceType == request.WorkSpaceType)
+                            .Where(x => x.WorkspaceType == request.WorkspaceType)
                             .Where(x => !x.IsDeleted)
                             .FirstOrDefaultAsync();
 
@@ -113,11 +113,11 @@ namespace TaskTracker.Core.src.Services.Impl
                         {
                             //Не должно быть рабочих пространств с одинаковыми инн, не должно быть одинаковых комбинаций:
                             //даты регистрации, юр. адреса, страны.
-                            var existingWorkspaceByCompanyFields = await _dbContext.Set<WorkSpace>()
+                            var existingWorkspaceByCompanyFields = await _dbContext.Set<Workspace>()
                                 .AsNoTracking()
                                 .Where(x => x.INN == request.INN
                                 || (x.Country == request.Country && x.Address == request.Address && x.RegistrationDate == request.RegistrationDate))
-                                .Where(x => x.WorkSpaceType == request.WorkSpaceType)
+                                .Where(x => x.WorkspaceType == request.WorkspaceType)
                                 .Where(x => !x.IsDeleted)
                                 .FirstOrDefaultAsync();
 
@@ -133,7 +133,7 @@ namespace TaskTracker.Core.src.Services.Impl
                             return result.WithError(WorkspaceErrorCodes.CompanyWithNameAlreadyExists);
                         }
                     }
-                    else if (request.WorkSpaceType == WorkSpaceType.Personal)
+                    else if (request.WorkspaceType == WorkspaceType.Personal)
                     {
                         //для личного рабочего пространства ReviewStatus всегда проставляется NULL
                         if (request.ReviewStatus.HasValue)
@@ -144,9 +144,9 @@ namespace TaskTracker.Core.src.Services.Impl
                             request.ReviewStatus = null;
                         }
 
-                        var existsPersonalWorkspace = await _dbContext.Set<WorkSpace>()
+                        var existsPersonalWorkspace = await _dbContext.Set<Workspace>()
                             .AsNoTracking()
-                            .Where(x => x.WorkSpaceType == request.WorkSpaceType)
+                            .Where(x => x.WorkspaceType == request.WorkspaceType)
                             .Where(x => x.DirectorUserId == request.DirectorUserId)
                             .Where(x => !x.IsDeleted)
                             .AnyAsync();
@@ -156,35 +156,35 @@ namespace TaskTracker.Core.src.Services.Impl
                             return result.WithError(WorkspaceErrorCodes.CanCreateOnlyOnePersonalWorkspace);
                         }
                     }
-                    newWorkSpace.WorkSpaceType = request.WorkSpaceType;
-                    newWorkSpace.DirectorUserId = request.DirectorUserId;
+                    newWorkspace.WorkspaceType = request.WorkspaceType;
+                    newWorkspace.DirectorUserId = request.DirectorUserId;
                 }
                 //TODO: сделать через автомаппер
-                newWorkSpace.Name = request.Name;
-                newWorkSpace.Country = request.Country;
-                newWorkSpace.RegistrationDate = request.RegistrationDate;
-                newWorkSpace.Address = request.Address;
-                newWorkSpace.INN = request.INN;
-                newWorkSpace.ReviewStatus = request.ReviewStatus;
+                newWorkspace.Name = request.Name;
+                newWorkspace.Country = request.Country;
+                newWorkspace.RegistrationDate = request.RegistrationDate;
+                newWorkspace.Address = request.Address;
+                newWorkspace.INN = request.INN;
+                newWorkspace.ReviewStatus = request.ReviewStatus;
 
                 using (var transaction = await _dbContext.Database.BeginTransactionAsync())
                 {
-                    if(existingWorkSpace == null)
-                        await _dbContext.AddAsync(newWorkSpace);
+                    if(existingWorkspace == null)
+                        await _dbContext.AddAsync(newWorkspace);
                     await _dbContext.SaveChangesAsync();
 
                     //создаём сотрудника(владельца) для новой компании
-                    if (existingWorkSpace == null)
+                    if (existingWorkspace == null)
                     {
-                        var newWorkSpaceMember = new WorkSpaceMember()
+                        var newWorkspaceMember = new WorkspaceMember()
                         {
-                            UserId = newWorkSpace.DirectorUserId,
+                            UserId = newWorkspace.DirectorUserId,
                             TeamRole = UserTeamRole.Owner,
-                            UserStatus = UserWorkSpaceStatus.Active,
-                            WorkSpaceId = newWorkSpace.Id
+                            UserStatus = UserWorkspaceStatus.Active,
+                            WorkspaceId = newWorkspace.Id,
                         };
 
-                        await _dbContext.AddAsync(newWorkSpaceMember);
+                        await _dbContext.AddAsync(newWorkspaceMember);
                         await _dbContext.SaveChangesAsync();
                     }
                     await transaction.CommitAsync();
@@ -214,8 +214,8 @@ namespace TaskTracker.Core.src.Services.Impl
                 //Вытаскиваем все запросы, в которые приглашают юзера
                 var statusChanges = await _dbContext.Set<WorkspaceInvite>()
                     .AsNoTracking()
-                    .Include(x => x.WorkSpace)
-                    .Include(x=> x.WorkSpace.DirectorUser)
+                    .Include(x => x.Workspace)
+                    .Include(x=> x.Workspace.DirectorUser)
                     .Include(x=> x.Inviter)
                     .Include(x=> x.User)
                     .Where(x => x.UserId == userId)
@@ -250,12 +250,12 @@ namespace TaskTracker.Core.src.Services.Impl
                 //Вытаскиваем все запросы, в которых юзер - приглашающий
                 var statusChanges = await _dbContext.Set<WorkspaceInvite>()
                     .AsNoTracking()
-                    .Include(x => x.WorkSpace)
+                    .Include(x => x.Workspace)
                     .Include(x=> x.User)
-                    .Include(x => x.WorkSpace.DirectorUser)
+                    .Include(x => x.Workspace.DirectorUser)
                     .Include(x => x.Inviter)
                     .Where(x => x.InviterId == userId)
-                    .Where(x=> x.WorkSpaceId == workspaceId)
+                    .Where(x=> x.WorkspaceId == workspaceId)
                     .Where(x => statusesNeedShow.Contains(x.RequestStatus))
                     .Where(x => !x.IsDeleted)
                     .Where(x => !x.IsHidden)
@@ -279,7 +279,7 @@ namespace TaskTracker.Core.src.Services.Impl
             var result = new DataResult<bool>();
             try
             {
-                if (request.WorkSpaceId <= 0)
+                if (request.WorkspaceId <= 0)
                 {
                     return result.WithError(WorkspaceErrorCodes.WorkspaceNotSet);
                 }
@@ -305,28 +305,28 @@ namespace TaskTracker.Core.src.Services.Impl
                     .AsNoTracking()
                     .Where(x => !x.IsDeleted)
                     .Where(x=> x.UserId == request.UserId)
-                    .Where(x=> x.WorkSpaceId == request.WorkSpaceId)
+                    .Where(x=> x.WorkspaceId == request.WorkspaceId)
                     .Where(x=> x.RequestStatus == InviteStatus.Default)
                     .AnyAsync();
 
                 if(activeRequestForUserExists)
                     return result.WithError(WorkspaceErrorCodes.ActiveInviteAlreadyExists);
 
-                var workspaceExists = await _dbContext.Set<WorkSpace>()
+                var workspaceExists = await _dbContext.Set<Workspace>()
                     .AsNoTracking()
                     .Where(x => !x.IsDeleted)
                     .Where(x => x.DirectorUserId == request.InviterId)
-                    .Where(x => x.Id == request.WorkSpaceId)
+                    .Where(x => x.Id == request.WorkspaceId)
                     .AnyAsync();
 
                 if (!workspaceExists)
                     return result.WithError(WorkspaceErrorCodes.WpsForInviteNotExists);
 
-                 var lastUserMemberInfo = await _dbContext.Set<WorkSpaceMember>()
+                 var lastUserMemberInfo = await _dbContext.Set<WorkspaceMember>()
                     .AsNoTracking()
                     .Where(x => !x.IsDeleted)
                     .Where(x => x.UserId == request.UserId)
-                    .Where(x => x.WorkSpaceId == request.WorkSpaceId)
+                    .Where(x => x.WorkspaceId == request.WorkspaceId)
                     .OrderBy(x=> x.Id)
                     .FirstOrDefaultAsync();
 
@@ -337,7 +337,7 @@ namespace TaskTracker.Core.src.Services.Impl
                 var newWpsInviteRequest = new WorkspaceInvite()
                 { 
                     UserId = request.UserId,
-                    WorkSpaceId = request.WorkSpaceId,
+                    WorkspaceId = request.WorkspaceId,
                     InviterId = request.InviterId,
                     Date = request.Date,
                     PreviousStatus = lastUserMemberInfo?.UserStatus,
@@ -360,25 +360,25 @@ namespace TaskTracker.Core.src.Services.Impl
 
         public async Task<bool> IsWorkspaceMember(int userId, int workspaceId)
         {
-            return await _dbContext.Set<WorkSpaceMember>()
+            return await _dbContext.Set<WorkspaceMember>()
                 .AsNoTracking()
                 .Where(x => !x.IsDeleted)
-                .Where(x=> !x.WorkSpace.IsDeleted)
-                .Where(x => x.WorkSpaceId == workspaceId)
+                .Where(x=> !x.Workspace.IsDeleted)
+                .Where(x => x.WorkspaceId == workspaceId)
                 .Where(x => x.UserId == userId)
-                .Where(x=> x.UserStatus == UserWorkSpaceStatus.Active)
+                .Where(x=> x.UserStatus == UserWorkspaceStatus.Active)
                 .AnyAsync();
         }
 
         public async Task<bool> IsWorkspaceOwner(int userId, int workspaceId)
         {
-            return await _dbContext.Set<WorkSpaceMember>()
+            return await _dbContext.Set<WorkspaceMember>()
                 .AsNoTracking()
                 .Where(x => !x.IsDeleted)
-                .Where(x => !x.WorkSpace.IsDeleted)
-                .Where(x => x.WorkSpaceId == workspaceId)
+                .Where(x => !x.Workspace.IsDeleted)
+                .Where(x => x.WorkspaceId == workspaceId)
                 .Where(x => x.UserId == userId)
-                .Where(x => x.UserStatus == UserWorkSpaceStatus.Active)
+                .Where(x => x.UserStatus == UserWorkspaceStatus.Active)
                 .Where(x=> x.TeamRole == UserTeamRole.Owner)
                 .AnyAsync();
         }
@@ -390,10 +390,10 @@ namespace TaskTracker.Core.src.Services.Impl
             try
             {
                 //Исключить тех, кто уже есть в вокрспейсе
-                var usersAlreadyInWsp = await _dbContext.Set<WorkSpaceMember>()
+                var usersAlreadyInWsp = await _dbContext.Set<WorkspaceMember>()
                     .AsNoTracking()
                     .Where(x => !x.IsDeleted)
-                    .Where(x => x.WorkSpaceId == searchUser.WorkSpaceId)
+                    .Where(x => x.WorkspaceId == searchUser.WorkspaceId)
                     .Select(x=> x.UserId)
                     .ToArrayAsync();
 
@@ -443,33 +443,6 @@ namespace TaskTracker.Core.src.Services.Impl
                     return result.WithError(WorkspaceErrorCodes.InviteNotExists);
 
                 activeRequest.RequestStatus = request.RequestStatus;
-
-               if(request.RequestStatus == InviteStatus.UserConfirmed)
-               {
-                    var workspaceMember = await _dbContext.Set<WorkSpaceMember>()
-                        .AsNoTracking()
-                        .Where(x => !x.IsDeleted)
-                        .Where(x=> !x.WorkSpace.IsDeleted)
-                        .Where(x => x.WorkSpaceId == activeRequest.WorkSpaceId)
-                        .Where(x=> x.UserId == activeRequest.UserId)
-                        .FirstOrDefaultAsync();
-
-                    if (workspaceMember != null)
-                        workspaceMember.UserStatus = UserWorkSpaceStatus.Active;
-                    else
-                    {
-                        //TODO: создавать WorkspaceMember в таске
-                        workspaceMember = new WorkSpaceMember()
-                        {
-                            TeamRole = UserTeamRole.NotSet,
-                            UserStatus = UserWorkSpaceStatus.Active,
-                            UserId = request.UserId ?? 0,
-                            WorkSpaceId = activeRequest.WorkSpaceId
-                        };
-
-                        await _dbContext.AddAsync(workspaceMember);
-                    }
-               }
 
                 await _dbContext.SaveChangesAsync();
 

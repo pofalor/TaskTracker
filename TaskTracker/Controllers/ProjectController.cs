@@ -87,12 +87,12 @@ namespace TaskTracker.Web.Api.Controllers
                     return response.WithError(ProjectErrorCodes.AccessDenied);
                 }
 
-                var isWorkspaceMember = await _workSpaceService.IsWorkspaceMember(UserId, request.WorkSpaceId);
+                var isWorkspaceMember = await _workSpaceService.IsWorkspaceMember(UserId, request.WorkspaceId);
                 if (!isWorkspaceMember)
                 {
                     await _logNotificatorService.SendTelegramAdminAsync($"The user has sent a request to create a project" +
                         $"but he not workspace membership{Environment.NewLine} " +
-                        $"Workspace id: {request.WorkSpaceId}{Environment.NewLine} " +
+                        $"Workspace id: {request.WorkspaceId}{Environment.NewLine} " +
                         $"User id: {UserId}.");
                     return response.WithError(ProjectErrorCodes.UserNotMemberWsp);
                 }

@@ -7,5 +7,5 @@ export class CreateOrEditProjectPR {
     endDate: string | undefined;
     authorId: number | undefined;
     projectMgrId!: number;
-    workSpaceId!: number;
+    workspaceId!: number;
 }

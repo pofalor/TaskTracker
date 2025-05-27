@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { CreateOrEditWorkSpacePostRequest } from '../model/postRequests/createOrEditWorkSpacePostRequest';
+import { CreateOrEditWorkspacePostRequest } from '../model/postRequests/createOrEditWorkspacePostRequest';
 import { IResponse } from '../interfaces/response';
 import { ApiService } from './api.service';
 import { lastValueFrom, Observable } from 'rxjs';
-import { WorkSpaceModel } from '../model/workSpaceModel';
+import { WorkspaceModel } from '../model/workspaceModel';
 import { UserWspStatusChangeModel } from '../model/userWspStatusChangeModel';
 import { CreateWspInvitePostRequest } from '../model/postRequests/сreateWspInvitePostRequest';
 import { SearchUserForInvitePR } from '../model/postRequests/searchUserForInvitePR';
@@ -19,12 +19,12 @@ export class WorkspaceService {
 
   constructor(private api: ApiService) { }
 
-  public async getMyWorkspaces(): Promise<IResponse<WorkSpaceModel[]>> {
-    var res = this.api.get<WorkSpaceModel[]>(serviceApiUrl + 'getMyWorkspaces');
+  public async getMyWorkspaces(): Promise<IResponse<WorkspaceModel[]>> {
+    var res = this.api.get<WorkspaceModel[]>(serviceApiUrl + 'getMyWorkspaces');
     return await lastValueFrom(res);
   }
 
-  public async createOrEdit(postRequest: CreateOrEditWorkSpacePostRequest): Promise<IResponse<boolean>> {
+  public async createOrEdit(postRequest: CreateOrEditWorkspacePostRequest): Promise<IResponse<boolean>> {
     var res = this.api.post<boolean>(serviceApiUrl + 'add', postRequest);
     return await lastValueFrom(res);
   }

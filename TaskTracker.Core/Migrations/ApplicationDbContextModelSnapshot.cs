@@ -99,7 +99,8 @@ namespace TaskTracker.Core.Migrations
                         .IsRequired()
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("bytea")
-                        .HasColumnName("version");
+                        .HasColumnName("version")
+                        .HasDefaultValueSql("gen_random_bytes(8)");
 
                     b.HasKey("Id");
 
@@ -174,9 +175,10 @@ namespace TaskTracker.Core.Migrations
                         .IsRequired()
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("bytea")
-                        .HasColumnName("version");
+                        .HasColumnName("version")
+                        .HasDefaultValueSql("gen_random_bytes(8)");
 
-                    b.Property<int>("WorkSpaceId")
+                    b.Property<int>("WorkspaceId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
@@ -185,7 +187,7 @@ namespace TaskTracker.Core.Migrations
 
                     b.HasIndex("ProjectMgrId");
 
-                    b.HasIndex("WorkSpaceId");
+                    b.HasIndex("WorkspaceId");
 
                     b.ToTable("Project", (string)null);
                 });
@@ -242,7 +244,8 @@ namespace TaskTracker.Core.Migrations
                         .IsRequired()
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("bytea")
-                        .HasColumnName("version");
+                        .HasColumnName("version")
+                        .HasDefaultValueSql("gen_random_bytes(8)");
 
                     b.HasKey("Id");
 
@@ -310,14 +313,15 @@ namespace TaskTracker.Core.Migrations
                         .IsRequired()
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("bytea")
-                        .HasColumnName("version");
+                        .HasColumnName("version")
+                        .HasDefaultValueSql("gen_random_bytes(8)");
 
                     b.HasKey("Id");
 
                     b.ToTable("User", (string)null);
                 });
 
-            modelBuilder.Entity("TaskTracker.Core.src.Entities.WorkSpace", b =>
+            modelBuilder.Entity("TaskTracker.Core.src.Entities.Workspace", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -364,14 +368,19 @@ namespace TaskTracker.Core.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("registration_date");
 
+                    b.Property<int?>("ReviewStatus")
+                        .HasColumnType("integer")
+                        .HasColumnName("review_status");
+
                     b.Property<byte[]>("Version")
                         .IsConcurrencyToken()
                         .IsRequired()
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("bytea")
-                        .HasColumnName("version");
+                        .HasColumnName("version")
+                        .HasDefaultValueSql("gen_random_bytes(8)");
 
-                    b.Property<int>("WorkSpaceType")
+                    b.Property<int>("WorkspaceType")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
                         .HasDefaultValue(0)
@@ -381,64 +390,7 @@ namespace TaskTracker.Core.Migrations
 
                     b.HasIndex("DirectorUserId");
 
-                    b.ToTable("WorkSpace", (string)null);
-                });
-
-            modelBuilder.Entity("TaskTracker.Core.src.Entities.WorkSpaceMember", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(false)
-                        .HasColumnName("is_deleted");
-
-                    b.Property<DateTime>("ObjectCreateDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("object_create_date");
-
-                    b.Property<DateTime>("ObjectEditDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("object_edit_date");
-
-                    b.Property<int>("TeamRole")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(0)
-                        .HasColumnName("team_role");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("UserStatus")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(1)
-                        .HasColumnName("user_status");
-
-                    b.Property<byte[]>("Version")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("bytea")
-                        .HasColumnName("version");
-
-                    b.Property<int>("WorkSpaceId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.HasIndex("WorkSpaceId");
-
-                    b.ToTable("WorkSpaceMember", (string)null);
+                    b.ToTable("Workspace", (string)null);
                 });
 
             modelBuilder.Entity("TaskTracker.Core.src.Entities.WorkspaceInvite", b =>
@@ -505,9 +457,10 @@ namespace TaskTracker.Core.Migrations
                         .IsRequired()
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("bytea")
-                        .HasColumnName("version");
+                        .HasColumnName("version")
+                        .HasDefaultValueSql("gen_random_bytes(8)");
 
-                    b.Property<int>("WorkSpaceId")
+                    b.Property<int>("WorkspaceId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
@@ -516,9 +469,67 @@ namespace TaskTracker.Core.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.HasIndex("WorkSpaceId");
+                    b.HasIndex("WorkspaceId");
 
                     b.ToTable("WorkspaceInvite", (string)null);
+                });
+
+            modelBuilder.Entity("TaskTracker.Core.src.Entities.WorkspaceMember", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_deleted");
+
+                    b.Property<DateTime>("ObjectCreateDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("object_create_date");
+
+                    b.Property<DateTime>("ObjectEditDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("object_edit_date");
+
+                    b.Property<int>("TeamRole")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0)
+                        .HasColumnName("team_role");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("UserStatus")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(1)
+                        .HasColumnName("user_status");
+
+                    b.Property<byte[]>("Version")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("bytea")
+                        .HasColumnName("version")
+                        .HasDefaultValueSql("gen_random_bytes(8)");
+
+                    b.Property<int>("WorkspaceId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("WorkspaceId");
+
+                    b.ToTable("WorkspaceMember", (string)null);
                 });
 
             modelBuilder.Entity("TaskTracker.Core.src.Entities.Issue", b =>
@@ -566,9 +577,9 @@ namespace TaskTracker.Core.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TaskTracker.Core.src.Entities.WorkSpace", "WorkSpace")
+                    b.HasOne("TaskTracker.Core.src.Entities.Workspace", "Workspace")
                         .WithMany()
-                        .HasForeignKey("WorkSpaceId")
+                        .HasForeignKey("WorkspaceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -576,7 +587,7 @@ namespace TaskTracker.Core.Migrations
 
                     b.Navigation("ProjectMgr");
 
-                    b.Navigation("WorkSpace");
+                    b.Navigation("Workspace");
                 });
 
             modelBuilder.Entity("TaskTracker.Core.src.Entities.TimeTracking", b =>
@@ -598,7 +609,7 @@ namespace TaskTracker.Core.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("TaskTracker.Core.src.Entities.WorkSpace", b =>
+            modelBuilder.Entity("TaskTracker.Core.src.Entities.Workspace", b =>
                 {
                     b.HasOne("TaskTracker.Core.src.Entities.User", "DirectorUser")
                         .WithMany()
@@ -607,25 +618,6 @@ namespace TaskTracker.Core.Migrations
                         .IsRequired();
 
                     b.Navigation("DirectorUser");
-                });
-
-            modelBuilder.Entity("TaskTracker.Core.src.Entities.WorkSpaceMember", b =>
-                {
-                    b.HasOne("TaskTracker.Core.src.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("TaskTracker.Core.src.Entities.WorkSpace", "WorkSpace")
-                        .WithMany()
-                        .HasForeignKey("WorkSpaceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-
-                    b.Navigation("WorkSpace");
                 });
 
             modelBuilder.Entity("TaskTracker.Core.src.Entities.WorkspaceInvite", b =>
@@ -642,9 +634,9 @@ namespace TaskTracker.Core.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TaskTracker.Core.src.Entities.WorkSpace", "WorkSpace")
+                    b.HasOne("TaskTracker.Core.src.Entities.Workspace", "Workspace")
                         .WithMany()
-                        .HasForeignKey("WorkSpaceId")
+                        .HasForeignKey("WorkspaceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -652,7 +644,26 @@ namespace TaskTracker.Core.Migrations
 
                     b.Navigation("User");
 
-                    b.Navigation("WorkSpace");
+                    b.Navigation("Workspace");
+                });
+
+            modelBuilder.Entity("TaskTracker.Core.src.Entities.WorkspaceMember", b =>
+                {
+                    b.HasOne("TaskTracker.Core.src.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TaskTracker.Core.src.Entities.Workspace", "Workspace")
+                        .WithMany()
+                        .HasForeignKey("WorkspaceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+
+                    b.Navigation("Workspace");
                 });
 #pragma warning restore 612, 618
         }

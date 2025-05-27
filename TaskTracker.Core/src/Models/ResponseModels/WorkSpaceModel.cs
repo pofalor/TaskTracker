@@ -10,7 +10,7 @@ namespace TaskTracker.Core.src.Models.ResponseModels
         /// Название рабочего пространства
         /// </summary>
         public string Name { get; set; } = null!;
-        public WorkSpaceType WorkSpaceType { get; set; }
+        public WorkspaceType WorkspaceType { get; set; }
 
         /// <summary>
         /// Ссылка на управляющего компании

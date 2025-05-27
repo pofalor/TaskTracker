@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { BaseComponent } from '../../../base/base.component';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { CreateOrEditWorkSpacePostRequest } from '../../../model/postRequests/createOrEditWorkSpacePostRequest';
+import { CreateOrEditWorkspacePostRequest } from '../../../model/postRequests/createOrEditWorkspacePostRequest';
 import { ProjectService } from '../../../services/project.service';
 import { NgbModal, NgbActiveModal, NgbDatepickerModule, NgbAlertModule } from '@ng-bootstrap/ng-bootstrap';
 import { TranslateService } from '@ngx-translate/core';
@@ -105,7 +105,7 @@ export class CreateProjectComponent extends BaseComponent {
     t.project.endDate = endDateObj ? DatepickerUtils.dateToStr(endDateObj) : undefined;
     t.project.authorId = t.userService.get()?.id;
     t.project.projectMgrId = t.formProjectMgrId?.value;
-    t.project.workSpaceId = t.workspaceId;
+    t.project.workspaceId = t.workspaceId;
 
     await t.projectService.createOrEdit(t.project)
       .then(async (resp: any) => {

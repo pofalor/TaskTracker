@@ -45,9 +45,9 @@ namespace TaskTracker.Core.src.Services.Impl
                     .Include(x=> x.Author)
                     .Include(x=> x.Assignee)
                     .Where(x => x.ProjectId == filter.ProjectId)
-                    .Where(x => x.Project.WorkSpaceId == filter.WorkspaceId)
+                    .Where(x => x.Project.WorkspaceId == filter.WorkspaceId)
                     .Where(x => !x.Project.IsDeleted)
-                    .Where(x => !x.Project.WorkSpace.IsDeleted)
+                    .Where(x => !x.Project.Workspace.IsDeleted)
                     .Where(x => !x.IsDeleted)
                     .ToListAsync();
 
@@ -131,8 +131,8 @@ namespace TaskTracker.Core.src.Services.Impl
                 var wspId = await _dbContext.Set<Project>()
                     .Where(x => request.ProjectId == x.Id)
                     .Where(x => !x.IsDeleted)
-                    .Where(x => !x.WorkSpace.IsDeleted)
-                    .Select(x => x.WorkSpaceId)
+                    .Where(x => !x.Workspace.IsDeleted)
+                    .Select(x => x.WorkspaceId)
                     .DefaultIfEmpty()
                     .FirstOrDefaultAsync();
 
@@ -239,13 +239,13 @@ namespace TaskTracker.Core.src.Services.Impl
                     return result.WithError(IssueErrorCodes.IssueNotSet);
                 }
 
-                var isWorkspaceMember = await _workSpaceService.IsWorkspaceMember(request.UserId, existingIssue.Project.WorkSpaceId);
+                var isWorkspaceMember = await _workSpaceService.IsWorkspaceMember(request.UserId, existingIssue.Project.WorkspaceId);
                 if (!isWorkspaceMember)
                 {
                     await _logNotificatorService.SendTelegramAdminAsync($"The user has sent a request to track time, " +
                         $"but he not workspace membership{Environment.NewLine}" +
                         $"Issue id: {request.IssueId}{Environment.NewLine}" +
-                        $"Workspace id: {existingIssue.Project.WorkSpaceId}{Environment.NewLine}" +
+                        $"Workspace id: {existingIssue.Project.WorkspaceId}{Environment.NewLine}" +
                         $"User id: {request.UserId}.");
                     return result.WithError(IssueErrorCodes.UserNotMemberWsp);
                 }

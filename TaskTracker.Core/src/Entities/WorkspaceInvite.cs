@@ -12,9 +12,9 @@ namespace TaskTracker.Core.src.Entities
         /// Ссылка на рабочее пространство, 
         /// в рамках которого юзер меняет статус
         /// </summary>
-        public WorkSpace WorkSpace { get; set; } = null!;
+        public Workspace Workspace { get; set; } = null!;
 
-        public int WorkSpaceId { get; set; }
+        public int WorkspaceId { get; set; }
 
         /// <summary>
         /// Юзер, которого приглашают или удаляют из рабочего пространства
@@ -32,9 +32,9 @@ namespace TaskTracker.Core.src.Entities
         /// Дата, когда был создан запрос в UTC
         /// </summary>
         public DateTime Date { get; set; } 
-        public UserWorkSpaceStatus? PreviousStatus { get; set; }
+        public UserWorkspaceStatus? PreviousStatus { get; set; }
 
-        public UserWorkSpaceStatus NewStatus { get; set; }
+        public UserWorkspaceStatus NewStatus { get; set; }
 
         /// <summary>
         /// Подтвердил юзер приглашение или нет

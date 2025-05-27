@@ -3,13 +3,13 @@ using TaskTracker.Core.src.Enums;
 
 namespace TaskTracker.Core.src.Entities
 {
-    public class WorkSpace : PersistentEntity
+    public class Workspace : PersistentEntity
     {
         /// <summary>
         /// Название рабочего пространства
         /// </summary>
         public string Name { get; set; } = null!;
-        public WorkSpaceType WorkSpaceType { get; set; }
+        public WorkspaceType WorkspaceType { get; set; }
 
         /// <summary>
         /// Ссылка на управляющего компании
@@ -17,7 +17,7 @@ namespace TaskTracker.Core.src.Entities
         public int DirectorUserId { get; set; }
         public User DirectorUser { get; set; } = null!;
 
-        //Все поля ниже заполняются, если WorkSpaceType - Company
+        //Все поля ниже заполняются, если WorkspaceType - Company
 
         /// <summary>
         /// Страна, в которой компания зарегистрирована

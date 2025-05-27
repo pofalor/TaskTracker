@@ -24,7 +24,7 @@
     "futureDate": "The date must not be later than the current date",
     "invalidTimeTrack":"Required format: 2h 3m 11s"
   },
-  "workSpaceType": {
+  "workspaceType": {
     "0": "Personal",
     "1": "Company"
   },

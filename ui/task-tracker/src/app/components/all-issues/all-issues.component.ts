@@ -8,7 +8,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { UserStatusChangeType } from '../../shared/enums/user-status-change-type';
 import { ProjectModel } from '../../shared/model/projectModel';
 import { UserWspStatusChangeModel } from '../../shared/model/userWspStatusChangeModel';
-import { WorkSpaceModel } from '../../shared/model/workSpaceModel';
+import { WorkspaceModel } from '../../shared/model/workspaceModel';
 import { AuthService } from '../../shared/services/onlyFrontServices/auth.service';
 import { UserService } from '../../shared/services/user.service';
 import { CommonModule } from '@angular/common';

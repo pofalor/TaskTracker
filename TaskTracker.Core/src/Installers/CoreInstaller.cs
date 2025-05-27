@@ -1,4 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using System.Net.NetworkInformation;
+using TaskTracker.Core.src.BackgroundJobs;
 using TaskTracker.Core.src.Services;
 using TaskTracker.Core.src.Services.Impl;
 
@@ -9,6 +12,7 @@ namespace TaskTracker.Core.src.Installers
         public static IServiceCollection AddCore(this IServiceCollection services) 
         { 
             services.AddCoreServices();
+            services.AddBackgroundJobs();
             return services;
         }
 
@@ -25,6 +29,14 @@ namespace TaskTracker.Core.src.Installers
             services.AddScoped<IWorkspaceService, WorkspaceService>();
             services.AddScoped<IProjectService, ProjectService>();
             services.AddScoped<IIssueService, IssueService>();
+
+            return services;
+        }
+
+        public static IServiceCollection AddBackgroundJobs(this IServiceCollection services)
+        {
+            services.AddHostedService<InviteBackgroundJob>();
+            services.AddHostedService<RoleManagerBackgroundJob>();
 
             return services;
         }

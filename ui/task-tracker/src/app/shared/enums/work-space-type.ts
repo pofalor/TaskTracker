@@ -1,4 +1,4 @@
-export enum WorkSpaceType {
+export enum WorkspaceType {
     /**
     Для фильтрации
     */

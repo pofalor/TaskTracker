@@ -7,6 +7,6 @@ export class ProjectModel{
     endDate: string | undefined;
     authorId!: number;
     projectMgrId!: number;
-    workSpaceId!: number;
+    workspaceId!: number;
     projectMgrName! : string;
 }

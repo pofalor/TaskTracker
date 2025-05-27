@@ -6,7 +6,7 @@ import { CommonModule } from '@angular/common';
 import { NgbDatepickerModule, NgbModal, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgSelectComponent, NgOptionComponent } from '@ng-select/ng-select';
 import { TranslateService } from '@ngx-translate/core';
-import { WorkSpaceType } from '../../../enums/work-space-type';
+import { WorkspaceType } from '../../../enums/work-space-type';
 import { LangPipe } from '../../../pipes/lang.pipe';
 import { UserService } from '../../../services/user.service';
 import { WorkspaceService } from '../../../services/workspace.service';
