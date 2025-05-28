@@ -112,5 +112,11 @@ namespace TaskTracker.Core.src.ErrorCodes
         /// </summary>
         [ErrorMessage(typeof(IssueErrorCodeResources), nameof(TrackDateInFuture))]
         TrackDateInFuture = TrackDateNotSet + 1,
+
+        /// <summary>
+        /// Не удаётся получить активный трек
+        /// </summary>
+        [ErrorMessage(typeof(IssueErrorCodeResources), nameof(CannotGetAutoTrack))]
+        CannotGetAutoTrack = TrackDateInFuture + 1,
     }
 }

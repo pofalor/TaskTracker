@@ -168,4 +168,7 @@
   <data name="TrackDateInFuture" xml:space="preserve">
     <value>Begin date is in the future. Change the begin date and try again</value>
   </data>
+  <data name="CannotGetAutoTrack" xml:space="preserve">
+    <value>Unable to get active track value. Please contact technical support</value>
+  </data>
 </root>

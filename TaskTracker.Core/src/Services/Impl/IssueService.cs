@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NLog.Filters;
+using NpgsqlTypes;
 using System.Collections.Immutable;
 using System.Linq;
 using TaskTracker.Core.src.Constants;
@@ -260,6 +261,34 @@ namespace TaskTracker.Core.src.Services.Impl
                 _logger.LogError(ex, "Error while tracking time.{NewLine}{Parameter}: {Request}{NewLine2}",
                     Environment.NewLine, nameof(request), request?.ToJson(), Environment.NewLine);
                 return result.WithError(IssueErrorCodes.CannotCreateTimeTrack);
+            }
+        }
+
+        public async Task<IDataResult<TimeTracking?>> GetActiveAutoTrack(int userId, int projectId)
+        {
+            var result = new DataResult<TimeTracking?>();
+
+            try
+            {
+                var validStatuses = new AutoTrackTimeStatus[] { AutoTrackTimeStatus.Active, AutoTrackTimeStatus.Stopped };
+
+                var activeTimeTrack = await _dbContext.Set<TimeTracking>()
+                    .Where(x => x.AutoTrackStatus.HasValue)
+                    .Where(x=> validStatuses.Contains(x.AutoTrackStatus.Value))
+                    .Where(x=> x.UserId == userId)
+                    .Where(x=> x.Issue.ProjectId == projectId)
+                    .Where(x => !x.IsDeleted)
+                    .FirstOrDefaultAsync();
+
+                return result.WithData(activeTimeTrack);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while getting active auto track.{NewLine}" +
+                    "{Parameter}: {UserId}{NewLine2}" +
+                    "{Parameter2}: {ProjectId}",
+                    Environment.NewLine, nameof(userId), userId, Environment.NewLine, nameof(projectId), projectId);
+                return result.WithError(IssueErrorCodes.CannotGetAutoTrack);
             }
         }
     }

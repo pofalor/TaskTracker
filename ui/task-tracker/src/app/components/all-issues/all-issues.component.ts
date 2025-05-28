@@ -18,6 +18,10 @@ import { IssueFilter } from '../../shared/model/filters/issueFilter';
 import { IssueModel } from '../../shared/model/issueModel';
 import { CreateIssueComponent } from '../../shared/components/modals/create-issue/create-issue.component';
 import { TrackTimeComponent } from '../../shared/components/modals/track-time/track-time.component';
+import { TimeTrackingModel } from '../../shared/model/timeTrackingModel';
+import { IssueStatus } from '../../shared/enums/issue-status';
+import { TimerModel } from '../../shared/model/onlyFrontModels/timer.model';
+import { interval, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-all-issues',
@@ -32,6 +36,10 @@ export class AllIssuesComponent extends BaseComponent {
   public getUser: () => UserModel;
   modalRef!: NgbModalRef;
   UserStatusChangeType = UserStatusChangeType;
+  activeTimeTrack: TimeTrackingModel | null = null;
+  IssueStatus = IssueStatus;
+  timerModel: TimerModel = new TimerModel();
+  timerSubscription: Subscription | null = null;
 
   constructor(
     public authService: AuthService,
@@ -63,12 +71,18 @@ export class AllIssuesComponent extends BaseComponent {
 
     t.setLoading(true);
     Promise.all([
-      t.getProjectIssues(false)
+      t.getProjectIssues(false),
+      t.getActiveAutoTrack(false)
     ])
       .then(() => {
         t.setLoading(false);
       });
   }
+
+  ngOnDestroy() {
+    this.pauseTimer();
+  }
+
 
   public async getProjectIssues(needLoader: boolean = true) {
     var t = this;
@@ -83,6 +97,24 @@ export class AllIssuesComponent extends BaseComponent {
     await t.issueService.getProjectIssues(filter)
       .then((resp: any) => {
         t.allIssues = resp.data;
+      })
+      .catch((e) => {
+        t.showResponseError(e);
+      })
+      .finally(() => {
+        if (needLoader)
+          t.setLoading(false);
+      });
+  }
+
+  private async getActiveAutoTrack(needLoader: boolean = true) {
+    var t = this;
+    if (needLoader)
+      t.setLoading(true);
+
+    await t.issueService.getActiveAutoTrack(+t.workspaceId, +t.projectId)
+      .then((resp: any) => {
+        t.activeTimeTrack = resp.data;
       })
       .catch((e) => {
         t.showResponseError(e);
@@ -125,7 +157,7 @@ export class AllIssuesComponent extends BaseComponent {
     }
   }
 
-  editIssue(issue: IssueModel){
+  editIssue(issue: IssueModel) {
     var t = this;
     t.modalRef = t.modalService.open(CreateIssueComponent,
       {
@@ -150,7 +182,7 @@ export class AllIssuesComponent extends BaseComponent {
     t.modalRef.result.then(async (result) => t.processModalResult(result));
   }
 
-  trackTime(issueId: number){
+  trackTime(issueId: number) {
     var t = this;
     t.modalRef = t.modalService.open(TrackTimeComponent,
       {
@@ -161,5 +193,52 @@ export class AllIssuesComponent extends BaseComponent {
     t.modalRef.componentInstance.issueId = issueId;
 
     t.modalRef.result.then(async (result) => t.processTrackResult(result));
+  }
+
+  startAutoTracking(issueId: number) {
+    var t = this;
+    t.showConfirm("Are you sure you want to start automatic time tracking?", "Confirm the action", true, "Yes")
+      .then(async (result) => t.processTrackResult(result));
+  }
+
+  stopAutoTracking(issueId: number) {
+    var t = this;
+    t.showConfirm("Are you sure you want to stop automatic time tracking?", "Confirm the action", true, "Yes")
+      .then(async (result) => t.processTrackResult(result));
+  }
+
+  startTimer() {
+    if (!this.timerModel.timerRunning) {
+      this.timerModel.timerRunning = true;
+      this.timerSubscription = interval(1000).subscribe(() => {
+        this.timerModel.seconds++;
+        if (this.timerModel.seconds >= 60) {
+          this.timerModel.seconds = 0;
+          this.timerModel.minutes++;
+          if (this.timerModel.minutes >= 60) {
+            this.timerModel.minutes = 0;
+            this.timerModel.hours++;
+            if (this.timerModel.hours >= 24) {
+              this.timerModel.hours = 0;
+            }
+          }
+        }
+      });
+    }
+  }
+
+  pauseTimer() {
+    if (this.timerSubscription) {
+      this.timerSubscription.unsubscribe();
+      this.timerSubscription = null;
+      this.timerModel.timerRunning = false;
+    }
+  }
+
+  resetTimer() {
+    this.pauseTimer();
+    this.timerModel.seconds = 0;
+    this.timerModel.minutes = 0;
+    this.timerModel.hours = 0;
   }
 }

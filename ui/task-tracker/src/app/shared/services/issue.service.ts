@@ -7,6 +7,7 @@ import { ApiService } from './api.service';
 import { CreateOrEditIssuePR } from '../model/postRequests/createOrEditIssuePR';
 import { TimeTrackPR } from '../model/postRequests/timeTrackPR';
 import { UserModel } from '../model/userModel';
+import { TimeTrackingModel } from '../model/timeTrackingModel';
 
 const serviceApiUrl = 'api/issue/';
 
@@ -31,4 +32,9 @@ export class IssueService {
     var res = this.api.post<boolean>(serviceApiUrl + 'trackTime', postRequest);
     return await lastValueFrom(res);
   }
+
+  public async getActiveAutoTrack(projectId: number, workspaceId: number): Promise<IResponse<TimeTrackingModel | null>> {
+    var res = this.api.get<TimeTrackingModel | null>(serviceApiUrl + `getActiveAutoTrack?projectId=${projectId}&workspaceId=${workspaceId}`);
+    return await lastValueFrom(res);
+  } 
 }

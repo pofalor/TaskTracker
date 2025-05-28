@@ -1,4 +1,35 @@
 <div class="container-fluid">
+    <div class="row" *ngIf="!!activeTimeTrack">
+        <div class="col col-sm px-3">
+            <div class="text-left text-uppercase f-30 f-w-700 my-3">
+                {{"Active time track" | lang}}
+            </div>
+        </div>
+        <div class="col-auto mb-4">
+            <div class="card h-100 mb-0">
+                <div class="card-body pb-0 pr-0">
+                    <div class="row">
+                        <div class="col-12 pb-3">
+                            <div class="text-left f-22">
+                                <p class="mb-0">{{ "Time spent" | lang}}:
+                                    <span class="mb-0">{{ timerModel.hours | number: '2.0' }}:{{ timerModel.minutes |
+                                        number: '2.0' }}:{{ timerModel.seconds | number: '2.0' }}</span>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-12 pb-2">
+                            <div class="text-left">
+                                <p class="mb-0">{{ "Date begin" | lang}}:
+                                    <span class="mb-0">{{ activeTimeTrack.dateBegin }}</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="row">
         <div class="col col-sm px-3">
             <div class="text-left text-uppercase f-30 f-w-700 my-3">
@@ -6,7 +37,7 @@
             </div>
         </div>
         <div class="col-auto">
-            <button type="button" class="btn btn-primary" (click)="createIssue()">
+            <button type="button" class="btn btn-primary my-3" (click)="createIssue()">
                 {{'Create issue'| lang}}
             </button>
         </div>
@@ -46,6 +77,11 @@
                             </a>
                             <a class="cursor-pointer">
                                 <i class="fa fa-calendar p-2" (click)="trackTime(issue.id)"></i>
+                            </a>
+                            <a class="cursor-pointer"
+                                *ngIf="issue.assigneeId == getUser().id && issue.status == IssueStatus.InProgress">
+                                <i *ngIf="!activeTimeTrack" class="fa fa-unlock p-2" (click)="startAutoTracking(issue.id)"></i>
+                                <i *ngIf="!!activeTimeTrack" class="fa fa-lock p-2" (click)="stopAutoTracking(issue.id)"></i>
                             </a>
                         </td>
                     </tr>

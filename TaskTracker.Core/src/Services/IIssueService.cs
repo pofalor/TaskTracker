@@ -12,5 +12,10 @@ namespace TaskTracker.Core.src.Services
         Task<IDataResult<bool>> TrackTime(TimeTracking request);
 
         Task<IDataResult<bool>> CreateOrEdit(Issue request);
+
+        /// <summary>
+        /// Получить активный автоматический трек, если он есть. Если нет, то возвращается null.
+        /// </summary>
+        Task<IDataResult<TimeTracking?>> GetActiveAutoTrack(int userId, int projectId);
     }
 }
