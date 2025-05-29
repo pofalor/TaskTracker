@@ -4,7 +4,7 @@ using NLog.Filters;
 using TaskTracker.Controllers.BaseControllers;
 using TaskTracker.Core.src.Constants;
 using TaskTracker.Core.src.Entities;
-using TaskTracker.Core.src.ErrorCodes;
+using TaskTracker.Core.src.Enums.ErrorCodes;
 using TaskTracker.Core.src.Models.Filters;
 using TaskTracker.Core.src.Models.PostRequests;
 using TaskTracker.Core.src.Models.ResponseModels;
@@ -138,45 +138,6 @@ namespace TaskTracker.Web.Api.Controllers
                 _logger.LogError(ex, "Error while sending request to track time.{NewLine}{Parameter}:{Request}{NewLine2}",
                    Environment.NewLine, nameof(request), request?.ToJson(), Environment.NewLine);
                 return response.WithError(IssueErrorCodes.CannotCreateTimeTrack);
-            }
-        }
-
-        [Route("getActiveAutoTrack")]
-        [HttpGet]
-        public async Task<DataResponse<TimeTrackingModel?>> GetActiveAutoTrack(int projectId, int workspaceId)
-        {
-            var response = new DataResponse<TimeTrackingModel?>();
-
-            try
-            {
-                var isWorkspaceMember = await _workSpaceService.IsWorkspaceMember(UserId, workspaceId);
-                if (!isWorkspaceMember)
-                {
-                    await _logNotificatorService.SendTelegramAdminAsync($"The user has sent a request to get active auto track, " +
-                        $"but he not workspace membership{Environment.NewLine} " +
-                        $"Project id: {projectId}{Environment.NewLine} " +
-                        $"User id: {UserId}.");
-                    return response.WithError(IssueErrorCodes.UserNotMemberWsp);
-                }
-
-                var result = await _issueService.GetActiveAutoTrack(UserId, projectId);
-
-                
-                if (result.Success)
-                {
-                    var mapRes = _mapper.Map<TimeTrackingModel>(result.Data);
-                    return response.WithData(mapRes);
-                }
-                else
-                    return response.WithError(result.Errors[0]);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error while sending request to get auto track time.{NewLine}" +
-                    "{Parameter}:{UserId}{NewLine2}" +
-                    "{Parameter2}:{ProjectId}",
-                   Environment.NewLine, nameof(UserId), UserId, Environment.NewLine, nameof(projectId), projectId);
-                return response.WithError(IssueErrorCodes.CannotGetAutoTrack);
             }
         }
     }

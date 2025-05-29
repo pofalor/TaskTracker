@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using TaskTracker.Controllers.BaseControllers;
-using TaskTracker.Core.src.ErrorCodes;
+using TaskTracker.Core.src.Enums.ErrorCodes;
 using TaskTracker.Core.src.Models.ResponseModels;
 using TaskTracker.Core.src.Services;
 using TaskTracker.Core.src.Services.Impl;

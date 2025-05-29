@@ -36,6 +36,11 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>AuthenticationErrorCodeResources.resx</DependentUpon>
     </Compile>
+    <Compile Update="src\Resources\ErrorCodes\AutoTimeTrackErrorCodeResources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>AutoTimeTrackErrorCodeResources.resx</DependentUpon>
+    </Compile>
     <Compile Update="src\Resources\ErrorCodes\BaseErrorCodeResources.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -77,6 +82,10 @@
     <EmbeddedResource Update="src\Resources\ErrorCodes\AuthenticationErrorCodeResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>AuthenticationErrorCodeResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="src\Resources\ErrorCodes\AutoTimeTrackErrorCodeResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>AutoTimeTrackErrorCodeResources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Update="src\Resources\ErrorCodes\BaseErrorCodeResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

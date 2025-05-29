@@ -4,7 +4,7 @@ using TaskTracker.Core.src.DataAccess;
 using TaskTracker.Core.src.DataResult;
 using TaskTracker.Core.src.Entities;
 using TaskTracker.Core.src.Enums;
-using TaskTracker.Core.src.ErrorCodes;
+using TaskTracker.Core.src.Enums.ErrorCodes;
 using TaskTracker.Core.src.Models.Filters;
 using TaskTracker.Utils.src.Extensions;
 

@@ -9,7 +9,7 @@ using TaskTracker.Core.src.DataAccess;
 using TaskTracker.Core.src.DataResult;
 using TaskTracker.Core.src.Entities;
 using TaskTracker.Core.src.Enums;
-using TaskTracker.Core.src.ErrorCodes;
+using TaskTracker.Core.src.Enums.ErrorCodes;
 using TaskTracker.Core.src.Models.Filters;
 using TaskTracker.Core.src.Models.PostRequests;
 using TaskTracker.Core.src.Models.ResponseModels;
@@ -230,6 +230,7 @@ namespace TaskTracker.Core.src.Services.Impl
                 }
 
                 var existingIssue = await _dbContext.Set<Issue>()
+                    .AsNoTracking()
                     .Include(x=> x.Project)
                     .Where(x => request.IssueId == x.Id)
                     .Where(x => !x.IsDeleted)
@@ -251,7 +252,27 @@ namespace TaskTracker.Core.src.Services.Impl
                     return result.WithError(IssueErrorCodes.UserNotMemberWsp);
                 }
 
-                await _dbContext.AddAsync(request);
+                var existingTimeTrack = await _dbContext.Set<TimeTracking>()
+                    .Where(x => request.Id == x.Id)
+                    .Where(x => !x.IsDeleted)
+                    .FirstOrDefaultAsync();
+
+                //если не пусто, значит изменяем, иначе добавляем новую задачу. Если не пусто, значит это автоматический трек
+                if (existingTimeTrack != null)
+                {
+                    existingTimeTrack.Comment = request.Comment;
+                    existingTimeTrack.TimeSpent = request.TimeSpent;
+
+                    if (existingTimeTrack.AutoTrackStatus.HasValue)
+                    {
+                        existingTimeTrack.AutoTrackStatus = AutoTrackTimeStatus.Finished;
+                    }
+                }
+                else
+                {
+                    await _dbContext.AddAsync(request);
+                }
+                
                 await _dbContext.SaveChangesAsync();
 
                 return result.WithData(true);
@@ -261,34 +282,6 @@ namespace TaskTracker.Core.src.Services.Impl
                 _logger.LogError(ex, "Error while tracking time.{NewLine}{Parameter}: {Request}{NewLine2}",
                     Environment.NewLine, nameof(request), request?.ToJson(), Environment.NewLine);
                 return result.WithError(IssueErrorCodes.CannotCreateTimeTrack);
-            }
-        }
-
-        public async Task<IDataResult<TimeTracking?>> GetActiveAutoTrack(int userId, int projectId)
-        {
-            var result = new DataResult<TimeTracking?>();
-
-            try
-            {
-                var validStatuses = new AutoTrackTimeStatus[] { AutoTrackTimeStatus.Active, AutoTrackTimeStatus.Stopped };
-
-                var activeTimeTrack = await _dbContext.Set<TimeTracking>()
-                    .Where(x => x.AutoTrackStatus.HasValue)
-                    .Where(x=> validStatuses.Contains(x.AutoTrackStatus.Value))
-                    .Where(x=> x.UserId == userId)
-                    .Where(x=> x.Issue.ProjectId == projectId)
-                    .Where(x => !x.IsDeleted)
-                    .FirstOrDefaultAsync();
-
-                return result.WithData(activeTimeTrack);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error while getting active auto track.{NewLine}" +
-                    "{Parameter}: {UserId}{NewLine2}" +
-                    "{Parameter2}: {ProjectId}",
-                    Environment.NewLine, nameof(userId), userId, Environment.NewLine, nameof(projectId), projectId);
-                return result.WithError(IssueErrorCodes.CannotGetAutoTrack);
             }
         }
     }

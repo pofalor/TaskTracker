@@ -52,7 +52,12 @@ namespace TaskTracker.Core.src.Context
                 .ForMember(dist => dist.TimeSpent, opt => opt.MapFrom(x => x.TimeSpent.ConvertToTimespan()));
             CreateMap<CreateOrEditIssuePR, Issue>()
                 .ForMember(dist => dist.Estimate, opt => opt.MapFrom(x => x.Estimate.ConvertToTimespan()));
-            CreateMap<TimeTracking, TimeTrackingModel>();
+            CreateMap<TimeTracking, TimeTrackingModel>()
+                .ForMember(dist => dist.DateBegin, opt => opt.MapFrom(x => x.DateBegin.ToString(DateFormatConstants.IsoString)))
+                .ForMember(dist => dist.TimeSpent, opt => opt.MapFrom(x => x.TimeSpent.ToString()));
+            CreateMap<AutoTimeTrackPR, TimeTracking>()
+                .ForMember(dist => dist.DateBegin, opt => opt.MapFrom(x => x.GetBeginDate()))
+                .ForMember(dist => dist.TimeSpent, opt => opt.MapFrom(x => x.TimeSpent.ConvertToTimespan()));
         }
     }
 }

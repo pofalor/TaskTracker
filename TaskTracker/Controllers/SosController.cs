@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TaskTracker.Controllers.BaseControllers;
 using TaskTracker.Core.src.ConfigSectionModels;
-using TaskTracker.Core.src.ErrorCodes;
+using TaskTracker.Core.src.Enums.ErrorCodes;
 using TaskTracker.Core.src.Services;
 using TaskTracker.Web.Api.Extensions;
 using TaskTracker.Web.Api.Responses;

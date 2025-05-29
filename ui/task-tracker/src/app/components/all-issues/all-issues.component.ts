@@ -22,10 +22,17 @@ import { TimeTrackingModel } from '../../shared/model/timeTrackingModel';
 import { IssueStatus } from '../../shared/enums/issue-status';
 import { TimerModel } from '../../shared/model/onlyFrontModels/timer.model';
 import { interval, Subscription } from 'rxjs';
+import { AutoTrackTimeStatus } from '../../shared/enums/auto-track-time-status';
+import { AutoTimeTrackService } from '../../shared/services/autoTimeTrack.service';
+import { TimeTrackPR } from '../../shared/model/postRequests/timeTrackPR';
+import { DatepickerUtils } from '../../shared/utils/ngbDatepickerUtils';
+import { DateUtils } from '../../shared/utils/dateUtils';
+import { FormatDatePipe } from "../../shared/pipes/formatDate.pipe";
+import { AutoTimeTrackPR } from '../../shared/model/postRequests/autoTimeTrackPR';
 
 @Component({
   selector: 'app-all-issues',
-  imports: [ReactiveFormsModule, CommonModule, LangPipe],
+  imports: [ReactiveFormsModule, CommonModule, LangPipe, FormatDatePipe],
   templateUrl: './all-issues.component.html',
   styleUrl: './all-issues.component.scss'
 })
@@ -40,6 +47,8 @@ export class AllIssuesComponent extends BaseComponent {
   IssueStatus = IssueStatus;
   timerModel: TimerModel = new TimerModel();
   timerSubscription: Subscription | null = null;
+  activeIssue: IssueModel | undefined;
+  AutoTrackTimeStatus = AutoTrackTimeStatus;
 
   constructor(
     public authService: AuthService,
@@ -48,7 +57,8 @@ export class AllIssuesComponent extends BaseComponent {
     private translate: TranslateService,
     private activateRoute: ActivatedRoute,
     private router: Router,
-    private userService: UserService
+    private userService: UserService,
+    private autoTimeTrackService: AutoTimeTrackService
   ) {
     super(modalService, translate);
 
@@ -75,6 +85,7 @@ export class AllIssuesComponent extends BaseComponent {
       t.getActiveAutoTrack(false)
     ])
       .then(() => {
+        t.activeIssue = t.allIssues.find(x=> x.id == t.activeTimeTrack?.issueId);
         t.setLoading(false);
       });
   }
@@ -112,9 +123,10 @@ export class AllIssuesComponent extends BaseComponent {
     if (needLoader)
       t.setLoading(true);
 
-    await t.issueService.getActiveAutoTrack(+t.workspaceId, +t.projectId)
+    await t.autoTimeTrackService.getActiveAutoTrack(+t.workspaceId, +t.projectId)
       .then((resp: any) => {
         t.activeTimeTrack = resp.data;
+        t.initTimer();
       })
       .catch((e) => {
         t.showResponseError(e);
@@ -123,6 +135,29 @@ export class AllIssuesComponent extends BaseComponent {
         if (needLoader)
           t.setLoading(false);
       });
+  }
+
+  private initTimer() {
+    var t = this;
+    if (t.activeTimeTrack) {
+      switch(t.activeTimeTrack.autoTrackStatus){
+        case AutoTrackTimeStatus.Active:
+          //Если статус активный, значит ставим считаем значение по BeginDate и ставим таймер
+          var timeSpent = DateUtils.timeSince(t.activeTimeTrack.dateBegin);
+          var timeArr = timeSpent.split(':');
+          t.timerModel.hours = parseInt(timeArr[0]);
+          t.timerModel.minutes = parseInt(timeArr[1]);
+          t.timerModel.seconds = parseInt(timeArr[2]);
+          t.startTimer();
+          break;
+        case AutoTrackTimeStatus.Stopped:
+          var timeArr = t.activeTimeTrack.timeSpent.split(':');
+          t.timerModel.hours = parseInt(timeArr[0]);
+          t.timerModel.minutes = parseInt(timeArr[1]);
+          t.timerModel.seconds = parseInt(timeArr[2]);
+          break;
+      }
+    }
   }
 
   public createIssue() {
@@ -152,6 +187,7 @@ export class AllIssuesComponent extends BaseComponent {
     if (result) {
       var t = this;
       await t.getProjectIssues(false);
+      await t.getActiveAutoTrack(false);
       t.showSuccess("Time track sucessfully recorded", "Success");
       t.setLoading(false);
     }
@@ -198,14 +234,71 @@ export class AllIssuesComponent extends BaseComponent {
   startAutoTracking(issueId: number) {
     var t = this;
     t.showConfirm("Are you sure you want to start automatic time tracking?", "Confirm the action", true, "Yes")
-      .then(async (result) => t.processTrackResult(result));
+      .then(async (result) => {
+        if (result) {
+          t.setLoading(true);
+          var timeTrackPr = new AutoTimeTrackPR();
+          timeTrackPr.timeSpent = "0h 0m 0s";
+          timeTrackPr.dateBegin = new Date().toISOString().split(".")[0];
+          timeTrackPr.userId = t.getUser().id;
+          timeTrackPr.issueId = issueId;
+          await t.autoTimeTrackService.startTracking(timeTrackPr)
+            .then((resp: any) => {
+              t.activeTimeTrack = resp.data;
+              t.initTimer();
+            })
+            .catch((e) => {
+              t.showResponseError(e);
+            })
+            .finally(() => {
+              t.setLoading(false);
+            });
+        }
+      });
   }
 
   stopAutoTracking(issueId: number) {
     var t = this;
     t.showConfirm("Are you sure you want to stop automatic time tracking?", "Confirm the action", true, "Yes")
-      .then(async (result) => t.processTrackResult(result));
+      .then(async (result) => {
+        if (result) {
+          t.pauseTimer();
+          t.setLoading(true);
+          var timeTrackPr = new AutoTimeTrackPR();
+          timeTrackPr.timeSpent = `${t.timerModel.hours}h ${t.timerModel.minutes}m ${t.timerModel.seconds}s`;
+          timeTrackPr.userId = t.getUser().id;
+          timeTrackPr.issueId = t.activeTimeTrack?.issueId ?? t.activeIssue?.id ?? issueId;
+          timeTrackPr.id = t.activeTimeTrack?.id;
+          await t.autoTimeTrackService.stopTracking(timeTrackPr)
+            .then((resp: any) => {
+              t.activeTimeTrack = resp.data;
+            })
+            .catch((e) => {
+              t.showResponseError(e);
+            })
+            .finally(() => {
+              t.setLoading(false);
+            });
+        }
+      });
   }
+
+  finishAutoTracking(){
+    var t = this;
+    t.modalRef = t.modalService.open(TrackTimeComponent,
+      {
+        centered: true,
+        size: 'lg'
+      });
+
+    t.modalRef.componentInstance.id = t.activeTimeTrack?.id;
+    t.modalRef.componentInstance.issueId = t.activeTimeTrack?.issueId;
+    t.modalRef.componentInstance.dateBegin = t.activeTimeTrack?.dateBegin;
+    t.modalRef.componentInstance.timeSpent = `${t.timerModel.hours}h ${t.timerModel.minutes}m ${t.timerModel.seconds}s`;
+
+    t.modalRef.result.then(async (result) => t.processTrackResult(result));
+  }
+
 
   startTimer() {
     if (!this.timerModel.timerRunning) {
@@ -218,9 +311,6 @@ export class AllIssuesComponent extends BaseComponent {
           if (this.timerModel.minutes >= 60) {
             this.timerModel.minutes = 0;
             this.timerModel.hours++;
-            if (this.timerModel.hours >= 24) {
-              this.timerModel.hours = 0;
-            }
           }
         }
       });

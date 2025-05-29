@@ -1,4 +1,4 @@
-export class TimeTrackPR {
+export class AutoTimeTrackPR {
     id: number | undefined;
     timeSpent: string | undefined;
     dateBegin: string | undefined;

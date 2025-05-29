@@ -4,6 +4,7 @@ namespace TaskTracker.Core.src.Models.ResponseModels
 {
     public class TimeTrackingModel
     {
+        public int Id { get; set; }
         /// <summary>
         /// Затраченное время
         /// </summary>

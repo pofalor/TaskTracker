@@ -1,6 +1,7 @@
 import { AutoTrackTimeStatus } from "../enums/auto-track-time-status";
 
 export class TimeTrackingModel {
+    id: number | undefined;
     /**
      * Затраченное время
      */

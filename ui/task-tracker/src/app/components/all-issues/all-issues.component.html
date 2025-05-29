@@ -1,6 +1,6 @@
 <div class="container-fluid">
     <div class="row" *ngIf="!!activeTimeTrack">
-        <div class="col col-sm px-3">
+        <div class="col-12 px-3">
             <div class="text-left text-uppercase f-30 f-w-700 my-3">
                 {{"Active time track" | lang}}
             </div>
@@ -9,6 +9,11 @@
             <div class="card h-100 mb-0">
                 <div class="card-body pb-0 pr-0">
                     <div class="row">
+                        <div *ngIf="!!activeIssue" class="col-12 pb-3">
+                            <div class="text-left f-24 f-w-700">
+                                {{activeIssue.projectCode + '-' + activeIssue.index}}
+                            </div>
+                        </div>
                         <div class="col-12 pb-3">
                             <div class="text-left f-22">
                                 <p class="mb-0">{{ "Time spent" | lang}}:
@@ -18,11 +23,21 @@
                             </div>
                         </div>
                         <div class="col-12 pb-2">
-                            <div class="text-left">
+                            <div class="text-left f-22">
                                 <p class="mb-0">{{ "Date begin" | lang}}:
-                                    <span class="mb-0">{{ activeTimeTrack.dateBegin }}</span>
+                                    <span class="mb-0">{{ activeTimeTrack.dateBegin | formatDate}}</span>
                                 </p>
                             </div>
+                        </div>
+                        <!-- <div class="col-6">
+                            <button *ngIf="activeTimeTrack.autoTrackStatus == AutoTrackTimeStatus.Stopped" type="button" class="btn btn-primary my-3" (click)="createIssue()">
+                                {{'Continue'| lang}}
+                            </button>
+                        </div> -->
+                        <div class="col-6">
+                            <button *ngIf="activeTimeTrack.autoTrackStatus == AutoTrackTimeStatus.Stopped" type="button" class="btn btn-primary my-3" (click)="finishAutoTracking()">
+                                {{'Save'| lang}}
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -79,9 +94,12 @@
                                 <i class="fa fa-calendar p-2" (click)="trackTime(issue.id)"></i>
                             </a>
                             <a class="cursor-pointer"
-                                *ngIf="issue.assigneeId == getUser().id && issue.status == IssueStatus.InProgress">
-                                <i *ngIf="!activeTimeTrack" class="fa fa-unlock p-2" (click)="startAutoTracking(issue.id)"></i>
-                                <i *ngIf="!!activeTimeTrack" class="fa fa-lock p-2" (click)="stopAutoTracking(issue.id)"></i>
+                                *ngIf="!activeTimeTrack && issue.assigneeId == getUser().id && issue.status == IssueStatus.InProgress">
+                                <i class="fa fa-unlock p-2" (click)="startAutoTracking(issue.id)"></i>
+                            </a>
+                            <a class="cursor-pointer" *ngIf="!!activeTimeTrack && activeTimeTrack.issueId == issue.id 
+                                && issue.assigneeId == getUser().id && issue.status == IssueStatus.InProgress && activeTimeTrack.autoTrackStatus == AutoTrackTimeStatus.Active">
+                                <i class="fa fa-lock p-2" (click)="stopAutoTracking(issue.id)"></i>
                             </a>
                         </td>
                     </tr>

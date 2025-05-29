@@ -4,9 +4,10 @@ using TaskTracker.Utils.src.Extensions;
 
 namespace TaskTracker.Core.src.Models.PostRequests
 {
-    public class TimeTrackPR : BasePostRequest
+    public class AutoTimeTrackPR : BasePostRequest
     {
-        public int? Id { get; set; }
+        public int? Id {  get; set; }
+
         /// <summary>
         /// Затраченное время
         /// </summary>
@@ -36,28 +37,7 @@ namespace TaskTracker.Core.src.Models.PostRequests
         {
             return DateBegin.IsEmpty() 
                 ? DateTime.UtcNow - TimeSpent.ConvertToTimespan()
-                : ParseBeginDate();
-        }
-
-        private DateTime ParseBeginDate()
-        {
-            DateTime result;
-            try
-            {
-                result = DateTime.ParseExact(DateBegin, DateFormatConstants.FrontInputFormat, CultureInfo.InvariantCulture);
-            }
-            catch
-            {
-                try
-                {
-                    result = DateTime.ParseExact(DateBegin, DateFormatConstants.IsoString, CultureInfo.InvariantCulture);
-                }
-                catch
-                {
-                    result = DateTime.UtcNow;
-                }
-            }
-            return result;
+                : DateTime.ParseExact(DateBegin, DateFormatConstants.IsoString, CultureInfo.InvariantCulture);
         }
     }
 }
