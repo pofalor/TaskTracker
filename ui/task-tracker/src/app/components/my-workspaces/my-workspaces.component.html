@@ -8,9 +8,10 @@
     </div>
     <div class="row">
         <ng-container *ngFor="let workspace of allMyWorkspaces">
-            <div *ngIf="!!allMyWorkspaces && allMyWorkspaces.length > 0" class="col-auto col-xxl-3 mb-4">
+            <div *ngIf="!!allMyWorkspaces && allMyWorkspaces.length > 0 && needShowWorkspace(workspace)"
+                class="col-auto col-xxl-3 mb-4">
                 <div class="card h-100 mb-0">
-                    <div class="card-body pb-0 pr-0">
+                    <div class="card-body pb-0 pr-0 flex-card">
                         <div class="row">
                             <div class="col-auto d-flex flex-column">
                                 <div class="text-left text-uppercase f-22 f-w-700">
@@ -24,6 +25,8 @@
                                     {{'buttons.change'| lang}}
                                 </button>
                             </div>
+                        </div>
+                        <div class="row h-100">
                             <div class="col-12 mt-4">
                                 <label class="mb-1">{{ "Type of workspace" | lang}}</label>
                             </div>
@@ -48,8 +51,15 @@
                                     <span class="mb-0">{{ 'teamRoles.' + workspace.teamRole | lang}}</span>
                                 </p>
                             </div>
-                            <div class="col-12 pb-3">
-                                <button class="btn btn-primary" (click)="viewWorkspace(workspace)">
+                            <div class="col-12 pb-3"
+                                *ngIf="!!workspace.reviewStatus && workspace.workspaceType == WorkspaceType.Company && workspace.directorUserId == getUser().id">
+                                <p class="mb-0">{{ "Review status (by administrator)" | lang}}:
+                                    <span class="mb-0">{{ 'reviewStatus.' + workspace.reviewStatus | lang}}</span>
+                                </p>
+                            </div>
+                            <div class="col-12 pb-3" style="align-content: end;">
+                                <button class="btn btn-primary" (click)="viewWorkspace(workspace)"
+                                    [disabled]="!!workspace.reviewStatus && workspace.reviewStatus != WorkspaceReviewStatus.Approved">
                                     {{'buttons.view' | lang}}
                                 </button>
                             </div>
@@ -64,7 +74,7 @@
                 <div class="card-body h-100 pb-0 pr-0">
                     <div class="row h-100">
                         <div class="col d-flex flex-column flex-center">
-                            <img style="width: 60px;" src="/assets/icons/plus_icon.png" type="button"
+                            <img style="width: 60px; user-select: none;" src="/assets/icons/plus_icon.png" type="button"
                                 class="cursor-pointer" (click)="createWorkspace()" draggable="false" class="mb-2">
                         </div>
                     </div>
@@ -106,8 +116,7 @@
                         <div class="col-12 pb-2" *ngIf="invitation.requestStatus != UserStatusChangeType.Default">
                             <div class="text-left">
                                 <p class="mb-0">{{ "Status" | lang}}:
-                                    <span
-                                        [ngClass]="{ 'c-red': invitation.requestStatus == UserStatusChangeType.UserDeclined,
+                                    <span [ngClass]="{ 'c-red': invitation.requestStatus == UserStatusChangeType.UserDeclined,
                                         'c-green': invitation.requestStatus == UserStatusChangeType.UserConfirmed}">
                                         {{ 'wspInviteStatus.' + invitation.requestStatus | lang}}
                                     </span>
@@ -117,12 +126,14 @@
                         <div class="col-12 pb-3" *ngIf="invitation.requestStatus == UserStatusChangeType.Default">
                             <div class="row">
                                 <div class="col-6">
-                                    <button class="btn btn-danger w-100" type="button" (click)="setRequestStatus(false, invitation.id)">
+                                    <button class="btn btn-danger w-100" type="button"
+                                        (click)="setRequestStatus(false, invitation.id)">
                                         {{ "buttons.decline" | lang }}
                                     </button>
                                 </div>
                                 <div class="col-6">
-                                    <button class="btn btn-primary w-100" type="button" (click)="setRequestStatus(true, invitation.id)">
+                                    <button class="btn btn-primary w-100" type="button"
+                                        (click)="setRequestStatus(true, invitation.id)">
                                         {{ "buttons.confirm" | lang }}
                                     </button>
                                 </div>

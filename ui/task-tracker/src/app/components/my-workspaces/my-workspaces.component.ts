@@ -19,6 +19,8 @@ import { ModalInfoModel } from '../../shared/model/onlyFrontModels/modalInfo.mod
 import { AcceptInvitePR } from '../../shared/model/postRequests/acceptInvitePR';
 import { UserStatusChangeType } from '../../shared/enums/user-status-change-type';
 import { UserService } from '../../shared/services/user.service';
+import { UserModel } from '../../shared/model/userModel';
+import { WorkspaceReviewStatus } from '../../shared/enums/workspace-review-status';
 
 @Component({
   selector: 'app-my-workspaces',
@@ -34,6 +36,8 @@ export class MyWorkspacesComponent extends BaseComponent {
   allMyInvitations: UserWspStatusChangeModel[] = [];
   UserStatusChangeType = UserStatusChangeType;
   runIntervals : any[] = [];
+  public getUser: () => UserModel;
+  WorkspaceReviewStatus = WorkspaceReviewStatus;
 
   constructor(
     public authService: AuthService,
@@ -44,6 +48,11 @@ export class MyWorkspacesComponent extends BaseComponent {
     private userService: UserService,
   ) {
     super(modalService, translate);
+
+    this.getUser = () => {
+      var user = this.userService.get() ?? new UserModel();
+      return user;
+    }
   }
 
   async ngOnInit() {
@@ -201,5 +210,16 @@ export class MyWorkspacesComponent extends BaseComponent {
       .finally(() => {
         t.setLoading(false);
       });
+  }
+
+  needShowWorkspace(workspace: WorkspaceModel){
+     var t =  this;
+     if(!!workspace.reviewStatus || workspace.workspaceType == WorkspaceType.Company){
+      //Пространство на проверке надо показывать только овнеру, остальным скрывать
+      return !!workspace.reviewStatus && (workspace.reviewStatus != WorkspaceReviewStatus.OnReview || workspace.directorUserId == t.getUser().id);
+     }
+     else {
+      return true;
+     }
   }
 }

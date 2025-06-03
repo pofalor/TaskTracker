@@ -363,10 +363,11 @@ namespace TaskTracker.Core.src.Services.Impl
             return await _dbContext.Set<WorkspaceMember>()
                 .AsNoTracking()
                 .Where(x => !x.IsDeleted)
-                .Where(x=> !x.Workspace.IsDeleted)
+                .Where(x => !x.Workspace.IsDeleted)
                 .Where(x => x.WorkspaceId == workspaceId)
                 .Where(x => x.UserId == userId)
-                .Where(x=> x.UserStatus == UserWorkspaceStatus.Active)
+                .Where(x => x.UserStatus == UserWorkspaceStatus.Active)
+                .Where(x => !x.Workspace.ReviewStatus.HasValue || x.Workspace.ReviewStatus == WorkspaceReviewStatus.Approved)
                 .AnyAsync();
         }
 

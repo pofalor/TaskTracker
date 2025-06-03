@@ -74,5 +74,10 @@
     "2": "Medium",
     "3": "High",
     "4": "Highest"
+  },
+  "reviewStatus":{
+    "1": "Waiting for confirmation",
+    "2": "Approved",
+    "3": "Declined by administrator"
   }
 }
