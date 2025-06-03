@@ -123,7 +123,7 @@ export class AllIssuesComponent extends BaseComponent {
     if (needLoader)
       t.setLoading(true);
 
-    await t.autoTimeTrackService.getActiveAutoTrack(+t.workspaceId, +t.projectId)
+    await t.autoTimeTrackService.getActiveAutoTrack(+t.projectId, +t.workspaceId)
       .then((resp: any) => {
         t.activeTimeTrack = resp.data;
         t.initTimer();
