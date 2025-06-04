@@ -1,5 +1,5 @@
 export class SearchUserForInvitePR {
-    workSpaceId!: number;
+    workspaceId!: number;
     inviterId: number | undefined;
     search!: string;
 }

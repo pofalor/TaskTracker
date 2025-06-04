@@ -198,4 +198,25 @@
   <data name="CannotAcceptInviteWsp" xml:space="preserve">
     <value>Failed to accept request. Please contact support</value>
   </data>
+  <data name="ReviewStatusNull" xml:space="preserve">
+    <value>System error. Please contact technical support</value>
+  </data>
+  <data name="ReviewStatusWrong" xml:space="preserve">
+    <value>System error. Please refresh the page and try again. If unsuccessful, contact technical support</value>
+  </data>
+  <data name="CannotGetWspForAdmin" xml:space="preserve">
+    <value>Unable to retrieve workspace information for verification. Please contact support</value>
+  </data>
+  <data name="ReviewStatusNotSet" xml:space="preserve">
+    <value>System error: review status not set. Please contact support</value>
+  </data>
+  <data name="ReviewStatusInvalid" xml:space="preserve">
+    <value>System error: invalid review status. Please contact support</value>
+  </data>
+  <data name="WorkspaceNotFound" xml:space="preserve">
+    <value>System error: workspace not found. Please contact support</value>
+  </data>
+  <data name="CannotChangeReviewStatus" xml:space="preserve">
+    <value>Unable to change workspace status. Please contact support</value>
+  </data>
 </root>

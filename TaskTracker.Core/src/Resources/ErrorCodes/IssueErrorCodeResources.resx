@@ -168,4 +168,7 @@
   <data name="TrackDateInFuture" xml:space="preserve">
     <value>Begin date is in the future. Change the begin date and try again</value>
   </data>
+  <data name="AccessDenied" xml:space="preserve">
+    <value>Access denied</value>
+  </data>
 </root>

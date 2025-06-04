@@ -3,19 +3,19 @@ using TaskTracker.Core.src.Enums;
 
 namespace TaskTracker.Core.src.Entities
 {
-    public class WorkSpaceMember : PersistentEntity
+    public class WorkspaceMember : PersistentEntity
     {
         /// <summary>
         /// Роль юзера в команде
         /// </summary>
         public UserTeamRole TeamRole { get; set; }
          
-        public UserWorkSpaceStatus UserStatus { get; set; }
+        public UserWorkspaceStatus UserStatus { get; set; }
 
         public User User { get; set; } = null!;
         public int UserId { get; set; }
 
-        public WorkSpace WorkSpace { get; set; } = null!;
-        public int WorkSpaceId { get; set; }
+        public Workspace Workspace { get; set; } = null!;
+        public int WorkspaceId { get; set; }
     }
 }

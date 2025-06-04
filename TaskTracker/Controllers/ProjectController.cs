@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using TaskTracker.Controllers.BaseControllers;
 using TaskTracker.Core.src.Constants;
 using TaskTracker.Core.src.Entities;
-using TaskTracker.Core.src.ErrorCodes;
+using TaskTracker.Core.src.Enums.ErrorCodes;
 using TaskTracker.Core.src.Models.Filters;
 using TaskTracker.Core.src.Models.PostRequests;
 using TaskTracker.Core.src.Models.ResponseModels;
@@ -18,12 +18,12 @@ namespace TaskTracker.Web.Api.Controllers
     public class ProjectController : ProtectedApiController
     {
         private readonly ILogger<ProjectController> _logger;
-        private readonly IWorkSpaceService _workSpaceService;
+        private readonly IWorkspaceService _workSpaceService;
         private readonly IProjectService _projectService;
         private readonly IMapper _mapper;
         private readonly ILogNotificatorService _logNotificatorService;
 
-        public ProjectController(ILogger<ProjectController> logger, IWorkSpaceService workSpaceService,
+        public ProjectController(ILogger<ProjectController> logger, IWorkspaceService workSpaceService,
             IMapper mapper, IUserService userService, ILogNotificatorService logNotificatorService, IProjectService projectService) 
         {
             _logger = logger;
@@ -87,12 +87,12 @@ namespace TaskTracker.Web.Api.Controllers
                     return response.WithError(ProjectErrorCodes.AccessDenied);
                 }
 
-                var isWorkspaceMember = await _workSpaceService.IsWorkspaceMember(UserId, request.WorkSpaceId);
+                var isWorkspaceMember = await _workSpaceService.IsWorkspaceMember(UserId, request.WorkspaceId);
                 if (!isWorkspaceMember)
                 {
                     await _logNotificatorService.SendTelegramAdminAsync($"The user has sent a request to create a project" +
                         $"but he not workspace membership{Environment.NewLine} " +
-                        $"Workspace id: {request.WorkSpaceId}{Environment.NewLine} " +
+                        $"Workspace id: {request.WorkspaceId}{Environment.NewLine} " +
                         $"User id: {UserId}.");
                     return response.WithError(ProjectErrorCodes.UserNotMemberWsp);
                 }
@@ -109,7 +109,7 @@ namespace TaskTracker.Web.Api.Controllers
             {
                 _logger.LogError(ex, "Error while sending request to add or change element.{NewLine}{Parameter}:{Request}{NewLine2}",
                    Environment.NewLine, nameof(request), request?.ToJson(), Environment.NewLine);
-                return response.WithError(WorkSpaceErrorCodes.CannotCreateOrEditWorkspace);
+                return response.WithError(WorkspaceErrorCodes.CannotCreateOrEditWorkspace);
             }
         }
 

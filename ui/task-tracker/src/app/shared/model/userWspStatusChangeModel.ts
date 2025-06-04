@@ -20,7 +20,7 @@ export class UserWspStatusChangeModel {
     public isHidden!: boolean;
 
     /** Имя рабочего пространства, куда приглашают юзера */
-    public workSpaceName!: string;
+    public workspaceName!: string;
 
     /** Фамилия, имя либо никнейм того, кто приглашает в воркспейс */
     public inviterName!: string;

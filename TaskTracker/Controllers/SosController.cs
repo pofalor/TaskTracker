@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TaskTracker.Controllers.BaseControllers;
 using TaskTracker.Core.src.ConfigSectionModels;
-using TaskTracker.Core.src.ErrorCodes;
+using TaskTracker.Core.src.Enums.ErrorCodes;
 using TaskTracker.Core.src.Services;
 using TaskTracker.Web.Api.Extensions;
 using TaskTracker.Web.Api.Responses;
@@ -62,6 +62,34 @@ namespace TaskTracker.Web.Api.Controllers
                     "{Parameter1}: {RoleName}, {Parameter2}: {Token}{NewLine2}",
                     Environment.NewLine, nameof(roleName), roleName, nameof(securityToken), securityToken, Environment.NewLine);
                 return result.WithError(SosErrorCodes.RoleCreationError);
+            }
+        }
+
+        [HttpGet("settorole")]
+        public async Task<DataResponse<bool>> SetToRole(string roleName, string securityToken, int userId)
+        {
+            var result = new DataResponse<bool>();
+            try
+            {
+                if (securityToken != AnonymousTokenRequest)
+                {
+                    return result.WithError(SosErrorCodes.InvalidToken);
+                }
+
+                var response = await _sosService.SetToRole(roleName, userId);
+                if (response.Success && response.Data)
+                {
+                    return result.WithData(response.Data);
+                }
+
+                return result.WithError(response.Errors[0]);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while sending request to add role for user.{NewLine}" +
+                    "{Parameter1}: {RoleName}, {Parameter2}: {Token}{NewLine2}, {Parameter3}: {UserId}",
+                    Environment.NewLine, nameof(roleName), roleName, nameof(securityToken), securityToken, Environment.NewLine, nameof(userId), userId);
+                return result.WithError(SosErrorCodes.RoleAddingError);
             }
         }
     }

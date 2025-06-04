@@ -8,7 +8,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { UserStatusChangeType } from '../../shared/enums/user-status-change-type';
 import { ProjectModel } from '../../shared/model/projectModel';
 import { UserWspStatusChangeModel } from '../../shared/model/userWspStatusChangeModel';
-import { WorkSpaceModel } from '../../shared/model/workSpaceModel';
+import { WorkspaceModel } from '../../shared/model/workspaceModel';
 import { AuthService } from '../../shared/services/onlyFrontServices/auth.service';
 import { UserService } from '../../shared/services/user.service';
 import { CommonModule } from '@angular/common';
@@ -18,10 +18,21 @@ import { IssueFilter } from '../../shared/model/filters/issueFilter';
 import { IssueModel } from '../../shared/model/issueModel';
 import { CreateIssueComponent } from '../../shared/components/modals/create-issue/create-issue.component';
 import { TrackTimeComponent } from '../../shared/components/modals/track-time/track-time.component';
+import { TimeTrackingModel } from '../../shared/model/timeTrackingModel';
+import { IssueStatus } from '../../shared/enums/issue-status';
+import { TimerModel } from '../../shared/model/onlyFrontModels/timer.model';
+import { interval, Subscription } from 'rxjs';
+import { AutoTrackTimeStatus } from '../../shared/enums/auto-track-time-status';
+import { AutoTimeTrackService } from '../../shared/services/autoTimeTrack.service';
+import { TimeTrackPR } from '../../shared/model/postRequests/timeTrackPR';
+import { DatepickerUtils } from '../../shared/utils/ngbDatepickerUtils';
+import { DateUtils } from '../../shared/utils/dateUtils';
+import { FormatDatePipe } from "../../shared/pipes/formatDate.pipe";
+import { AutoTimeTrackPR } from '../../shared/model/postRequests/autoTimeTrackPR';
 
 @Component({
   selector: 'app-all-issues',
-  imports: [ReactiveFormsModule, CommonModule, LangPipe],
+  imports: [ReactiveFormsModule, CommonModule, LangPipe, FormatDatePipe],
   templateUrl: './all-issues.component.html',
   styleUrl: './all-issues.component.scss'
 })
@@ -32,6 +43,12 @@ export class AllIssuesComponent extends BaseComponent {
   public getUser: () => UserModel;
   modalRef!: NgbModalRef;
   UserStatusChangeType = UserStatusChangeType;
+  activeTimeTrack: TimeTrackingModel | null = null;
+  IssueStatus = IssueStatus;
+  timerModel: TimerModel = new TimerModel();
+  timerSubscription: Subscription | null = null;
+  activeIssue: IssueModel | undefined;
+  AutoTrackTimeStatus = AutoTrackTimeStatus;
 
   constructor(
     public authService: AuthService,
@@ -40,7 +57,8 @@ export class AllIssuesComponent extends BaseComponent {
     private translate: TranslateService,
     private activateRoute: ActivatedRoute,
     private router: Router,
-    private userService: UserService
+    private userService: UserService,
+    private autoTimeTrackService: AutoTimeTrackService
   ) {
     super(modalService, translate);
 
@@ -63,12 +81,19 @@ export class AllIssuesComponent extends BaseComponent {
 
     t.setLoading(true);
     Promise.all([
-      t.getProjectIssues(false)
+      t.getProjectIssues(false),
+      t.getActiveAutoTrack(false)
     ])
       .then(() => {
+        t.activeIssue = t.allIssues.find(x=> x.id == t.activeTimeTrack?.issueId);
         t.setLoading(false);
       });
   }
+
+  ngOnDestroy() {
+    this.pauseTimer();
+  }
+
 
   public async getProjectIssues(needLoader: boolean = true) {
     var t = this;
@@ -91,6 +116,48 @@ export class AllIssuesComponent extends BaseComponent {
         if (needLoader)
           t.setLoading(false);
       });
+  }
+
+  private async getActiveAutoTrack(needLoader: boolean = true) {
+    var t = this;
+    if (needLoader)
+      t.setLoading(true);
+
+    await t.autoTimeTrackService.getActiveAutoTrack(+t.projectId, +t.workspaceId)
+      .then((resp: any) => {
+        t.activeTimeTrack = resp.data;
+        t.initTimer();
+      })
+      .catch((e) => {
+        t.showResponseError(e);
+      })
+      .finally(() => {
+        if (needLoader)
+          t.setLoading(false);
+      });
+  }
+
+  private initTimer() {
+    var t = this;
+    if (t.activeTimeTrack) {
+      switch(t.activeTimeTrack.autoTrackStatus){
+        case AutoTrackTimeStatus.Active:
+          //Если статус активный, значит ставим считаем значение по BeginDate и ставим таймер
+          var timeSpent = DateUtils.timeSince(t.activeTimeTrack.dateBegin);
+          var timeArr = timeSpent.split(':');
+          t.timerModel.hours = parseInt(timeArr[0]);
+          t.timerModel.minutes = parseInt(timeArr[1]);
+          t.timerModel.seconds = parseInt(timeArr[2]);
+          t.startTimer();
+          break;
+        case AutoTrackTimeStatus.Stopped:
+          var timeArr = t.activeTimeTrack.timeSpent.split(':');
+          t.timerModel.hours = parseInt(timeArr[0]);
+          t.timerModel.minutes = parseInt(timeArr[1]);
+          t.timerModel.seconds = parseInt(timeArr[2]);
+          break;
+      }
+    }
   }
 
   public createIssue() {
@@ -120,12 +187,13 @@ export class AllIssuesComponent extends BaseComponent {
     if (result) {
       var t = this;
       await t.getProjectIssues(false);
+      await t.getActiveAutoTrack(false);
       t.showSuccess("Time track sucessfully recorded", "Success");
       t.setLoading(false);
     }
   }
 
-  editIssue(issue: IssueModel){
+  editIssue(issue: IssueModel) {
     var t = this;
     t.modalRef = t.modalService.open(CreateIssueComponent,
       {
@@ -150,7 +218,7 @@ export class AllIssuesComponent extends BaseComponent {
     t.modalRef.result.then(async (result) => t.processModalResult(result));
   }
 
-  trackTime(issueId: number){
+  trackTime(issueId: number) {
     var t = this;
     t.modalRef = t.modalService.open(TrackTimeComponent,
       {
@@ -161,5 +229,106 @@ export class AllIssuesComponent extends BaseComponent {
     t.modalRef.componentInstance.issueId = issueId;
 
     t.modalRef.result.then(async (result) => t.processTrackResult(result));
+  }
+
+  startAutoTracking(issueId: number) {
+    var t = this;
+    t.showConfirm("Are you sure you want to start automatic time tracking?", "Confirm the action", true, "Yes")
+      .then(async (result) => {
+        if (result) {
+          t.setLoading(true);
+          var timeTrackPr = new AutoTimeTrackPR();
+          timeTrackPr.timeSpent = "0h 0m 0s";
+          timeTrackPr.dateBegin = new Date().toISOString().split(".")[0];
+          timeTrackPr.userId = t.getUser().id;
+          timeTrackPr.issueId = issueId;
+          await t.autoTimeTrackService.startTracking(timeTrackPr)
+            .then((resp: any) => {
+              t.activeTimeTrack = resp.data;
+              t.initTimer();
+            })
+            .catch((e) => {
+              t.showResponseError(e);
+            })
+            .finally(() => {
+              t.setLoading(false);
+            });
+        }
+      });
+  }
+
+  stopAutoTracking(issueId: number) {
+    var t = this;
+    t.showConfirm("Are you sure you want to stop automatic time tracking?", "Confirm the action", true, "Yes")
+      .then(async (result) => {
+        if (result) {
+          t.pauseTimer();
+          t.setLoading(true);
+          var timeTrackPr = new AutoTimeTrackPR();
+          timeTrackPr.timeSpent = `${t.timerModel.hours}h ${t.timerModel.minutes}m ${t.timerModel.seconds}s`;
+          timeTrackPr.userId = t.getUser().id;
+          timeTrackPr.issueId = t.activeTimeTrack?.issueId ?? t.activeIssue?.id ?? issueId;
+          timeTrackPr.id = t.activeTimeTrack?.id;
+          await t.autoTimeTrackService.stopTracking(timeTrackPr)
+            .then((resp: any) => {
+              t.activeTimeTrack = resp.data;
+            })
+            .catch((e) => {
+              t.showResponseError(e);
+            })
+            .finally(() => {
+              t.setLoading(false);
+            });
+        }
+      });
+  }
+
+  finishAutoTracking(){
+    var t = this;
+    t.modalRef = t.modalService.open(TrackTimeComponent,
+      {
+        centered: true,
+        size: 'lg'
+      });
+
+    t.modalRef.componentInstance.id = t.activeTimeTrack?.id;
+    t.modalRef.componentInstance.issueId = t.activeTimeTrack?.issueId;
+    t.modalRef.componentInstance.dateBegin = t.activeTimeTrack?.dateBegin;
+    t.modalRef.componentInstance.timeSpent = `${t.timerModel.hours}h ${t.timerModel.minutes}m ${t.timerModel.seconds}s`;
+
+    t.modalRef.result.then(async (result) => t.processTrackResult(result));
+  }
+
+
+  startTimer() {
+    if (!this.timerModel.timerRunning) {
+      this.timerModel.timerRunning = true;
+      this.timerSubscription = interval(1000).subscribe(() => {
+        this.timerModel.seconds++;
+        if (this.timerModel.seconds >= 60) {
+          this.timerModel.seconds = 0;
+          this.timerModel.minutes++;
+          if (this.timerModel.minutes >= 60) {
+            this.timerModel.minutes = 0;
+            this.timerModel.hours++;
+          }
+        }
+      });
+    }
+  }
+
+  pauseTimer() {
+    if (this.timerSubscription) {
+      this.timerSubscription.unsubscribe();
+      this.timerSubscription = null;
+      this.timerModel.timerRunning = false;
+    }
+  }
+
+  resetTimer() {
+    this.pauseTimer();
+    this.timerModel.seconds = 0;
+    this.timerModel.minutes = 0;
+    this.timerModel.hours = 0;
   }
 }

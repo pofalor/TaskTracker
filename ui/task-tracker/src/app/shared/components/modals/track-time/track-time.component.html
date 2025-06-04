@@ -17,7 +17,7 @@
                     </div>
                 </div>
 
-                <div class="col-12 pb-3">
+                <div *ngIf="!dateBegin" class="col-12 pb-3">
                     <label class="mb-1">{{ "Date start" | lang }}</label>
                     <div class="row">
                         <div class="col-11">

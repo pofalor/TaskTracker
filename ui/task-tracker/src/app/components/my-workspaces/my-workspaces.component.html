@@ -7,10 +7,11 @@
         </div>
     </div>
     <div class="row">
-        <ng-container *ngFor="let workspace of allMyWorkSpaces">
-            <div *ngIf="!!allMyWorkSpaces && allMyWorkSpaces.length > 0" class="col-auto col-xxl-3 mb-4">
+        <ng-container *ngFor="let workspace of allMyWorkspaces">
+            <div *ngIf="!!allMyWorkspaces && allMyWorkspaces.length > 0 && needShowWorkspace(workspace)"
+                class="col-auto col-xxl-3 mb-4">
                 <div class="card h-100 mb-0">
-                    <div class="card-body pb-0 pr-0">
+                    <div class="card-body pb-0 pr-0 flex-card">
                         <div class="row">
                             <div class="col-auto d-flex flex-column">
                                 <div class="text-left text-uppercase f-22 f-w-700">
@@ -18,12 +19,14 @@
                                 </div>
                             </div>
                             <div class="col" *ngIf="workspace.teamRole == UserTeamRole.Owner">
-                                <button (click)="editWorkSpace(workspace)" class="btn btn-outline-primary pull-right"
+                                <button (click)="editWorkspace(workspace)" class="btn btn-outline-primary pull-right"
                                     style="float: right;">
                                     <i class="fa fa-edit" style="font-size: 17px; "></i>
                                     {{'buttons.change'| lang}}
                                 </button>
                             </div>
+                        </div>
+                        <div class="row h-100">
                             <div class="col-12 mt-4">
                                 <label class="mb-1">{{ "Type of workspace" | lang}}</label>
                             </div>
@@ -31,15 +34,15 @@
                                 <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
                                     <input type="radio" class="btn-check" [name]="'btnradio_' + workspace.id"
                                         [id]="'btnradio1_' + workspace.id" disabled autocomplete="off"
-                                        [attr.checked]="workspace.workSpaceType == WorkSpaceType.Personal ? 'checked' : null">
+                                        [attr.checked]="workspace.workspaceType == WorkspaceType.Personal ? 'checked' : null">
                                     <label class="btn btn-outline-primary" [for]="'btnradio1_' + workspace.id">
-                                        {{'workSpaceType.' + WorkSpaceType.Personal | lang}}
+                                        {{'workspaceType.' + WorkspaceType.Personal | lang}}
                                     </label>
                                     <input type="radio" class="btn-check" [name]="'btnradio_' + workspace.id"
                                         [id]="'btnradio2_' + workspace.id" disabled autocomplete="off"
-                                        [attr.checked]="workspace.workSpaceType == WorkSpaceType.Company ? 'checked' : null">
+                                        [attr.checked]="workspace.workspaceType == WorkspaceType.Company ? 'checked' : null">
                                     <label class="btn btn-outline-primary" [for]="'btnradio2_' + workspace.id">
-                                        {{'workSpaceType.' + WorkSpaceType.Company | lang}}
+                                        {{'workspaceType.' + WorkspaceType.Company | lang}}
                                     </label>
                                 </div>
                             </div>
@@ -48,8 +51,15 @@
                                     <span class="mb-0">{{ 'teamRoles.' + workspace.teamRole | lang}}</span>
                                 </p>
                             </div>
-                            <div class="col-12 pb-3">
-                                <button class="btn btn-primary" (click)="viewWorkspace(workspace)">
+                            <div class="col-12 pb-3"
+                                *ngIf="!!workspace.reviewStatus && workspace.workspaceType == WorkspaceType.Company && workspace.directorUserId == getUser().id">
+                                <p class="mb-0">{{ "Review status (by administrator)" | lang}}:
+                                    <span class="mb-0">{{ 'reviewStatus.' + workspace.reviewStatus | lang}}</span>
+                                </p>
+                            </div>
+                            <div class="col-12 pb-3" style="align-content: end;">
+                                <button class="btn btn-primary" (click)="viewWorkspace(workspace)"
+                                    [disabled]="!!workspace.reviewStatus && workspace.reviewStatus != WorkspaceReviewStatus.Approved">
                                     {{'buttons.view' | lang}}
                                 </button>
                             </div>
@@ -64,7 +74,7 @@
                 <div class="card-body h-100 pb-0 pr-0">
                     <div class="row h-100">
                         <div class="col d-flex flex-column flex-center">
-                            <img style="width: 60px;" src="/assets/icons/plus_icon.png" type="button"
+                            <img style="width: 60px; user-select: none;" src="/assets/icons/plus_icon.png" type="button"
                                 class="cursor-pointer" (click)="createWorkspace()" draggable="false" class="mb-2">
                         </div>
                     </div>
@@ -85,7 +95,7 @@
                     <div class="row">
                         <div class="col-12 pb-3">
                             <div class="text-left text-uppercase f-22 f-w-700">
-                                {{invitation.workSpaceName}}
+                                {{invitation.workspaceName}}
                             </div>
                         </div>
                         <div class="col-12 pb-2">
@@ -106,8 +116,7 @@
                         <div class="col-12 pb-2" *ngIf="invitation.requestStatus != UserStatusChangeType.Default">
                             <div class="text-left">
                                 <p class="mb-0">{{ "Status" | lang}}:
-                                    <span
-                                        [ngClass]="{ 'c-red': invitation.requestStatus == UserStatusChangeType.UserDeclined,
+                                    <span [ngClass]="{ 'c-red': invitation.requestStatus == UserStatusChangeType.UserDeclined,
                                         'c-green': invitation.requestStatus == UserStatusChangeType.UserConfirmed}">
                                         {{ 'wspInviteStatus.' + invitation.requestStatus | lang}}
                                     </span>
@@ -117,12 +126,14 @@
                         <div class="col-12 pb-3" *ngIf="invitation.requestStatus == UserStatusChangeType.Default">
                             <div class="row">
                                 <div class="col-6">
-                                    <button class="btn btn-danger w-100" type="button" (click)="setRequestStatus(false, invitation.id)">
+                                    <button class="btn btn-danger w-100" type="button"
+                                        (click)="setRequestStatus(false, invitation.id)">
                                         {{ "buttons.decline" | lang }}
                                     </button>
                                 </div>
                                 <div class="col-6">
-                                    <button class="btn btn-primary w-100" type="button" (click)="setRequestStatus(true, invitation.id)">
+                                    <button class="btn btn-primary w-100" type="button"
+                                        (click)="setRequestStatus(true, invitation.id)">
                                         {{ "buttons.confirm" | lang }}
                                     </button>
                                 </div>
@@ -131,6 +142,47 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <div class="row" *ngIf="!!workspacesForCheck && workspacesForCheck.length > 0">
+        <div class="col-12">
+            <div class="text-left text-uppercase f-30 f-w-700 my-3">
+                {{"Workspaces for verification" | lang}}
+            </div>
+        </div>
+        <div class="col-12">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">{{"Name" | lang}}</th>
+                        <th scope="col">{{"Country" | lang}}</th>
+                        <th scope="col">{{"Registration date" | lang}}</th>
+                        <th scope="col">{{"Address" | lang}}</th>
+                        <th scope="col">{{"TIN" | lang}}</th>
+                        <th scope="col">{{"Actions" | lang}}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let workspace of workspacesForCheck let i = index">
+                        <th scope="row">{{i + 1}}</th>
+                        <td>{{workspace.name}}</td>
+                        <td>{{getCountryByCode(workspace.country)}}</td>
+                        <td>{{workspace.registrationDate}}</td>
+                        <td>{{workspace.address}}</td>
+                        <td>{{workspace.inn}}</td>
+                        <td>
+                            <a class="cursor-pointer">
+                                <i class="fa fa-check p-2" (click)="changeReviewStatus(WorkspaceReviewStatus.Approved, workspace)"></i>
+                            </a>
+                            <a class="cursor-pointer">
+                                <i class="fa fa-times p-2" (click)="changeReviewStatus(WorkspaceReviewStatus.Declined, workspace)"></i>
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>

@@ -34,7 +34,7 @@ namespace TaskTracker.Core.src.Models.ResponseModels
         /// <summary>
         /// Имя рабочего пространства, куда приглашают юзера
         /// </summary>
-        public string WorkSpaceName { get; set; } = null!;
+        public string WorkspaceName { get; set; } = null!;
 
         /// <summary>
         /// Фамилия, имя либо никнейм того, кто приглашает в воркспейс

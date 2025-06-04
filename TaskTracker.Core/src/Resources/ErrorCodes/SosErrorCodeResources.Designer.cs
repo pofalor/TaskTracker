@@ -70,6 +70,15 @@ namespace TaskTracker.Core.src.Resources.ErrorCodes {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Error adding role.
+        /// </summary>
+        internal static string RoleAddingError {
+            get {
+                return ResourceManager.GetString("RoleAddingError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на A role with this name already exists.
         /// </summary>
         internal static string RoleAlreadyExists {
@@ -93,6 +102,24 @@ namespace TaskTracker.Core.src.Resources.ErrorCodes {
         internal static string RoleNameNullError {
             get {
                 return ResourceManager.GetString("RoleNameNullError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на There is no such role..
+        /// </summary>
+        internal static string RoleNotExists {
+            get {
+                return ResourceManager.GetString("RoleNotExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на There is no such user..
+        /// </summary>
+        internal static string UserNotExists {
+            get {
+                return ResourceManager.GetString("UserNotExists", resourceCulture);
             }
         }
     }

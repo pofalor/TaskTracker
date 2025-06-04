@@ -14,7 +14,7 @@ import { LangPipe } from '../../shared/pipes/lang.pipe';
 import { WorkspaceService } from '../../shared/services/workspace.service';
 import { UserWspStatusChangeModel } from '../../shared/model/userWspStatusChangeModel';
 import { CreateWspInvitationModalComponent } from '../../shared/components/modals/create-wsp-invitation-modal/create-wsp-invitation.modal.component';
-import { WorkSpaceModel } from '../../shared/model/workSpaceModel';
+import { WorkspaceModel } from '../../shared/model/workspaceModel';
 import { UserStatusChangeType } from '../../shared/enums/user-status-change-type';
 import { CreateProjectComponent } from '../../shared/components/modals/create-project/create-project.component';
 import { DatepickerUtils } from '../../shared/utils/ngbDatepickerUtils';
@@ -32,7 +32,7 @@ export class WorkspaceInfoComponent extends BaseComponent {
   public isWorkspaceOwner: boolean = false;
   public invitesMeCreated: UserWspStatusChangeModel[] = [];
   modalRef!: NgbModalRef;
-  workspace: WorkSpaceModel = new WorkSpaceModel();
+  workspace: WorkspaceModel = new WorkspaceModel();
   UserStatusChangeType = UserStatusChangeType;
 
   constructor(

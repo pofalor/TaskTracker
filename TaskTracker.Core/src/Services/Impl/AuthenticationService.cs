@@ -12,7 +12,7 @@ using TaskTracker.Core.src.Constants;
 using TaskTracker.Core.src.DataAccess;
 using TaskTracker.Core.src.DataResult;
 using TaskTracker.Core.src.Entities;
-using TaskTracker.Core.src.ErrorCodes;
+using TaskTracker.Core.src.Enums.ErrorCodes;
 using TaskTracker.Core.src.Identity;
 using TaskTracker.Core.src.Models.PostRequests;
 using TaskTracker.Core.src.Models.ResponseModels;
@@ -29,7 +29,6 @@ namespace TaskTracker.Core.src.Services.Impl
         private readonly ApplicationDbContext _dbContext;
         private readonly ApplicationIdentityDbContext _identityDbContext;
         readonly IdentityConfiguration IdentityConfig;
-
 
         public AuthenticationService(UserManager<IdentityUser> userManager,
         SignInManager<IdentityUser> signInManager, ILogger<AuthenticationService> logger, 

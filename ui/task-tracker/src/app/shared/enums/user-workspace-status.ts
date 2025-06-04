@@ -1,4 +1,4 @@
-export enum UserWorkSpaceStatus
+export enum UserWorkspaceStatus
 {
     /** Для фильтрации */
     All = -1,

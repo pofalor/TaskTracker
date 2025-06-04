@@ -4,21 +4,21 @@ using TaskTracker.Core.src.Enums;
 
 namespace TaskTracker.Core.src.Models.PostRequests
 {
-    public class CreateOrEditWorkSpacePostRequest : BasePostRequest
+    public class CreateOrEditWorkspacePostRequest : BasePostRequest
     {
         public int Id { get; set; }
         /// <summary>
         /// Название рабочего пространства
         /// </summary>
         public string Name { get; set; } = null!;
-        public WorkSpaceType WorkSpaceType { get; set; }
+        public WorkspaceType WorkspaceType { get; set; }
 
         /// <summary>
         /// Ссылка на управляющего компании
         /// </summary>
         public int? DirectorUserId { get; set; }
 
-        //Все поля ниже заполняются, если WorkSpaceType - Company
+        //Все поля ниже заполняются, если WorkspaceType - Company
 
         /// <summary>
         /// Страна, в которой компания зарегистрирована
@@ -44,5 +44,7 @@ namespace TaskTracker.Core.src.Models.PostRequests
                 return !string.IsNullOrEmpty(RegistrationDate) ? DateTime.ParseExact(RegistrationDate, DateFormatConstants.FrontInputFormat, CultureInfo.InvariantCulture) : null;
             } 
         }
+
+        public WorkspaceReviewStatus? ReviewStatus { get; set; }
     }
 }

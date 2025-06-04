@@ -22,14 +22,14 @@ namespace TaskTracker.Core.src.Resources.ErrorCodes {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class WorkSpaceErrorCodeResources {
+    internal class WorkspaceErrorCodeResources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal WorkSpaceErrorCodeResources() {
+        internal WorkspaceErrorCodeResources() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace TaskTracker.Core.src.Resources.ErrorCodes {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("TaskTracker.Core.src.Resources.ErrorCodes.WorkSpaceErrorCodeResources", typeof(WorkSpaceErrorCodeResources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("TaskTracker.Core.src.Resources.ErrorCodes.WorkspaceErrorCodeResources", typeof(WorkspaceErrorCodeResources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -106,6 +106,15 @@ namespace TaskTracker.Core.src.Resources.ErrorCodes {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Unable to change workspace status. Please contact support.
+        /// </summary>
+        internal static string CannotChangeReviewStatus {
+            get {
+                return ResourceManager.GetString("CannotChangeReviewStatus", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Failed to create workspace invite.
         /// </summary>
         internal static string CannotCreateOrEditInviteWsp {
@@ -147,6 +156,15 @@ namespace TaskTracker.Core.src.Resources.ErrorCodes {
         internal static string CannotGetWpsRequests {
             get {
                 return ResourceManager.GetString("CannotGetWpsRequests", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Unable to retrieve workspace information for verification. Please contact support.
+        /// </summary>
+        internal static string CannotGetWspForAdmin {
+            get {
+                return ResourceManager.GetString("CannotGetWspForAdmin", resourceCulture);
             }
         }
         
@@ -232,6 +250,42 @@ namespace TaskTracker.Core.src.Resources.ErrorCodes {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на System error: invalid review status. Please contact support.
+        /// </summary>
+        internal static string ReviewStatusInvalid {
+            get {
+                return ResourceManager.GetString("ReviewStatusInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на System error: review status not set. Please contact support.
+        /// </summary>
+        internal static string ReviewStatusNotSet {
+            get {
+                return ResourceManager.GetString("ReviewStatusNotSet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на System error. Please contact technical support.
+        /// </summary>
+        internal static string ReviewStatusNull {
+            get {
+                return ResourceManager.GetString("ReviewStatusNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на System error. Please refresh the page and try again. If unsuccessful, contact technical support.
+        /// </summary>
+        internal static string ReviewStatusWrong {
+            get {
+                return ResourceManager.GetString("ReviewStatusWrong", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на The user is already in this workspace.
         /// </summary>
         internal static string UserAlreadyInWsp {
@@ -246,6 +300,15 @@ namespace TaskTracker.Core.src.Resources.ErrorCodes {
         internal static string UserNotFoundInWsp {
             get {
                 return ResourceManager.GetString("UserNotFoundInWsp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на System error: workspace not found. Please contact support.
+        /// </summary>
+        internal static string WorkspaceNotFound {
+            get {
+                return ResourceManager.GetString("WorkspaceNotFound", resourceCulture);
             }
         }
         

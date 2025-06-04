@@ -1,21 +1,22 @@
 import { UserTeamRole } from "../enums/user-team-role";
-import { WorkSpaceType } from "../enums/work-space-type";
+import { WorkspaceType } from "../enums/work-space-type";
+import { WorkspaceReviewStatus } from "../enums/workspace-review-status";
 
-export class WorkSpaceModel{
+export class WorkspaceModel{
 
     public id! : number;
     
     /**  Название рабочего пространства */
     public name! : string;
     
-    public workSpaceType! : WorkSpaceType;
+    public workspaceType! : WorkspaceType;
     
     /** Ссылка на управляющего компании */
     public directorUserId! : number;
 
     public teamRole!: UserTeamRole;
     
-    //Все поля ниже заполняются, если WorkSpaceType - Company
+    //Все поля ниже заполняются, если WorkspaceType - Company
     
     /** Страна, в которой компания зарегистрирована */
     public country : number | undefined;
@@ -27,4 +28,6 @@ export class WorkSpaceModel{
     public address : string | undefined;
     
     public inn : string | undefined;
+
+    public reviewStatus: WorkspaceReviewStatus | undefined;
 }

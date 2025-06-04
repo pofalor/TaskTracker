@@ -1,7 +1,7 @@
 ﻿using TaskTracker.Core.src.Constants;
 using TaskTracker.Core.src.Resources.ErrorCodes;
 
-namespace TaskTracker.Core.src.ErrorCodes
+namespace TaskTracker.Core.src.Enums.ErrorCodes
 {
     public enum IssueErrorCodes
     {
@@ -111,6 +111,6 @@ namespace TaskTracker.Core.src.ErrorCodes
         /// Не удаётся списать часы, т.к. дата начала в будущем
         /// </summary>
         [ErrorMessage(typeof(IssueErrorCodeResources), nameof(TrackDateInFuture))]
-        TrackDateInFuture = TrackDateNotSet + 1,
+        TrackDateInFuture = TrackDateNotSet + 1
     }
 }

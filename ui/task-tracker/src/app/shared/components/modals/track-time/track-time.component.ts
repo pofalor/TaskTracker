@@ -6,7 +6,7 @@ import { CommonModule } from '@angular/common';
 import { NgbDatepickerModule, NgbModal, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgSelectComponent, NgOptionComponent } from '@ng-select/ng-select';
 import { TranslateService } from '@ngx-translate/core';
-import { WorkSpaceType } from '../../../enums/work-space-type';
+import { WorkspaceType } from '../../../enums/work-space-type';
 import { LangPipe } from '../../../pipes/lang.pipe';
 import { UserService } from '../../../services/user.service';
 import { WorkspaceService } from '../../../services/workspace.service';
@@ -20,6 +20,7 @@ import { DatepickerUtils } from '../../../utils/ngbDatepickerUtils';
   styleUrl: './track-time.component.scss'
 })
 export class TrackTimeComponent extends BaseComponent {
+  @Input() id: number | undefined;
   @Input() issueId!: number;
   @Input() timeSpent: string = '';
   @Input() dateBegin: any;
@@ -49,6 +50,10 @@ export class TrackTimeComponent extends BaseComponent {
       formDateBegin: [t.dateBegin, [t.baseDateValidator.bind(t)]],
       formComment: [t.comment, [Validators.maxLength(500)]]
     });
+
+    if(!!t.dateBegin){
+      t.formDateBegin?.disable();
+    }
   }
 
   back(result: boolean = false) {
@@ -63,9 +68,10 @@ export class TrackTimeComponent extends BaseComponent {
     }
     t.setLoading(true);
 
+    t.timeTrack.id = t.id;
     t.timeTrack.issueId = t.issueId;
     t.timeTrack.timeSpent =  t.formTimeSpent?.value;
-    t.timeTrack.dateBegin = !!t.formDateBegin?.value ? DatepickerUtils.dateToStr(t.formDateBegin?.value) : undefined;
+    t.timeTrack.dateBegin = t.dateBegin ?? (!!t.formDateBegin?.value ? DatepickerUtils.dateToStr(t.formDateBegin?.value) : undefined);
     t.timeTrack.comment = t.formComment?.value;
 
     await t.issueService.trackTime(t.timeTrack)

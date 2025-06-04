@@ -1,4 +1,4 @@
-﻿using TaskTracker.Core.src.ErrorCodes;
+﻿using TaskTracker.Core.src.Enums.ErrorCodes;
 
 namespace TaskTracker.Core.src.DataResult
 {

@@ -7,6 +7,7 @@ import { ApiService } from './api.service';
 import { CreateOrEditIssuePR } from '../model/postRequests/createOrEditIssuePR';
 import { TimeTrackPR } from '../model/postRequests/timeTrackPR';
 import { UserModel } from '../model/userModel';
+import { TimeTrackingModel } from '../model/timeTrackingModel';
 
 const serviceApiUrl = 'api/issue/';
 

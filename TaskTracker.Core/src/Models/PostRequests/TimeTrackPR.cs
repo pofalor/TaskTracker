@@ -6,6 +6,7 @@ namespace TaskTracker.Core.src.Models.PostRequests
 {
     public class TimeTrackPR : BasePostRequest
     {
+        public int? Id { get; set; }
         /// <summary>
         /// Затраченное время
         /// </summary>
@@ -35,7 +36,28 @@ namespace TaskTracker.Core.src.Models.PostRequests
         {
             return DateBegin.IsEmpty() 
                 ? DateTime.UtcNow - TimeSpent.ConvertToTimespan()
-                : DateTime.ParseExact(DateBegin, DateFormatConstants.FrontInputFormat, CultureInfo.InvariantCulture);
+                : ParseBeginDate();
+        }
+
+        private DateTime ParseBeginDate()
+        {
+            DateTime result;
+            try
+            {
+                result = DateTime.ParseExact(DateBegin, DateFormatConstants.FrontInputFormat, CultureInfo.InvariantCulture);
+            }
+            catch
+            {
+                try
+                {
+                    result = DateTime.ParseExact(DateBegin, DateFormatConstants.IsoString, CultureInfo.InvariantCulture);
+                }
+                catch
+                {
+                    result = DateTime.UtcNow;
+                }
+            }
+            return result;
         }
     }
 }

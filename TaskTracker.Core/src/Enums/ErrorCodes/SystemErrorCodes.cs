@@ -1,6 +1,6 @@
 ﻿using TaskTracker.Core.src.Resources.ErrorCodes;
 
-namespace TaskTracker.Core.src.ErrorCodes
+namespace TaskTracker.Core.src.Enums.ErrorCodes
 {
     public enum SystemErrorCodes
     {

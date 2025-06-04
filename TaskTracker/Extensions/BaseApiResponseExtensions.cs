@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
 using TaskTracker.Core.src.DataResult;
-using TaskTracker.Core.src.ErrorCodes;
+using TaskTracker.Core.src.Enums.ErrorCodes;
 using TaskTracker.Utils.src.Extensions;
 using TaskTracker.Web.Api.Responses;
 

@@ -1,7 +1,7 @@
-import { UserWorkSpaceStatus } from "../../enums/user-workspace-status";
+import { UserWorkspaceStatus } from "../../enums/user-workspace-status";
 
 export class CreateWspInvitePostRequest {
-    workSpaceId!: number;
+    workspaceId!: number;
 
     userId!: number;
 
@@ -10,5 +10,5 @@ export class CreateWspInvitePostRequest {
     /** Дата, когда был создан запрос в UTC */
     date!: string;
 
-    newStatus!: UserWorkSpaceStatus;
+    newStatus!: UserWorkspaceStatus;
 }

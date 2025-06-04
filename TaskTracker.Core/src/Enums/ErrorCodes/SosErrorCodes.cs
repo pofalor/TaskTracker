@@ -1,7 +1,7 @@
 ﻿using TaskTracker.Core.src.Constants;
 using TaskTracker.Core.src.Resources.ErrorCodes;
 
-namespace TaskTracker.Core.src.ErrorCodes
+namespace TaskTracker.Core.src.Enums.ErrorCodes
 {
     public enum SosErrorCodes
     {
@@ -28,5 +28,23 @@ namespace TaskTracker.Core.src.ErrorCodes
         /// </summary>
         [ErrorMessage(typeof(SosErrorCodeResources), nameof(InvalidToken))]
         InvalidToken = RoleCreationError + 1,
+
+        /// <summary>
+        /// Роль не существует
+        /// </summary>
+        [ErrorMessage(typeof(SosErrorCodeResources), nameof(RoleNotExists))]
+        RoleNotExists = InvalidToken + 1,
+
+        /// <summary>
+        /// Пользователь не существует
+        /// </summary>
+        [ErrorMessage(typeof(SosErrorCodeResources), nameof(UserNotExists))]
+        UserNotExists = RoleNotExists + 1,
+
+        /// <summary>
+        /// Ошибка при добавлении роли
+        /// </summary>
+        [ErrorMessage(typeof(SosErrorCodeResources), nameof(RoleAddingError))]
+        RoleAddingError = UserNotExists + 1,
     }
 }

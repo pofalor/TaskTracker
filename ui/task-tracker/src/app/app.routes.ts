@@ -9,16 +9,19 @@ export const routes: Routes = [
         path: "my-workspaces", 
         loadComponent: () => import('./components/my-workspaces/my-workspaces.component').then(c => c.MyWorkspacesComponent),
         canActivate: [UserGuard],
+         data: { roles: ['User'] }
     },
     { 
         path: "workspace-info",
         loadComponent: () => import('./components/workspace-info/workspace-info.component').then(c => c.WorkspaceInfoComponent),
         canActivate: [UserGuard],
+         data: { roles: ['User'] }
     },
     { 
         path: "all-issues",
         loadComponent: () => import('./components/all-issues/all-issues.component').then(c => c.AllIssuesComponent),
         canActivate: [UserGuard],
+        data: { roles: ['User'] }
     },
 
     { path: "*", redirectTo: 'my-workspaces' },

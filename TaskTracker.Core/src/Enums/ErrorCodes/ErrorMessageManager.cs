@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using TaskTracker.Utils.src.Extensions;
 
-namespace TaskTracker.Core.src.ErrorCodes
+namespace TaskTracker.Core.src.Enums.ErrorCodes
 {
     public static class ErrorMessageManager
     {
@@ -14,9 +14,10 @@ namespace TaskTracker.Core.src.ErrorCodes
             RegisterEnum<AuthenticationErrorCodes>();
             RegisterEnum<SosErrorCodes>();
             RegisterEnum<UserErrorCodes>();
-            RegisterEnum<WorkSpaceErrorCodes>();
+            RegisterEnum<WorkspaceErrorCodes>();
             RegisterEnum<ProjectErrorCodes>();
             RegisterEnum<IssueErrorCodes>();
+            RegisterEnum<AutoTimeTrackErrorCodes>();
         }
 
         /// <summary>

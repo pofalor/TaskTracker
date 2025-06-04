@@ -1,7 +1,7 @@
 ﻿using TaskTracker.Core.src.Constants;
 using TaskTracker.Core.src.Resources.ErrorCodes;
 
-namespace TaskTracker.Core.src.ErrorCodes
+namespace TaskTracker.Core.src.Enums.ErrorCodes
 {
     public enum ProjectErrorCodes
     {
@@ -9,7 +9,7 @@ namespace TaskTracker.Core.src.ErrorCodes
         /// Не удалось получить информацию о проектах
         /// </summary>
         [ErrorMessage(typeof(ProjectErrorCodeResources), nameof(CannotGetProjects))]
-        CannotGetProjects = WorkSpaceErrorCodes.CannotGetMyWorkspaces + ErrorConstants.EnumErrorCodeCount,
+        CannotGetProjects = WorkspaceErrorCodes.CannotGetMyWorkspaces + ErrorConstants.EnumErrorCodeCount,
 
         /// <summary>
         /// Юзер не является членом рабочего пространства
@@ -80,14 +80,14 @@ namespace TaskTracker.Core.src.ErrorCodes
         /// <summary>
         /// Не удаётся сделать запрос, т.к. нет прав у пользователя
         /// </summary>
-        [ErrorMessage(typeof(WorkSpaceErrorCodeResources), nameof(AccessDenied))]
+        [ErrorMessage(typeof(WorkspaceErrorCodeResources), nameof(AccessDenied))]
         AccessDenied = CannotCreateProject + 1,
 
 
         /// <summary>
         /// Не удалось получить кандидатов в проджект менеджеры
         /// </summary>
-        [ErrorMessage(typeof(WorkSpaceErrorCodeResources), nameof(CannotGetProjectMgrCandidates))]
+        [ErrorMessage(typeof(WorkspaceErrorCodeResources), nameof(CannotGetProjectMgrCandidates))]
         CannotGetProjectMgrCandidates = AccessDenied + 1,
     }
 }

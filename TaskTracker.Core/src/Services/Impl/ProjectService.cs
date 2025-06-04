@@ -4,7 +4,7 @@ using TaskTracker.Core.src.DataAccess;
 using TaskTracker.Core.src.DataResult;
 using TaskTracker.Core.src.Entities;
 using TaskTracker.Core.src.Enums;
-using TaskTracker.Core.src.ErrorCodes;
+using TaskTracker.Core.src.Enums.ErrorCodes;
 using TaskTracker.Core.src.Models.Filters;
 using TaskTracker.Utils.src.Extensions;
 
@@ -14,9 +14,9 @@ namespace TaskTracker.Core.src.Services.Impl
     {
         private readonly ApplicationDbContext _dbContext;
         private readonly ILogger<ProjectService> _logger;
-        private readonly IWorkSpaceService _workSpaceService;
+        private readonly IWorkspaceService _workSpaceService;
 
-        public ProjectService(ApplicationDbContext dbContext, ILogger<ProjectService> logger, IWorkSpaceService workSpaceService)
+        public ProjectService(ApplicationDbContext dbContext, ILogger<ProjectService> logger, IWorkspaceService workSpaceService)
         {
             _dbContext = dbContext;
             _logger = logger;
@@ -33,8 +33,8 @@ namespace TaskTracker.Core.src.Services.Impl
                 var projects = await _dbContext.Set<Project>()
                     .AsNoTracking()
                     .Include(x=> x.ProjectMgr)
-                    .Where(x=> x.WorkSpaceId == workspaceId)
-                    .Include(x => x.WorkSpace)
+                    .Where(x=> x.WorkspaceId == workspaceId)
+                    .Include(x => x.Workspace)
                     .Where(x => !x.IsDeleted)
                     .ToListAsync();
 
@@ -53,7 +53,7 @@ namespace TaskTracker.Core.src.Services.Impl
             var result = new DataResult<bool>();
             try
             {
-                if (request.WorkSpaceId <= 0)
+                if (request.WorkspaceId <= 0)
                 {
                     return result.WithError(ProjectErrorCodes.WorkspaceNotSet);
                 }
@@ -82,7 +82,7 @@ namespace TaskTracker.Core.src.Services.Impl
                     return result.WithError(ProjectErrorCodes.ProjectEmptyName);
                 }
 
-                var isProjectMgrInWsp = await _workSpaceService.IsWorkspaceMember(request.ProjectMgrId, request.WorkSpaceId);
+                var isProjectMgrInWsp = await _workSpaceService.IsWorkspaceMember(request.ProjectMgrId, request.WorkspaceId);
 
                 if (!isProjectMgrInWsp)
                 {
@@ -97,7 +97,7 @@ namespace TaskTracker.Core.src.Services.Impl
                 //два активных реквеста не может быть
                 var projectWithNameOrCodeExists = await _dbContext.Set<Project>()
                     .AsNoTracking()
-                    .Where(x=> x.WorkSpaceId ==  request.WorkSpaceId)
+                    .Where(x=> x.WorkspaceId ==  request.WorkspaceId)
                     .Where(x => !x.IsDeleted)
                     .Where(x => x.Name == request.Name 
                     || x.Code == request.Code)
@@ -124,7 +124,7 @@ namespace TaskTracker.Core.src.Services.Impl
                 newProject.StartDate = request.StartDate;
                 newProject.EndDate = request.EndDate;
                 newProject.ProjectMgrId = request.ProjectMgrId;
-                newProject.WorkSpaceId = request.WorkSpaceId;
+                newProject.WorkspaceId = request.WorkspaceId;
 
                 if(existingProject == null)
                     await _dbContext.AddAsync(newProject);
@@ -147,13 +147,13 @@ namespace TaskTracker.Core.src.Services.Impl
             try
             {
                 //Вытаскиваем все проекты организации
-                var managerCandidates = await _dbContext.Set<WorkSpaceMember>()
+                var managerCandidates = await _dbContext.Set<WorkspaceMember>()
                     .AsNoTracking()
-                    .Where(x => x.WorkSpaceId == workspaceId)
-                    .Where(x=> x.UserStatus == UserWorkSpaceStatus.Active)
-                    .Include(x => x.WorkSpace)
+                    .Where(x => x.WorkspaceId == workspaceId)
+                    .Where(x=> x.UserStatus == UserWorkspaceStatus.Active)
+                    .Include(x => x.Workspace)
                     .Where(x => !x.IsDeleted)
-                    .Where(x=> !x.WorkSpace.IsDeleted)
+                    .Where(x=> !x.Workspace.IsDeleted)
                     .Select(x=> x.User)
                     .ToListAsync();
 

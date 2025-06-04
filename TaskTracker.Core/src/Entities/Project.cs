@@ -41,7 +41,7 @@ namespace TaskTracker.Core.src.Entities
         /// <summary>
         /// Рабочее пространство проекта
         /// </summary>
-        public WorkSpace WorkSpace { get; set; } = null!;
-        public int WorkSpaceId { get; set; }
+        public Workspace Workspace { get; set; } = null!;
+        public int WorkspaceId { get; set; }
     }
 }

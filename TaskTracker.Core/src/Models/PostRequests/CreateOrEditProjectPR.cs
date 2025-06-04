@@ -41,7 +41,7 @@ namespace TaskTracker.Core.src.Models.PostRequests
         /// <summary>
         /// Рабочее пространство проекта
         /// </summary>
-        public int WorkSpaceId { get; set; }
+        public int WorkspaceId { get; set; }
 
         public DateTime? ConvertEndDate()
         {

@@ -6,7 +6,7 @@ namespace TaskTracker.Core.src.Models.PostRequests
     public class CreateWspInvitePostRequest : BasePostRequest
     {
 
-        public int WorkSpaceId { get; set; }
+        public int WorkspaceId { get; set; }
 
         public int UserId { get; set; }
 
@@ -17,6 +17,6 @@ namespace TaskTracker.Core.src.Models.PostRequests
         /// </summary>
         public string Date { get; set; } = DateTime.UtcNow.ToString(DateFormatConstants.FrontInputFormat);
 
-        public UserWorkSpaceStatus NewStatus { get; set; }
+        public UserWorkspaceStatus NewStatus { get; set; }
     }
 }
