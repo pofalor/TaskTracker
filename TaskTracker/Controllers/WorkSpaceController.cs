@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TaskTracker.Controllers.BaseControllers;
 using TaskTracker.Core.src.Constants;
@@ -272,6 +273,56 @@ namespace TaskTracker.Web.Api.Controllers
                 _logger.LogError(ex, "Error while sending request to accept workspace invite.{NewLine}{Parameter}:{Request}{NewLine2}",
                    Environment.NewLine, nameof(request), request?.ToJson(), Environment.NewLine);
                 return response.WithError(WorkspaceErrorCodes.CannotAcceptInviteWsp);
+            }
+        }
+
+        [Route("getWorkspacesForCheck")]
+        [HttpGet]
+        [Authorize(Roles = Permissions.Admin)]
+        public async Task<DataResponse<List<WorkspaceModel>>> GetWorkspacesForCheck()
+        {
+            var response = new DataResponse<List<WorkspaceModel>>();
+
+            try
+            {
+                var result = await _workSpaceService.GetWorkspacesForCheck(UserId);
+                if (!result.Success)
+                {
+                    return response.WithError(result.Errors[0]);
+                }
+
+                var models = result.Data.Select(x => _mapper.Map<WorkspaceModel>(x)).ToList();
+                return response.WithData(models);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while getting workspaces for admin => {Parameter1}: {UserId},", nameof(UserId), UserId);
+                return response.WithError(WorkspaceErrorCodes.CannotGetWspForAdmin);
+            }
+        }
+
+        [Route("changeWorkspaceReviewStatus")]
+        [HttpPost]
+        [Authorize(Roles = Permissions.Admin)]
+        public async Task<DataResponse<bool>> ChangeWorkspaceReviewStatus(CreateOrEditWorkspacePostRequest request)
+        {
+            var response = new DataResponse<bool>();
+
+            try
+            {
+                var mapRes = _mapper.Map<Workspace>(request);
+                var result = await _workSpaceService.ChangeWorkspaceReviewStatus(mapRes);
+                if (!result.Success)
+                {
+                    return response.WithError(result.Errors[0]);
+                }
+
+                return response.WithData(true);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while changing workspace review status => {Parameter1}: {Request},", nameof(request), request?.ToJson());
+                return response.WithError(WorkspaceErrorCodes.CannotChangeReviewStatus);
             }
         }
     }

@@ -58,6 +58,7 @@ namespace TaskTracker.Core.src.Context
             CreateMap<AutoTimeTrackPR, TimeTracking>()
                 .ForMember(dist => dist.DateBegin, opt => opt.MapFrom(x => x.GetBeginDate()))
                 .ForMember(dist => dist.TimeSpent, opt => opt.MapFrom(x => x.TimeSpent.ConvertToTimespan()));
+            CreateMap<Workspace, WorkspaceModel>();
         }
     }
 }

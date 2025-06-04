@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.Linq;
 using TaskTracker.Core.src.DataAccess;
 using TaskTracker.Core.src.DataResult;
 using TaskTracker.Core.src.Entities;
@@ -454,6 +455,79 @@ namespace TaskTracker.Core.src.Services.Impl
                 _logger.LogError(ex, "Error while accepting invite to WSP.{NewLine}{Parameter}: {Request}{NewLine2}",
                     Environment.NewLine, nameof(request), request?.ToJson(), Environment.NewLine);
                 return result.WithError(WorkspaceErrorCodes.CannotAcceptInviteWsp);
+            }
+        }
+
+        public async Task<IDataResult<List<Workspace>>> GetWorkspacesForCheck(int adminId)
+        {
+            var result = new DataResult<List<Workspace>>();
+
+            try
+            {
+                //Вытаскиваем все организации, которые в статусе ожидает проверки
+                var workspaces = await _dbContext.Set<Workspace>()
+                    .AsNoTracking()
+                    .Where(x => x.WorkspaceType == WorkspaceType.Company)
+                    .Where(x => x.ReviewStatus.HasValue)
+                    .Where(x => !x.IsDeleted)
+                    .Where(x=> x.ReviewStatus.Value == WorkspaceReviewStatus.OnReview)
+                    //админ не может подтвердить своё рабочее пространство
+                    .Where(x=> x.DirectorUserId != adminId)
+                    .ToListAsync();
+
+                return result.WithData(workspaces);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while getting workspaces for admin.{NewLine}{Parameter}: {AdminId}",
+                    Environment.NewLine, nameof(adminId), adminId);
+                return result.WithError(WorkspaceErrorCodes.CannotGetMyWorkspaces);
+            }
+        }
+
+        public async Task<IDataResult<bool>> ChangeWorkspaceReviewStatus(Workspace workspace)
+        {
+            var result = new DataResult<bool>();
+            try
+            {
+                var validStatuses = new WorkspaceReviewStatus[]
+                {
+                    WorkspaceReviewStatus.Approved,
+                    WorkspaceReviewStatus.Declined
+                };
+
+                if (!workspace.ReviewStatus.HasValue)
+                {
+                    return result.WithError(WorkspaceErrorCodes.ReviewStatusNotSet);
+                }
+                if (!validStatuses.Contains(workspace.ReviewStatus.Value))
+                {
+                    return result.WithError(WorkspaceErrorCodes.ReviewStatusInvalid);
+                }
+
+                var existingWorkspace = await _dbContext.Set<Workspace>()
+                        .Where(x => workspace.Id == x.Id)
+                        .Where(x => !x.IsDeleted)
+                        .Where(x=> x.ReviewStatus.HasValue)
+                        .Where(x=> x.ReviewStatus == WorkspaceReviewStatus.OnReview)
+                        .FirstOrDefaultAsync();
+
+                //если не пусто, значит изменяем, иначе добавляем новое рабочее пространство
+                if (existingWorkspace == null)
+                {
+                    return result.WithError(WorkspaceErrorCodes.WorkspaceNotFound);
+                }
+                
+                existingWorkspace.ReviewStatus = workspace.ReviewStatus;
+                await _dbContext.SaveChangesAsync();
+
+                return result.WithData(true);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while changing workspace review status.{NewLine}{Parameter}: {Workspace}",
+                    Environment.NewLine, nameof(workspace), workspace?.ToJson());
+                return result.WithError(WorkspaceErrorCodes.CannotChangeReviewStatus);
             }
         }
     }

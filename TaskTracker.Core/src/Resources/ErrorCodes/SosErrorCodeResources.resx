@@ -129,4 +129,13 @@
   <data name="InvalidToken" xml:space="preserve">
     <value>Invalid token</value>
   </data>
+  <data name="RoleNotExists" xml:space="preserve">
+    <value>There is no such role.</value>
+  </data>
+  <data name="UserNotExists" xml:space="preserve">
+    <value>There is no such user.</value>
+  </data>
+  <data name="RoleAddingError" xml:space="preserve">
+    <value>Error adding role</value>
+  </data>
 </root>

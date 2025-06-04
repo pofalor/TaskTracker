@@ -21,6 +21,8 @@ import { UserStatusChangeType } from '../../shared/enums/user-status-change-type
 import { UserService } from '../../shared/services/user.service';
 import { UserModel } from '../../shared/model/userModel';
 import { WorkspaceReviewStatus } from '../../shared/enums/workspace-review-status';
+import { permissions } from '../../shared/constants/permissions';
+import { ListCountry } from '../../shared/constants/country';
 
 @Component({
   selector: 'app-my-workspaces',
@@ -35,9 +37,12 @@ export class MyWorkspacesComponent extends BaseComponent {
   UserTeamRole = UserTeamRole;
   allMyInvitations: UserWspStatusChangeModel[] = [];
   UserStatusChangeType = UserStatusChangeType;
-  runIntervals : any[] = [];
+  runIntervals: any[] = [];
   public getUser: () => UserModel;
   WorkspaceReviewStatus = WorkspaceReviewStatus;
+  workspacesForCheck: WorkspaceModel[] = [];
+  permissions = permissions;
+  ListCountry = ListCountry;
 
   constructor(
     public authService: AuthService,
@@ -60,7 +65,8 @@ export class MyWorkspacesComponent extends BaseComponent {
     t.setLoading(true);
     Promise.all([
       t.getMyWorkspaces(this, false),
-      t.getMyInvitations(false)
+      t.getMyInvitations(false),
+      t.getWorkspacesForCheck(false)
     ])
       .then(() => {
         t.setIntervals();
@@ -68,18 +74,18 @@ export class MyWorkspacesComponent extends BaseComponent {
       });
   }
 
-  ngOnDestroy(){
+  ngOnDestroy() {
     this.terminatentervals(this);
   }
 
-  private terminatentervals(t: any){
+  private terminatentervals(t: any) {
     t.runIntervals.forEach((id: string | number | NodeJS.Timeout | undefined) => {
       clearInterval(id);
     });
     t.runIntervals = [];
   }
 
-  private setIntervals(){
+  private setIntervals() {
     let t = this;
     t.terminatentervals(t);
     t.runIntervals.push(setInterval(t.getMyWorkspaces, 5000, t, false));
@@ -119,6 +125,57 @@ export class MyWorkspacesComponent extends BaseComponent {
           t.setLoading(false);
       });
   }
+
+  public async getWorkspacesForCheck(needLoader: boolean = true) {
+    var t = this;
+    if(!t.userService.verifyRole([permissions.Admin]))
+      return;
+        
+    if (needLoader)
+      t.setLoading(true);
+
+    await t.workspaceService.getWorkspacesForCheck()
+      .then((resp: any) => {
+        t.workspacesForCheck = resp.data;
+      })
+      .catch((e) => {
+        t.showResponseError(e);
+      })
+      .finally(() => {
+        if (needLoader)
+          t.setLoading(false);
+      });
+  }
+
+  public async changeReviewStatus(newStatus: WorkspaceReviewStatus, workspace: WorkspaceModel, needLoader: boolean = true) {
+    var t = this;
+    var action = newStatus == WorkspaceReviewStatus.Approved ? "approve" : "decline";
+    t.showConfirm(`Are you sure you want to ${action} workspace?`, "Confirm the action", true, "Yes")
+          .then(async (result) => {
+            if (result) {
+              t.setLoading(true);
+              var request = new CreateOrEditWorkspacePostRequest();
+              request.id = workspace.id;
+              request.reviewStatus = newStatus;
+              request.name = workspace.name;
+              await t.workspaceService.changeWorkspaceReviewStatus(request)
+                .then(async (resp: any) => {
+                  if(resp){
+                    var newAction = newStatus == WorkspaceReviewStatus.Approved ? "approved" : "declined";
+                    t.showSuccess("Workspace successfully " + newAction);
+                    await t.getWorkspacesForCheck(false);
+                  }
+                })
+                .catch((e) => {
+                  t.showResponseError(e);
+                })
+                .finally(() => {
+                  t.setLoading(false);
+                });
+            }
+          });
+  }
+
 
   public async createWorkspace() {
     var t = this;
@@ -186,7 +243,7 @@ export class MyWorkspacesComponent extends BaseComponent {
     });
   }
 
-  async acceptInvite(accept: boolean, inviteId: number){
+  async acceptInvite(accept: boolean, inviteId: number) {
     var t = this;
     t.setLoading(true);
     var postRequest: AcceptInvitePR = {
@@ -197,7 +254,7 @@ export class MyWorkspacesComponent extends BaseComponent {
 
     await t.workspaceService.acceptInvitationRequest(postRequest)
       .then(async (resp: any) => {
-        if(resp){
+        if (resp) {
           await t.getMyWorkspaces(t, false);
           await t.getMyInvitations(false);
           var result = accept ? "accepted" : "declined";
@@ -212,14 +269,19 @@ export class MyWorkspacesComponent extends BaseComponent {
       });
   }
 
-  needShowWorkspace(workspace: WorkspaceModel){
-     var t =  this;
-     if(!!workspace.reviewStatus || workspace.workspaceType == WorkspaceType.Company){
+  needShowWorkspace(workspace: WorkspaceModel) {
+    var t = this;
+    if (!!workspace.reviewStatus || workspace.workspaceType == WorkspaceType.Company) {
       //Пространство на проверке надо показывать только овнеру, остальным скрывать
       return !!workspace.reviewStatus && (workspace.reviewStatus != WorkspaceReviewStatus.OnReview || workspace.directorUserId == t.getUser().id);
-     }
-     else {
+    }
+    else {
       return true;
-     }
+    }
+  }
+
+  getCountryByCode(countryCode: number | undefined){
+    var t = this;
+    return t.ListCountry.find(x=> x.value == countryCode)?.name;
   }
 }

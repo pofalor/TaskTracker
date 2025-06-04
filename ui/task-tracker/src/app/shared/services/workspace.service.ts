@@ -58,4 +58,14 @@ export class WorkspaceService {
     var res = this.api.post<boolean>(serviceApiUrl + 'acceptInvitationRequest', postRequest);
     return await lastValueFrom(res);
   }
+
+  public async getWorkspacesForCheck(): Promise<IResponse<WorkspaceModel[]>> {
+    var res = this.api.get<WorkspaceModel[]>(serviceApiUrl + 'getWorkspacesForCheck');
+    return await lastValueFrom(res);
+  }
+
+  public async changeWorkspaceReviewStatus(postRequest: CreateOrEditWorkspacePostRequest): Promise<IResponse<boolean>> {
+    var res = this.api.post<boolean>(serviceApiUrl + 'changeWorkspaceReviewStatus', postRequest);
+    return await lastValueFrom(res);
+  }
 }

@@ -185,5 +185,35 @@ namespace TaskTracker.Core.src.Enums.ErrorCodes
         /// </summary>
         [ErrorMessage(typeof(WorkspaceErrorCodeResources), nameof(ReviewStatusWrong))]
         ReviewStatusWrong = ReviewStatusNull + 1,
+
+        /// <summary>
+        /// Не удалось получить рабочие пространства для проверки администратором
+        /// </summary>
+        [ErrorMessage(typeof(WorkspaceErrorCodeResources), nameof(CannotGetWspForAdmin))]
+        CannotGetWspForAdmin = ReviewStatusWrong + 1,
+
+        /// <summary>
+        /// Не задан статус для проверки администратором
+        /// </summary>
+        [ErrorMessage(typeof(WorkspaceErrorCodeResources), nameof(ReviewStatusNotSet))]
+        ReviewStatusNotSet = CannotGetWspForAdmin + 1,
+
+        /// <summary>
+        /// Невалидный статус отправлен с фронта для апрува
+        /// </summary>
+        [ErrorMessage(typeof(WorkspaceErrorCodeResources), nameof(ReviewStatusInvalid))]
+        ReviewStatusInvalid = ReviewStatusNotSet + 1,
+
+        /// <summary>
+        /// Не найдено рабочее пространство для проставления Review status
+        /// </summary>
+        [ErrorMessage(typeof(WorkspaceErrorCodeResources), nameof(WorkspaceNotFound))]
+        WorkspaceNotFound = ReviewStatusInvalid + 1,
+
+        /// <summary>
+        /// Не удалось изменить ReviewStatus 
+        /// </summary>
+        [ErrorMessage(typeof(WorkspaceErrorCodeResources), nameof(CannotChangeReviewStatus))]
+        CannotChangeReviewStatus = WorkspaceNotFound + 1,
     }
 }

@@ -144,4 +144,45 @@
             </div>
         </div>
     </div>
+
+    <div class="row" *ngIf="!!workspacesForCheck && workspacesForCheck.length > 0">
+        <div class="col-12">
+            <div class="text-left text-uppercase f-30 f-w-700 my-3">
+                {{"Workspaces for verification" | lang}}
+            </div>
+        </div>
+        <div class="col-12">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">{{"Name" | lang}}</th>
+                        <th scope="col">{{"Country" | lang}}</th>
+                        <th scope="col">{{"Registration date" | lang}}</th>
+                        <th scope="col">{{"Address" | lang}}</th>
+                        <th scope="col">{{"TIN" | lang}}</th>
+                        <th scope="col">{{"Actions" | lang}}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let workspace of workspacesForCheck let i = index">
+                        <th scope="row">{{i + 1}}</th>
+                        <td>{{workspace.name}}</td>
+                        <td>{{getCountryByCode(workspace.country)}}</td>
+                        <td>{{workspace.registrationDate}}</td>
+                        <td>{{workspace.address}}</td>
+                        <td>{{workspace.inn}}</td>
+                        <td>
+                            <a class="cursor-pointer">
+                                <i class="fa fa-check p-2" (click)="changeReviewStatus(WorkspaceReviewStatus.Approved, workspace)"></i>
+                            </a>
+                            <a class="cursor-pointer">
+                                <i class="fa fa-times p-2" (click)="changeReviewStatus(WorkspaceReviewStatus.Declined, workspace)"></i>
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>

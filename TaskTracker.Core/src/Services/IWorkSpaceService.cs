@@ -43,5 +43,12 @@ namespace TaskTracker.Core.src.Services
         Task<IDataResult<bool>> AcceptInvitationRequest(AcceptInvitePR request);
 
         Task<IDataResult<bool>> CreateOrEdit(Workspace request);
+
+        /// <summary>
+        /// Получить рабочие пространства для проверки администратором
+        /// </summary>
+        Task<IDataResult<List<Workspace>>> GetWorkspacesForCheck(int adminId);
+
+        Task<IDataResult<bool>> ChangeWorkspaceReviewStatus(Workspace workspace);
     }
 }
