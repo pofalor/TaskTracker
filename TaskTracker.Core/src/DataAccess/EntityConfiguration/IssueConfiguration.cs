@@ -16,7 +16,7 @@ namespace TaskTracker.Core.src.DataAccess.EntityConfiguration
             builder.Property(p => p.Type).HasColumnName("type").HasDefaultValue(IssueType.Task);
             builder.Property(p => p.Status).HasColumnName("status").HasDefaultValue(IssueStatus.Backlog);
             builder.Property(p => p.Priority).HasColumnName("priority").HasDefaultValue(IssuePriority.Medium);
-            builder.Property(p => p.Estimate).HasColumnName("estimate").HasDefaultValue(TimeSpan.Zero);
+            builder.Property(p => p.Estimate).HasColumnName("estimate");
             builder.HasIndex(b => b.Index).HasDatabaseName("index");
             builder.HasOne(p => p.Epic).WithMany().HasForeignKey(p => p.EpicId).IsRequired(false);
             builder.HasOne(p => p.Author).WithMany().HasForeignKey(p => p.AuthorId).IsRequired();

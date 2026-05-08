@@ -8,6 +8,23 @@ namespace TaskTracker.Utils.src.Extensions
         /// Конвертировать строку в формате : 2h 3m 11s в TimeSpan
         /// </summary>
         /// <param name="value"></param>
+        /// <returns>Если строка  пустая, то вернётся пустой объект</returns>
+        public static TimeSpan? ConvertToTSPNullCond(this string value)
+        {
+            if(string.IsNullOrEmpty(value))
+                return null;
+
+            var hour = value.GetNumberBeforeLetter("h");
+            var minute = value.GetNumberBeforeLetter("m");
+            var second = value.GetNumberBeforeLetter("s");
+            var val = new TimeSpan(int.Parse(hour), int.Parse(minute), int.Parse(second));
+            return val;
+        }
+
+        /// <summary>
+        /// Конвертировать строку в формате : 2h 3m 11s в TimeSpan
+        /// </summary>
+        /// <param name="value"></param>
         /// <returns></returns>
         public static TimeSpan ConvertToTimespan(this string value)
         {

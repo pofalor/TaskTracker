@@ -24,7 +24,7 @@ namespace TaskTracker.Core.src.Entities
         /// <summary>
         /// Оценка задачи
         /// </summary>
-        public TimeSpan Estimate { get; set; }
+        public TimeSpan? Estimate { get; set; }
 
         /// <summary>
         /// Порядковый номер задачи внутри проекта

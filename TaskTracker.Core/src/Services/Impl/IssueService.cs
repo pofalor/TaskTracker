@@ -69,7 +69,7 @@ namespace TaskTracker.Core.src.Services.Impl
                     Type = x.Type,
                     Status = x.Status,
                     Priority = x.Priority,
-                    Estimate = x.Estimate.ToString(),
+                    Estimate = x.Estimate?.ToString(),
                     Index = x.Index,
                     EpicId = x.EpicId,
                     AuthorId = x.AuthorId,
@@ -99,7 +99,7 @@ namespace TaskTracker.Core.src.Services.Impl
             var result = new DataResult<bool>();
             try
             {
-                //TODO: добавить проверку на EpicId
+                //TODO: добавить проверку на EpicId Эпик обязательно должен быть в этом же проекте. 
                 if (request.ProjectId <= 0)
                 {
                     return result.WithError(IssueErrorCodes.ProjectNotSet);
@@ -127,6 +127,10 @@ namespace TaskTracker.Core.src.Services.Impl
                 else if (request.AssigneeId.HasValue && request.AssigneeId.Value <= 0)
                 {
                     return result.WithError(IssueErrorCodes.IssueAssigneeInvalid);
+                }
+                else if (request.Estimate.HasValue && request.Estimate <= TimeSpan.Zero)
+                {
+                    return result.WithError(IssueErrorCodes.EstimateZeroOrLess);
                 }
 
                 var wspId = await _dbContext.Set<Project>()
@@ -195,6 +199,7 @@ namespace TaskTracker.Core.src.Services.Impl
                 newIssue.EpicId = request.EpicId;
                 newIssue.AssigneeId = request.AssigneeId;
                 newIssue.ProjectId = request.ProjectId;
+                newIssue.Estimate = request.Estimate;
 
                 if (existingIssue == null)
                     await _dbContext.AddAsync(newIssue);

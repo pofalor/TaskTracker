@@ -133,6 +133,15 @@ namespace TaskTracker.Core.src.Resources.ErrorCodes {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на System error: the estimate is less than or equal to zero. Please contact technical support..
+        /// </summary>
+        internal static string EstimateZeroOrLess {
+            get {
+                return ResourceManager.GetString("EstimateZeroOrLess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на The issue assignee is specified incorrectly. Please contact support..
         /// </summary>
         internal static string IssueAssigneeInvalid {

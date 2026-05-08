@@ -52,6 +52,16 @@
             </div>
         </div>
         <div class="col-auto">
+            <div class="btn-group my-3 me-2" role="group">
+                <button type="button" class="btn" [ngClass]="isKanbanView ? 'btn-outline-primary' : 'btn-primary'"
+                    (click)="setViewMode(false)">
+                    {{'Table view' | lang}}
+                </button>
+                <button type="button" class="btn" [ngClass]="isKanbanView ? 'btn-primary' : 'btn-outline-primary'"
+                    (click)="setViewMode(true)">
+                    {{'Kanban view' | lang}}
+                </button>
+            </div>
             <button type="button" class="btn btn-primary my-3" (click)="createIssue()">
                 {{'Create issue'| lang}}
             </button>
@@ -59,7 +69,7 @@
     </div>
 
     <div class="row">
-        <div class="col-12" *ngIf="!!allIssues && allIssues.length > 0">
+        <div class="col-12" *ngIf="!!allIssues && allIssues.length > 0 && !isKanbanView">
             <table class="table table-striped">
                 <thead>
                     <tr>
@@ -105,6 +115,62 @@
                     </tr>
                 </tbody>
             </table>
+        </div>
+
+        <div class="col-12" *ngIf="!!allIssues && allIssues.length > 0 && isKanbanView">
+            <div class="kanban-board">
+                <div class="kanban-column" *ngFor="let status of kanbanStatuses">
+                    <div class="kanban-column-header">
+                        <span>{{'issueStatus.' + status | lang}}</span>
+                        <span class="badge bg-primary rounded-pill">{{getIssuesByStatus(status).length}}</span>
+                    </div>
+
+                    <div class="kanban-column-body">
+                        <div cdkDropList [id]="getDropListId(status)" [cdkDropListData]="getIssuesByStatus(status)"
+                            [cdkDropListConnectedTo]="kanbanDropListIds" (cdkDropListDropped)="onDrop($event, status)"
+                            class="kanban-drop-zone">
+                            <div class="kanban-card" *ngFor="let issue of getIssuesByStatus(status)" cdkDrag>
+                            <div class="kanban-card-key">{{issue.projectCode + '-' + issue.index}}</div>
+                            <div class="kanban-card-title">{{issue.name}}</div>
+                            <div class="kanban-card-description">{{issue.description}}</div>
+                            <div class="kanban-card-meta">
+                                <div>{{"Type" | lang}}: {{'issueType.' + issue.type | lang}}</div>
+                                <div>{{"Priority" | lang}}: {{'issuePriority.' + issue.priority | lang}}</div>
+                                <div>{{"Assignee" | lang}}: {{issue.assigneeName ?? ("Not set" | lang)}}</div>
+                                <div>{{"Time track" | lang}}: {{issue.timeTrack}}</div>
+                            </div>
+
+                            <div class="kanban-card-actions">
+                                <button type="button" class="btn btn-outline-secondary btn-sm"
+                                    [disabled]="!canMoveLeft(issue.status)" (click)="moveIssue(issue, -1)">
+                                    <i class="fa fa-arrow-left"></i>
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm"
+                                    [disabled]="!canMoveRight(issue.status)" (click)="moveIssue(issue, 1)">
+                                    <i class="fa fa-arrow-right"></i>
+                                </button>
+                                <button type="button" class="btn btn-outline-primary btn-sm" (click)="editIssue(issue)">
+                                    <i class="fa fa-edit"></i>
+                                </button>
+                                <button type="button" class="btn btn-outline-primary btn-sm" (click)="trackTime(issue.id)">
+                                    <i class="fa fa-calendar"></i>
+                                </button>
+                                <button type="button" class="btn btn-outline-success btn-sm"
+                                    *ngIf="!activeTimeTrack && issue.assigneeId == getUser().id && issue.status == IssueStatus.InProgress"
+                                    (click)="startAutoTracking(issue.id)">
+                                    <i class="fa fa-unlock"></i>
+                                </button>
+                                <button type="button" class="btn btn-outline-warning btn-sm" *ngIf="!!activeTimeTrack && activeTimeTrack.issueId == issue.id 
+                                    && issue.assigneeId == getUser().id && issue.status == IssueStatus.InProgress && activeTimeTrack.autoTrackStatus == AutoTrackTimeStatus.Active"
+                                    (click)="stopAutoTracking(issue.id)">
+                                    <i class="fa fa-lock"></i>
+                                </button>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="col px-3" *ngIf="!allIssues || allIssues.length == 0">
             <div class="card">

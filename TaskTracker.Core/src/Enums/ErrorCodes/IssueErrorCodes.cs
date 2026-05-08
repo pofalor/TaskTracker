@@ -111,6 +111,12 @@ namespace TaskTracker.Core.src.Enums.ErrorCodes
         /// Не удаётся списать часы, т.к. дата начала в будущем
         /// </summary>
         [ErrorMessage(typeof(IssueErrorCodeResources), nameof(TrackDateInFuture))]
-        TrackDateInFuture = TrackDateNotSet + 1
+        TrackDateInFuture = TrackDateNotSet + 1,
+
+        /// <summary>
+        /// Не удается создать задачу, т.к. оценка меньше нуля
+        /// </summary>
+        [ErrorMessage(typeof(IssueErrorCodeResources), nameof(EstimateZeroOrLess))]
+        EstimateZeroOrLess = TrackDateInFuture + 1
     }
 }

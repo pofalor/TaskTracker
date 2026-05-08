@@ -29,10 +29,12 @@ import { DatepickerUtils } from '../../shared/utils/ngbDatepickerUtils';
 import { DateUtils } from '../../shared/utils/dateUtils';
 import { FormatDatePipe } from "../../shared/pipes/formatDate.pipe";
 import { AutoTimeTrackPR } from '../../shared/model/postRequests/autoTimeTrackPR';
+import { CreateOrEditIssuePR } from '../../shared/model/postRequests/createOrEditIssuePR';
+import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-all-issues',
-  imports: [ReactiveFormsModule, CommonModule, LangPipe, FormatDatePipe],
+  imports: [ReactiveFormsModule, CommonModule, LangPipe, FormatDatePipe, DragDropModule],
   templateUrl: './all-issues.component.html',
   styleUrl: './all-issues.component.scss'
 })
@@ -49,6 +51,19 @@ export class AllIssuesComponent extends BaseComponent {
   timerSubscription: Subscription | null = null;
   activeIssue: IssueModel | undefined;
   AutoTrackTimeStatus = AutoTrackTimeStatus;
+  isKanbanView: boolean = false;
+  kanbanStatuses: IssueStatus[] = [
+    IssueStatus.Backlog,
+    IssueStatus.SelectedForDevelopment,
+    IssueStatus.InProgress,
+    IssueStatus.PullRequest,
+    IssueStatus.ToDeploy,
+    IssueStatus.Test,
+    IssueStatus.Declined,
+    IssueStatus.Done,
+    IssueStatus.Deferred
+  ];
+  kanbanIssuesByStatus: { [key: number]: IssueModel[] } = {};
 
   constructor(
     public authService: AuthService,
@@ -108,6 +123,7 @@ export class AllIssuesComponent extends BaseComponent {
     await t.issueService.getProjectIssues(filter)
       .then((resp: any) => {
         t.allIssues = resp.data;
+        t.refreshKanbanColumns();
       })
       .catch((e) => {
         t.showResponseError(e);
@@ -330,5 +346,112 @@ export class AllIssuesComponent extends BaseComponent {
     this.timerModel.seconds = 0;
     this.timerModel.minutes = 0;
     this.timerModel.hours = 0;
+  }
+
+  public setViewMode(isKanbanView: boolean) {
+    this.isKanbanView = isKanbanView;
+  }
+
+  public getDropListId(status: IssueStatus): string {
+    return `kanban-drop-${status}`;
+  }
+
+  public get kanbanDropListIds(): string[] {
+    return this.kanbanStatuses.map((status) => this.getDropListId(status));
+  }
+
+  public onDrop(event: CdkDragDrop<IssueModel[]>, targetStatus: IssueStatus) {
+    if (event.previousContainer === event.container) {
+      moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
+      return;
+    }
+
+    var movedIssue = event.previousContainer.data[event.previousIndex];
+    if (!movedIssue) {
+      return;
+    }
+
+    this.updateIssueStatus(movedIssue, targetStatus);
+  }
+
+  public getIssuesByStatus(status: IssueStatus): IssueModel[] {
+    return this.kanbanIssuesByStatus[status] ?? [];
+  }
+
+  public canMoveLeft(status: IssueStatus): boolean {
+    return this.kanbanStatuses.indexOf(status) > 0;
+  }
+
+  public canMoveRight(status: IssueStatus): boolean {
+    var statusIndex = this.kanbanStatuses.indexOf(status);
+    return statusIndex > -1 && statusIndex < this.kanbanStatuses.length - 1;
+  }
+
+  public moveIssue(issue: IssueModel, direction: number) {
+    var t = this;
+    var currentIndex = t.kanbanStatuses.indexOf(issue.status);
+    if (currentIndex < 0) {
+      return;
+    }
+
+    var nextIndex = currentIndex + direction;
+    if (nextIndex < 0 || nextIndex >= t.kanbanStatuses.length) {
+      return;
+    }
+
+    t.updateIssueStatus(issue, t.kanbanStatuses[nextIndex]);
+  }
+
+  private refreshKanbanColumns() {
+    var t = this;
+    var groupedIssues: { [key: number]: IssueModel[] } = {};
+    t.kanbanStatuses.forEach((status) => {
+      groupedIssues[status] = t.allIssues.filter((issue) => issue.status === status);
+    });
+    t.kanbanIssuesByStatus = groupedIssues;
+  }
+
+  private async updateIssueStatus(issue: IssueModel, newStatus: IssueStatus): Promise<boolean> {
+    var t = this;
+    if (issue.status === newStatus) {
+      return true;
+    }
+
+    t.setLoading(true);
+    var issuePr = new CreateOrEditIssuePR();
+    issuePr.id = issue.id;
+    issuePr.name = issue.name;
+    issuePr.description = issue.description;
+    issuePr.type = issue.type;
+    issuePr.status = newStatus;
+    issuePr.priority = issue.priority;
+    issuePr.estimate = issue.estimate;
+    issuePr.index = issue.index;
+    issuePr.epicId = issue.epicId;
+    issuePr.authorId = issue.authorId;
+    issuePr.assigneeId = issue.assigneeId;
+    issuePr.projectId = issue.projectId;
+
+    await t.issueService.createOrEdit(issuePr)
+      .then(async (resp: any) => {
+        if (!!resp && !!resp.data) {
+          issue.status = newStatus;
+          if (t.activeIssue?.id === issue.id) {
+            t.activeIssue.status = newStatus;
+          }
+          t.refreshKanbanColumns();
+          return true;
+        }
+        return false;
+      })
+      .catch((e) => {
+        t.showResponseError(e);
+        return false;
+      })
+      .finally(() => {
+        t.setLoading(false);
+      });
+
+    return issue.status === newStatus;
   }
 }

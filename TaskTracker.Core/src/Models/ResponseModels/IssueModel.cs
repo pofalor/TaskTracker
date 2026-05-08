@@ -24,7 +24,7 @@ namespace TaskTracker.Core.src.Models.ResponseModels
         /// <summary>
         /// Оценка задачи
         /// </summary>
-        public string Estimate { get; set; } = string.Empty;
+        public string? Estimate { get; set; } = string.Empty;
 
         /// <summary>
         /// Порядковый номер задачи внутри проекта
