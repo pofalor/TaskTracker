@@ -15,6 +15,9 @@ import { IssuePriority } from '../../../enums/issue-priority';
 import { IssueStatus } from '../../../enums/issue-status';
 import { IssueService } from '../../../services/issue.service';
 import { IssueStatuses } from '../../../constants/issue-statuses';
+import { IssueModel } from '../../../model/issueModel';
+import { IssueFilter } from '../../../model/filters/issueFilter';
+import { formatTimeSpentForInput } from '../../../utils/timeTrackUtils';
 
 @Component({
   selector: 'app-create-issue',
@@ -32,7 +35,7 @@ export class CreateIssueComponent extends BaseComponent {
   @Input() issuePriority: IssuePriority | undefined;
   @Input() issueEstimate: string | undefined;
   @Input() issueIndex: number | undefined;
-  @Input() issueEpicId: number | undefined;
+  @Input() issueParentId: number | undefined;
   @Input() issueAuthorId: number | undefined;
   @Input() issueAssigneeId: number | undefined;
   @Input() issueProjectId!: number;
@@ -40,6 +43,7 @@ export class CreateIssueComponent extends BaseComponent {
   public issueForm!: FormGroup;
   issue: CreateOrEditIssuePR = new CreateOrEditIssuePR();
   assigneeCandidates: UserModel[] = [];
+  parentIssueCandidates: IssueModel[] = [];
   issueTypeArray: { label: string; value: string }[] = [];
   IssueStatuses = IssueStatuses;
   issuePriorityArray: { label: string; value: string }[] = [];
@@ -50,7 +54,7 @@ export class CreateIssueComponent extends BaseComponent {
   get formIssuePriority() { return this.issueForm.get('formIssuePriority'); }
   get formIssueEstimate() { return this.issueForm.get('formIssueEstimate'); }
   get formIssueDescr() { return this.issueForm.get('formIssueDescr'); }
-  get formIssueEpicId() { return this.issueForm.get('formIssueEpicId'); }
+  get formIssueParentId() { return this.issueForm.get('formIssueParentId'); }
   get formIssueAssigneeId() { return this.issueForm.get('formIssueAssigneeId'); }
 
   constructor(
@@ -72,15 +76,47 @@ export class CreateIssueComponent extends BaseComponent {
       formIssueType: [t.issueType, [Validators.required]],
       formIssueStatus: [t.issueStatus, [Validators.required]],
       formIssuePriority: [t.issuePriority, [Validators.required]],
-      formIssueEstimate: [t.issueEstimate, []],
+      formIssueEstimate: [formatTimeSpentForInput(t.issueEstimate), [Validators.pattern(t.timeTrackPattern)]],
       formIssueDescr: [t.issueDescr, [Validators.required, Validators.maxLength(500)]],
-      formIssueEpicId: [t.issueEpicId, []],
+      formIssueParentId: [t.issueParentId, []],
       formIssueAssigneeId: [t.issueAssigneeId, [Validators.required, Validators.min(1)]],
     });
 
-    await t.getAssigneeCandidates(true);
+    await Promise.all([
+      t.getAssigneeCandidates(false),
+      t.loadParentIssueCandidates(false),
+    ]);
     t.convertEnumToArr(IssueType, t.issueTypeArray);
     t.convertEnumToArr(IssuePriority, t.issuePriorityArray);
+  }
+
+  getIssueKey(issue: IssueModel): string {
+    return `${issue.projectCode}-${issue.index}`;
+  }
+
+  async loadParentIssueCandidates(needLoader: boolean = true) {
+    var t = this;
+    if (needLoader) {
+      t.setLoading(true);
+    }
+
+    const filter: IssueFilter = {
+      workspaceId: +t.workspaceId,
+      projectId: +t.issueProjectId,
+    };
+
+    await t.issueService.getProjectIssues(filter)
+      .then((resp: any) => {
+        t.parentIssueCandidates = (resp.data ?? []).filter((issue: IssueModel) => issue.id !== t.issueId);
+      })
+      .catch((e) => {
+        t.showResponseError(e);
+      })
+      .finally(() => {
+        if (needLoader) {
+          t.setLoading(false);
+        }
+      });
   }
 
   async getAssigneeCandidates(needLoader: boolean = true) {
@@ -127,8 +163,9 @@ export class CreateIssueComponent extends BaseComponent {
     t.issue.type = t.formIssueType?.value;
     t.issue.status = t.formIssueStatus?.value;
     t.issue.priority = t.formIssuePriority?.value;
+    t.issue.estimate = t.formIssueEstimate?.value?.trim() || undefined;
     t.issue.authorId = t.userService.get()?.id;
-    t.issue.epicId = t.formIssueEpicId?.value;
+    t.issue.parentId = t.formIssueParentId?.value ?? undefined;
     t.issue.assigneeId = t.formIssueAssigneeId?.value;
     t.issue.projectId = t.issueProjectId;
 

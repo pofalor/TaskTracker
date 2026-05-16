@@ -133,6 +133,42 @@ namespace TaskTracker.Core.src.Resources.ErrorCodes {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на An issue cannot be its own parent.
+        /// </summary>
+        internal static string ParentCannotBeSelf {
+            get {
+                return ResourceManager.GetString("ParentCannotBeSelf", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Parent issue is specified incorrectly. Please select another parent issue or contact support.
+        /// </summary>
+        internal static string ParentIssueInvalid {
+            get {
+                return ResourceManager.GetString("ParentIssueInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Parent issue was not found. Please select another parent issue.
+        /// </summary>
+        internal static string ParentIssueNotSet {
+            get {
+                return ResourceManager.GetString("ParentIssueNotSet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Parent issue must belong to the same project.
+        /// </summary>
+        internal static string ParentIssueWrongProject {
+            get {
+                return ResourceManager.GetString("ParentIssueWrongProject", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Fill in the issue description.
         /// </summary>
         internal static string EmptyDescr {

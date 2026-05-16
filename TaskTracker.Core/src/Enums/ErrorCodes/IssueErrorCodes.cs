@@ -130,5 +130,29 @@ namespace TaskTracker.Core.src.Enums.ErrorCodes
         /// </summary>
         [ErrorMessage(typeof(IssueErrorCodeResources), nameof(IssueStatusLockedByAutoTrack))]
         IssueStatusLockedByAutoTrack = CannotUpdateIssue + 1,
+
+        /// <summary>
+        /// Родительская задача указана некорректно
+        /// </summary>
+        [ErrorMessage(typeof(IssueErrorCodeResources), nameof(ParentIssueInvalid))]
+        ParentIssueInvalid = IssueStatusLockedByAutoTrack + 1,
+
+        /// <summary>
+        /// Родительская задача не найдена
+        /// </summary>
+        [ErrorMessage(typeof(IssueErrorCodeResources), nameof(ParentIssueNotSet))]
+        ParentIssueNotSet = ParentIssueInvalid + 1,
+
+        /// <summary>
+        /// Родительская задача из другого проекта
+        /// </summary>
+        [ErrorMessage(typeof(IssueErrorCodeResources), nameof(ParentIssueWrongProject))]
+        ParentIssueWrongProject = ParentIssueNotSet + 1,
+
+        /// <summary>
+        /// Задача не может быть родителем самой себе
+        /// </summary>
+        [ErrorMessage(typeof(IssueErrorCodeResources), nameof(ParentCannotBeSelf))]
+        ParentCannotBeSelf = ParentIssueWrongProject + 1,
     }
 }

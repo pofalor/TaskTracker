@@ -119,7 +119,7 @@ namespace TaskTracker.Web.Api.Controllers
                     request.AuthorId = UserId;
 
                 var mapRes = _mapper.Map<Issue>(request);
-                var result = await _issueService.UpdateIssue(mapRes);
+                var result = await _issueService.UpdateIssue(mapRes, UserId);
 
                 if (result.Success)
                     return response.WithData(result.Data);

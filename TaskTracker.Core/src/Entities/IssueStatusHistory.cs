@@ -11,7 +11,7 @@ namespace TaskTracker.Core.src.Entities
         /// Когда был изменён статус. Хранится в UTC.
         /// </summary>
         public DateTime ChangedAt { get; set; }
-        public User Issue { get; set; } = null!;
+        public Issue Issue { get; set; } = null!;
         public int IssueId { get; set; }
 
         /// <summary>

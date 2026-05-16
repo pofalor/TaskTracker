@@ -35,6 +35,23 @@ namespace TaskTracker.Utils.src.Extensions
             return val;
         }
 
+        /// <summary>
+        /// Форматировать TimeSpan в строку вида 2h 3m 11s
+        /// </summary>
+        public static string ToTimeTrackString(this TimeSpan value)
+        {
+            var totalSeconds = (int)value.TotalSeconds;
+            var hours = totalSeconds / 3600;
+            var minutes = totalSeconds % 3600 / 60;
+            var seconds = totalSeconds % 60;
+            return $"{hours}h {minutes}m {seconds}s";
+        }
+
+        public static string? ToTimeTrackStringNullCond(this TimeSpan? value)
+        {
+            return value.HasValue ? value.Value.ToTimeTrackString() : null;
+        }
+
         private static string GetNumberBeforeLetter(this string str, string letterBeforeNumber)
         {
             var resultStr = new StringBuilder();

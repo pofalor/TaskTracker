@@ -4,5 +4,8 @@
     "TIN": "ИНН",
     "Invite users to your workspace":"Приглашайте пользователей в своё рабочее пространство",
     "Please select a workspace":"Пожалуйста, выберите рабочее пространство",
-    "Are you sure you want to start automatic time tracking?":"Вы уверены, что хотите начать автоматический трекинг времени?"
+    "Are you sure you want to start automatic time tracking?":"Вы уверены, что хотите начать автоматический трекинг времени?",
+    "Estimate":"Оценка",
+    "Parent issue":"Родительская задача",
+    "Child issues":"Дочерние задачи"
 }

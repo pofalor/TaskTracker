@@ -31,7 +31,7 @@ namespace TaskTracker.Core.src.Models.PostRequests
         /// </summary>
         public int Index { get; set; }
 
-        public int? EpicId { get; set; }
+        public int? ParentId { get; set; }
 
         public int? AuthorId { get; set; }
 

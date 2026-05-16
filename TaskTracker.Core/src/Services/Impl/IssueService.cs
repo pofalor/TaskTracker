@@ -1,9 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using NLog.Filters;
-using NpgsqlTypes;
-using System.Collections.Immutable;
-using System.Linq;
 using TaskTracker.Core.src.Constants;
 using TaskTracker.Core.src.DataAccess;
 using TaskTracker.Core.src.DataResult;
@@ -11,7 +7,6 @@ using TaskTracker.Core.src.Entities;
 using TaskTracker.Core.src.Enums;
 using TaskTracker.Core.src.Enums.ErrorCodes;
 using TaskTracker.Core.src.Models.Filters;
-using TaskTracker.Core.src.Models.PostRequests;
 using TaskTracker.Core.src.Models.ResponseModels;
 using TaskTracker.Core.src.Repositories;
 using TaskTracker.Utils.src.Extensions;
@@ -25,19 +20,22 @@ namespace TaskTracker.Core.src.Services.Impl
         private readonly IWorkspaceService _workSpaceService;
         private readonly ILogNotificatorService _logNotificatorService;
         private readonly ITimeTrackingRepository _timeTrackingRepository;
+        private readonly IIssueRepository _issueRepository;
 
         public IssueService(
             ApplicationDbContext dbContext,
             ILogger<IssueService> logger,
             IWorkspaceService workSpaceService,
             ILogNotificatorService logNotificatorService,
-            ITimeTrackingRepository timeTrackingRepository)
+            ITimeTrackingRepository timeTrackingRepository,
+            IIssueRepository issueRepository)
         {
             _dbContext = dbContext;
             _logger = logger;
             _workSpaceService = workSpaceService;
             _logNotificatorService = logNotificatorService;
             _timeTrackingRepository = timeTrackingRepository;
+            _issueRepository = issueRepository;
         }
 
         public async Task<IDataResult<List<IssueModel>>> GetProjectIssues(IssueFilter filter)
@@ -46,27 +44,22 @@ namespace TaskTracker.Core.src.Services.Impl
 
             try
             {
-                //Вытаскиваем все задачи по проекту
-                var issues = await _dbContext.Set<Issue>()
-                    .AsNoTracking()
-                    .Include(x => x.Project)
-                    .Include(x=> x.Author)
-                    .Include(x=> x.Assignee)
-                    .Where(x => x.ProjectId == filter.ProjectId)
-                    .Where(x => x.Project.WorkspaceId == filter.WorkspaceId)
-                    .Where(x => !x.Project.IsDeleted)
-                    .Where(x => !x.Project.Workspace.IsDeleted)
-                    .Where(x => !x.IsDeleted)
-                    .ToListAsync();
+                var issues = await _issueRepository.GetProjectIssuesAsync(filter.ProjectId, filter.WorkspaceId);
 
                 var issueIds = issues.Select(x => x.Id);
 
-                var timeTrack = await _dbContext.Set<TimeTracking>()
-                    .AsNoTracking()
-                    .Where(x => issueIds.Contains(x.IssueId))
-                    .Where(x => !x.IsDeleted)
-                    .GroupBy(x => x.IssueId)
-                    .ToDictionaryAsync(x => x.Key, y => new TimeSpan(y.SafeSum(z => z.TimeSpent.Ticks)));
+                var timeTrack = await _timeTrackingRepository.GetTimeSpentByIssueIdsAsync(issueIds);
+
+                var issueKeys = issues.ToDictionary(
+                    x => x.Id,
+                    x => $"{x.Project.Code}-{x.Index}");
+
+                var childKeysByParent = issues
+                    .Where(x => x.ParentId.HasValue)
+                    .GroupBy(x => x.ParentId!.Value)
+                    .ToDictionary(
+                        g => g.Key,
+                        g => g.Select(x => issueKeys[x.Id]).OrderBy(k => k).ToList());
 
                 var models = issues.Select(x => new IssueModel
                 {
@@ -76,19 +69,23 @@ namespace TaskTracker.Core.src.Services.Impl
                     Type = x.Type,
                     Status = x.Status,
                     Priority = x.Priority,
-                    Estimate = x.Estimate?.ToString(),
+                    Estimate = x.Estimate.ToTimeTrackStringNullCond(),
                     Index = x.Index,
-                    EpicId = x.EpicId,
+                    ParentId = x.ParentId,
+                    ParentKey = x.ParentId.HasValue && issueKeys.TryGetValue(x.ParentId.Value, out var parentKey)
+                        ? parentKey
+                        : null,
+                    ChildIssueKeys = childKeysByParent.Get(x.Id, new List<string>()),
                     AuthorId = x.AuthorId,
                     AssigneeId = x.AssigneeId,
                     ProjectId = x.ProjectId,
-                    TimeTrack = timeTrack.Get(x.Id, new TimeSpan()).ToString(),
+                    TimeTrack = timeTrack.Get(x.Id, TimeSpan.Zero).ToTimeTrackString(),
                     ProjectCode = x.Project.Code,
                     AuthorName = x.Author.GetUserName(),
                     AssigneeName = x.Assignee?.GetUserName() ?? string.Empty
                 })
-                    .OrderByDescending(x=> x.Priority)
-                    .ThenByDescending(x=> x.Id)
+                    .OrderByDescending(x => x.Priority)
+                    .ThenByDescending(x => x.Id)
                     .ToList();
 
                 return result.WithData(models);
@@ -124,13 +121,13 @@ namespace TaskTracker.Core.src.Services.Impl
                     return result.WithError(assigneeError.Value);
                 }
 
-                var lastIssueIndex = await _dbContext.Set<Issue>()
-                    .AsNoTracking()
-                    .Where(x => !x.IsDeleted)
-                    .Where(x => x.ProjectId == request.ProjectId)
-                    .OrderByDescending(x => x.Index)
-                    .Select(x => x.Index)
-                    .FirstOrDefaultAsync();
+                var parentError = await ValidateParentIssueAsync(request.ParentId, request.ProjectId, request.Id);
+                if (parentError.HasValue)
+                {
+                    return result.WithError(parentError.Value);
+                }
+
+                var lastIssueIndex = await _issueRepository.GetNextIndexAsync(request.ProjectId);
 
                 var issue = new Issue
                 {
@@ -141,14 +138,22 @@ namespace TaskTracker.Core.src.Services.Impl
                     Type = request.Type,
                     Status = request.Status,
                     Priority = request.Priority,
-                    EpicId = request.EpicId,
+                    ParentId = request.ParentId,
                     AssigneeId = request.AssigneeId,
                     ProjectId = request.ProjectId,
                     Estimate = request.Estimate,
                 };
 
-                await _dbContext.AddAsync(issue);
-                await _dbContext.SaveChangesAsync();
+                await _issueRepository.AddAsync(issue);
+                await _issueRepository.AddStatusHistoryAsync(new IssueStatusHistory
+                {
+                    Issue = issue,
+                    OldStatus = null,
+                    NewStatus = issue.Status,
+                    ChangedAt = DateTime.UtcNow,
+                    ChangedByUserId = request.AuthorId,
+                });
+                await _issueRepository.SaveChangesAsync();
 
                 return result.WithData(true);
             }
@@ -160,7 +165,7 @@ namespace TaskTracker.Core.src.Services.Impl
             }
         }
 
-        public async Task<IDataResult<bool>> UpdateIssue(Issue request)
+        public async Task<IDataResult<bool>> UpdateIssue(Issue request, int userId)
         {
             var result = new DataResult<bool>();
             try
@@ -171,10 +176,7 @@ namespace TaskTracker.Core.src.Services.Impl
                     return result.WithError(validationError.Value);
                 }
 
-                var existingIssue = await _dbContext.Set<Issue>()
-                    .Where(x => request.Id == x.Id)
-                    .Where(x => !x.IsDeleted)
-                    .FirstOrDefaultAsync();
+                var existingIssue = await _issueRepository.GetByIdNotDeletedAsync(request.Id);
 
                 if (existingIssue == null)
                 {
@@ -193,23 +195,45 @@ namespace TaskTracker.Core.src.Services.Impl
                     return result.WithError(assigneeError.Value);
                 }
 
+                var parentError = await ValidateParentIssueAsync(request.ParentId, request.ProjectId, request.Id);
+                if (parentError.HasValue)
+                {
+                    return result.WithError(parentError.Value);
+                }
+
                 var statusChangeError = await ValidateStatusChangeAsync(existingIssue, request);
                 if (statusChangeError.HasValue)
                 {
                     return result.WithError(statusChangeError.Value);
                 }
 
+                var oldStatus = existingIssue.Status;
+                var statusChanged = oldStatus != request.Status;
+
                 existingIssue.Name = request.Name;
                 existingIssue.Description = request.Description;
                 existingIssue.Type = request.Type;
                 existingIssue.Status = request.Status;
                 existingIssue.Priority = request.Priority;
-                existingIssue.EpicId = request.EpicId;
+                existingIssue.ParentId = request.ParentId;
                 existingIssue.AssigneeId = request.AssigneeId;
                 existingIssue.ProjectId = request.ProjectId;
                 existingIssue.Estimate = request.Estimate;
 
-                await _dbContext.SaveChangesAsync();
+                if (statusChanged)
+                {
+                    await _issueRepository.AddStatusHistoryAsync(new IssueStatusHistory
+                    {
+                        IssueId = existingIssue.Id,
+                        OldStatus = oldStatus,
+                        NewStatus = request.Status,
+                        ChangedAt = DateTime.UtcNow,
+                        ChangedByUserId = userId,
+                    });
+                }
+
+                await _issueRepository.UpdateAsync(existingIssue);
+                await _issueRepository.SaveChangesAsync();
 
                 return result.WithData(true);
             }
@@ -223,7 +247,6 @@ namespace TaskTracker.Core.src.Services.Impl
 
         private static IssueErrorCodes? ValidateIssueRequest(Issue request, bool isUpdate)
         {
-            //TODO: добавить проверку на EpicId — эпик обязательно должен быть в этом же проекте.
             if (isUpdate && request.Id <= 0)
             {
                 return IssueErrorCodes.IssueNotSet;
@@ -244,11 +267,6 @@ namespace TaskTracker.Core.src.Services.Impl
                 return IssueErrorCodes.EmptyName;
             }
 
-            if (request.Description.IsEmpty())
-            {
-                return IssueErrorCodes.EmptyDescr;
-            }
-
             if (!IssueConstants.ValidIssueTypes.Contains(request.Type))
             {
                 return IssueErrorCodes.IssueTypeInvalid;
@@ -267,6 +285,35 @@ namespace TaskTracker.Core.src.Services.Impl
             if (request.Estimate.HasValue && request.Estimate <= TimeSpan.Zero)
             {
                 return IssueErrorCodes.EstimateZeroOrLess;
+            }
+
+            return null;
+        }
+
+        private async Task<IssueErrorCodes?> ValidateParentIssueAsync(int? parentId, int projectId, int issueId)
+        {
+            if (!parentId.HasValue)
+            {
+                return null;
+            }
+
+            if (parentId.Value <= 0)
+            {
+                return IssueErrorCodes.ParentIssueInvalid;
+            }
+
+            if (issueId > 0 && parentId.Value == issueId)
+            {
+                return IssueErrorCodes.ParentCannotBeSelf;
+            }
+
+            var parentExistsInProject = await _issueRepository.ExistsInProjectAsync(parentId.Value, projectId);
+            if (!parentExistsInProject)
+            {
+                var parentIssue = await _issueRepository.GetByIdNotDeletedAsync(parentId.Value);
+                return parentIssue == null
+                    ? IssueErrorCodes.ParentIssueNotSet
+                    : IssueErrorCodes.ParentIssueWrongProject;
             }
 
             return null;
@@ -368,7 +415,6 @@ namespace TaskTracker.Core.src.Services.Impl
                     .Where(x => !x.IsDeleted)
                     .FirstOrDefaultAsync();
 
-                //если не пусто, значит изменяем, иначе добавляем новую задачу. Если не пусто, значит это автоматический трек
                 if (existingTimeTrack != null)
                 {
                     existingTimeTrack.Comment = request.Comment;

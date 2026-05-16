@@ -31,7 +31,10 @@ namespace TaskTracker.Core.src.Models.ResponseModels
         /// </summary>
         public int Index { get; set; }
 
-        public int? EpicId { get; set; }
+        public int? ParentId { get; set; }
+
+        public string? ParentKey { get; set; }
+ 
 
         public int AuthorId { get; set; }
 
@@ -47,5 +50,6 @@ namespace TaskTracker.Core.src.Models.ResponseModels
         public string ProjectCode { get; set; } = null!;
         public string AuthorName { get; set; } = null!;
         public string AssigneeName { get; set; } = null!;
+        public List<string> ChildIssueKeys { get; set; } = [];
     }
 }

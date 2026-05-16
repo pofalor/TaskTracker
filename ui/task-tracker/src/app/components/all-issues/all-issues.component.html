@@ -79,6 +79,9 @@
                         <th scope="col">{{"Type" | lang}}</th>
                         <th scope="col">{{"Status" | lang}}</th>
                         <th scope="col">{{"Priority" | lang}}</th>
+                        <th scope="col">{{"Estimate" | lang}}</th>
+                        <th scope="col">{{"Parent issue" | lang}}</th>
+                        <th scope="col">{{"Child issues" | lang}}</th>
                         <th scope="col">{{"Author" | lang}}</th>
                         <th scope="col">{{"Assignee" | lang}}</th>
                         <th scope="col">{{"Time track" | lang}}</th>
@@ -93,6 +96,9 @@
                         <td>{{'issueType.' + issue.type | lang}}</td>
                         <td>{{'issueStatus.' + issue.status | lang}}</td>
                         <td>{{'issuePriority.' + issue.priority | lang}}</td>
+                        <td>{{issue.estimate || ("Not set" | lang)}}</td>
+                        <td>{{issue.parentKey ?? ("Not set" | lang)}}</td>
+                        <td>{{issue.childIssueKeys?.length ? issue.childIssueKeys.join(', ') : ("Not set" | lang)}}</td>
                         <td>{{issue.authorName}}</td>
                         <td>{{issue.assigneeName ?? ("Not set" | lang)}}</td>
                         <td>{{issue.timeTrack}}</td>
@@ -136,6 +142,9 @@
                             <div class="kanban-card-meta">
                                 <div>{{"Type" | lang}}: {{'issueType.' + issue.type | lang}}</div>
                                 <div>{{"Priority" | lang}}: {{'issuePriority.' + issue.priority | lang}}</div>
+                                <div>{{"Estimate" | lang}}: {{issue.estimate || ("Not set" | lang)}}</div>
+                                <div>{{"Parent issue" | lang}}: {{issue.parentKey ?? ("Not set" | lang)}}</div>
+                                <div>{{"Child issues" | lang}}: {{issue.childIssueKeys?.length ? issue.childIssueKeys.join(', ') : ("Not set" | lang)}}</div>
                                 <div>{{"Assignee" | lang}}: {{issue.assigneeName ?? ("Not set" | lang)}}</div>
                                 <div>{{"Time track" | lang}}: {{issue.timeTrack}}</div>
                             </div>

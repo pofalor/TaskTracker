@@ -225,7 +225,7 @@ export class AllIssuesComponent extends BaseComponent {
     t.modalRef.componentInstance.issuePriority = issue.priority;
     t.modalRef.componentInstance.issueEstimate = issue.estimate;
     t.modalRef.componentInstance.issueIndex = issue.index;
-    t.modalRef.componentInstance.issueEpicId = issue.epicId;
+    t.modalRef.componentInstance.issueParentId = issue.parentId;
     t.modalRef.componentInstance.issueAuthorId = issue.authorId;
     t.modalRef.componentInstance.issueAssigneeId = issue.assigneeId;
     t.modalRef.componentInstance.workspaceId = +t.workspaceId;
@@ -427,7 +427,7 @@ export class AllIssuesComponent extends BaseComponent {
     issuePr.priority = issue.priority;
     issuePr.estimate = issue.estimate;
     issuePr.index = issue.index;
-    issuePr.epicId = issue.epicId;
+    issuePr.parentId = issue.parentId;
     issuePr.authorId = issue.authorId;
     issuePr.assigneeId = issue.assigneeId;
     issuePr.projectId = issue.projectId;

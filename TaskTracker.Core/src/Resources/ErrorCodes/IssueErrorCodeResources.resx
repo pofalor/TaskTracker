@@ -180,4 +180,16 @@
   <data name="IssueStatusLockedByAutoTrack" xml:space="preserve">
     <value>Cannot change issue status while automatic time tracking is active on this issue. Stop or finish the timer first</value>
   </data>
+  <data name="ParentIssueInvalid" xml:space="preserve">
+    <value>Parent issue is specified incorrectly. Please select another parent issue or contact support</value>
+  </data>
+  <data name="ParentIssueNotSet" xml:space="preserve">
+    <value>Parent issue was not found. Please select another parent issue</value>
+  </data>
+  <data name="ParentIssueWrongProject" xml:space="preserve">
+    <value>Parent issue must belong to the same project</value>
+  </data>
+  <data name="ParentCannotBeSelf" xml:space="preserve">
+    <value>An issue cannot be its own parent</value>
+  </data>
 </root>

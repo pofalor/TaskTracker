@@ -41,6 +41,7 @@ namespace TaskTracker.Core.src.Installers
         public static IServiceCollection AddRepositories(this IServiceCollection services)
         {
             services.AddScoped<ITimeTrackingRepository, TimeTrackingRepository>();
+            services.AddScoped<IIssueRepository, IssueRepository>();
 
             return services;
         }

@@ -20,6 +20,7 @@ namespace TaskTracker.Core.src.DataAccess
             modelBuilder.ApplyConfiguration(new WorkspaceMemberConfiguration());
             modelBuilder.ApplyConfiguration(new ProjectConfiguration());
             modelBuilder.ApplyConfiguration(new IssueConfiguration());
+            modelBuilder.ApplyConfiguration(new IssueStatusHistoryConfiguration());
             modelBuilder.ApplyConfiguration(new TimeTrackingConfiguration());
             modelBuilder.ApplyConfiguration(new WorkspaceInviteConfiguration());
         }
