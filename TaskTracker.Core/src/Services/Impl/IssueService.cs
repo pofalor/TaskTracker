@@ -94,115 +94,53 @@ namespace TaskTracker.Core.src.Services.Impl
             }
         }
 
-        public async Task<IDataResult<bool>> CreateOrEdit(Issue request)
+        public async Task<IDataResult<bool>> CreateIssue(Issue request)
         {
             var result = new DataResult<bool>();
             try
             {
-                //TODO: добавить проверку на EpicId Эпик обязательно должен быть в этом же проекте. 
-                if (request.ProjectId <= 0)
+                var validationError = ValidateIssueRequest(request, isUpdate: false);
+                if (validationError.HasValue)
+                {
+                    return result.WithError(validationError.Value);
+                }
+
+                var wspId = await GetWorkspaceIdByProjectIdAsync(request.ProjectId);
+                if (wspId <= 0)
                 {
                     return result.WithError(IssueErrorCodes.ProjectNotSet);
                 }
-                else if (request.AuthorId <= 0)
+
+                var assigneeError = await ValidateAssigneeMembershipAsync(request, wspId);
+                if (assigneeError.HasValue)
                 {
-                    return result.WithError(IssueErrorCodes.AuthorNotSet);
-                }
-                else if (request.Name.IsEmpty())
-                {
-                    return result.WithError(IssueErrorCodes.EmptyName);
-                }
-                else if (request.Description.IsEmpty())
-                {
-                    return result.WithError(IssueErrorCodes.EmptyDescr);
-                }
-                else if (!IssueConstants.ValidIssueTypes.Contains(request.Type))
-                {
-                    return result.WithError(IssueErrorCodes.IssueTypeInvalid);
-                }
-                else if (!IssueConstants.ValidIssuePriorities.Contains(request.Priority))
-                {
-                    return result.WithError(IssueErrorCodes.IssuePriorityInvalid);
-                }
-                else if (request.AssigneeId.HasValue && request.AssigneeId.Value <= 0)
-                {
-                    return result.WithError(IssueErrorCodes.IssueAssigneeInvalid);
-                }
-                else if (request.Estimate.HasValue && request.Estimate <= TimeSpan.Zero)
-                {
-                    return result.WithError(IssueErrorCodes.EstimateZeroOrLess);
+                    return result.WithError(assigneeError.Value);
                 }
 
-                var wspId = await _dbContext.Set<Project>()
-                    .Where(x => request.ProjectId == x.Id)
+                var lastIssueIndex = await _dbContext.Set<Issue>()
+                    .AsNoTracking()
                     .Where(x => !x.IsDeleted)
-                    .Where(x => !x.Workspace.IsDeleted)
-                    .Select(x => x.WorkspaceId)
-                    .DefaultIfEmpty()
+                    .Where(x => x.ProjectId == request.ProjectId)
+                    .OrderByDescending(x => x.Index)
+                    .Select(x => x.Index)
                     .FirstOrDefaultAsync();
 
-                var isWorkspaceMember = await _workSpaceService.IsWorkspaceMember(request.AuthorId, wspId);
-                if (!isWorkspaceMember)
+                var issue = new Issue
                 {
-                    await _logNotificatorService.SendTelegramAdminAsync($"The user has sent a request to create issue, " +
-                        $"but he not workspace membership{Environment.NewLine} " +
-                        $"Project id: {request.ProjectId}{Environment.NewLine} " +
-                        $"User id: {request.AuthorId}.");
-                    return result.WithError(IssueErrorCodes.UserNotMemberWsp);
-                }
+                    AuthorId = request.AuthorId,
+                    Index = lastIssueIndex + 1,
+                    Name = request.Name,
+                    Description = request.Description,
+                    Type = request.Type,
+                    Status = request.Status,
+                    Priority = request.Priority,
+                    EpicId = request.EpicId,
+                    AssigneeId = request.AssigneeId,
+                    ProjectId = request.ProjectId,
+                    Estimate = request.Estimate,
+                };
 
-                if (request.AssigneeId.HasValue)
-                {
-                    var isAssigneeWorkspaceMember = await _workSpaceService.IsWorkspaceMember(request.AssigneeId.Value, wspId);
-                    if (!isAssigneeWorkspaceMember)
-                    {
-                        await _logNotificatorService.SendTelegramAdminAsync($"The user submitted a request to create an issue with an assignee " +
-                            $"who is not a member of the workspace{Environment.NewLine}" +
-                            $"Project id: {request.ProjectId}{Environment.NewLine} " +
-                            $"User id: {request.AuthorId}{Environment.NewLine}" +
-                            $"Assignee id: {request.AssigneeId}.");
-                        return result.WithError(IssueErrorCodes.AssigneeNotMemberWsp);
-                    }
-                }
-
-                var existingIssue = await _dbContext.Set<Issue>()
-                    .Where(x => request.Id == x.Id)
-                    .Where(x => !x.IsDeleted)
-                    .FirstOrDefaultAsync();
-
-                var newIssue = new Issue();
-
-                //если не пусто, значит изменяем, иначе добавляем новую задачу
-                if (existingIssue != null)
-                {
-                    newIssue = existingIssue;
-                }
-                else
-                {
-                    var lastIssueIndex = await _dbContext.Set<Issue>()
-                        .AsNoTracking()
-                        .Where(x => !x.IsDeleted)
-                        .Where(x => x.ProjectId == request.ProjectId)
-                        .OrderByDescending(x => x.Index)
-                        .Select(x => x.Index)
-                        .FirstOrDefaultAsync();
-
-                    newIssue.AuthorId = request.AuthorId;
-                    newIssue.Index = lastIssueIndex + 1;
-                }
-
-                newIssue.Name = request.Name;
-                newIssue.Description = request.Description;
-                newIssue.Type = request.Type;
-                newIssue.Status = request.Status;
-                newIssue.Priority = request.Priority;
-                newIssue.EpicId = request.EpicId;
-                newIssue.AssigneeId = request.AssigneeId;
-                newIssue.ProjectId = request.ProjectId;
-                newIssue.Estimate = request.Estimate;
-
-                if (existingIssue == null)
-                    await _dbContext.AddAsync(newIssue);
+                await _dbContext.AddAsync(issue);
                 await _dbContext.SaveChangesAsync();
 
                 return result.WithData(true);
@@ -213,6 +151,145 @@ namespace TaskTracker.Core.src.Services.Impl
                     Environment.NewLine, nameof(request), request?.ToJson(), Environment.NewLine);
                 return result.WithError(IssueErrorCodes.CannotCreateIssue);
             }
+        }
+
+        public async Task<IDataResult<bool>> UpdateIssue(Issue request)
+        {
+            var result = new DataResult<bool>();
+            try
+            {
+                var validationError = ValidateIssueRequest(request, isUpdate: true);
+                if (validationError.HasValue)
+                {
+                    return result.WithError(validationError.Value);
+                }
+
+                var existingIssue = await _dbContext.Set<Issue>()
+                    .Where(x => request.Id == x.Id)
+                    .Where(x => !x.IsDeleted)
+                    .FirstOrDefaultAsync();
+
+                if (existingIssue == null)
+                {
+                    return result.WithError(IssueErrorCodes.IssueNotSet);
+                }
+
+                var wspId = await GetWorkspaceIdByProjectIdAsync(existingIssue.ProjectId);
+                if (wspId <= 0)
+                {
+                    return result.WithError(IssueErrorCodes.ProjectNotSet);
+                }
+
+                var assigneeError = await ValidateAssigneeMembershipAsync(request, wspId);
+                if (assigneeError.HasValue)
+                {
+                    return result.WithError(assigneeError.Value);
+                }
+
+                existingIssue.Name = request.Name;
+                existingIssue.Description = request.Description;
+                existingIssue.Type = request.Type;
+                existingIssue.Status = request.Status;
+                existingIssue.Priority = request.Priority;
+                existingIssue.EpicId = request.EpicId;
+                existingIssue.AssigneeId = request.AssigneeId;
+                existingIssue.ProjectId = request.ProjectId;
+                existingIssue.Estimate = request.Estimate;
+
+                await _dbContext.SaveChangesAsync();
+
+                return result.WithData(true);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while updating issue.{NewLine}{Parameter}: {Request}{NewLine2}",
+                    Environment.NewLine, nameof(request), request?.ToJson(), Environment.NewLine);
+                return result.WithError(IssueErrorCodes.CannotUpdateIssue);
+            }
+        }
+
+        private static IssueErrorCodes? ValidateIssueRequest(Issue request, bool isUpdate)
+        {
+            //TODO: добавить проверку на EpicId — эпик обязательно должен быть в этом же проекте.
+            if (isUpdate && request.Id <= 0)
+            {
+                return IssueErrorCodes.IssueNotSet;
+            }
+
+            if (request.ProjectId <= 0)
+            {
+                return IssueErrorCodes.ProjectNotSet;
+            }
+
+            if (!isUpdate && request.AuthorId <= 0)
+            {
+                return IssueErrorCodes.AuthorNotSet;
+            }
+
+            if (request.Name.IsEmpty())
+            {
+                return IssueErrorCodes.EmptyName;
+            }
+
+            if (request.Description.IsEmpty())
+            {
+                return IssueErrorCodes.EmptyDescr;
+            }
+
+            if (!IssueConstants.ValidIssueTypes.Contains(request.Type))
+            {
+                return IssueErrorCodes.IssueTypeInvalid;
+            }
+
+            if (!IssueConstants.ValidIssuePriorities.Contains(request.Priority))
+            {
+                return IssueErrorCodes.IssuePriorityInvalid;
+            }
+
+            if (request.AssigneeId.HasValue && request.AssigneeId.Value <= 0)
+            {
+                return IssueErrorCodes.IssueAssigneeInvalid;
+            }
+
+            if (request.Estimate.HasValue && request.Estimate <= TimeSpan.Zero)
+            {
+                return IssueErrorCodes.EstimateZeroOrLess;
+            }
+
+            return null;
+        }
+
+        private async Task<int> GetWorkspaceIdByProjectIdAsync(int projectId)
+        {
+            return await _dbContext.Set<Project>()
+                .AsNoTracking()
+                .Where(x => projectId == x.Id)
+                .Where(x => !x.IsDeleted)
+                .Where(x => !x.Workspace.IsDeleted)
+                .Select(x => x.WorkspaceId)
+                .FirstOrDefaultAsync();
+        }
+
+        private async Task<IssueErrorCodes?> ValidateAssigneeMembershipAsync(Issue request, int workspaceId)
+        {
+            if (!request.AssigneeId.HasValue)
+            {
+                return null;
+            }
+
+            var isAssigneeWorkspaceMember = await _workSpaceService.IsWorkspaceMember(request.AssigneeId.Value, workspaceId);
+            if (isAssigneeWorkspaceMember)
+            {
+                return null;
+            }
+
+            await _logNotificatorService.SendTelegramAdminAsync(
+                $"The user submitted a request to save an issue with an assignee who is not a member of the workspace{Environment.NewLine}" +
+                $"Project id: {request.ProjectId}{Environment.NewLine}" +
+                $"User id: {request.AuthorId}{Environment.NewLine}" +
+                $"Assignee id: {request.AssigneeId}.");
+
+            return IssueErrorCodes.AssigneeNotMemberWsp;
         }
 
         public async Task<IDataResult<bool>> TrackTime(TimeTracking request)

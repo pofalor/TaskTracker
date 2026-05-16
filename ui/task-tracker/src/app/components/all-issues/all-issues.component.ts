@@ -432,7 +432,7 @@ export class AllIssuesComponent extends BaseComponent {
     issuePr.assigneeId = issue.assigneeId;
     issuePr.projectId = issue.projectId;
 
-    await t.issueService.createOrEdit(issuePr)
+    await t.issueService.update(issuePr)
       .then(async (resp: any) => {
         if (!!resp && !!resp.data) {
           issue.status = newStatus;

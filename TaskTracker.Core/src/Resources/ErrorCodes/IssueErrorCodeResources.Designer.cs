@@ -115,6 +115,15 @@ namespace TaskTracker.Core.src.Resources.ErrorCodes {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Failed to update issue. Please contact support.
+        /// </summary>
+        internal static string CannotUpdateIssue {
+            get {
+                return ResourceManager.GetString("CannotUpdateIssue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Fill in the issue description.
         /// </summary>
         internal static string EmptyDescr {

@@ -132,7 +132,8 @@ export class CreateIssueComponent extends BaseComponent {
     t.issue.assigneeId = t.formIssueAssigneeId?.value;
     t.issue.projectId = t.issueProjectId;
 
-    await t.issueService.createOrEdit(t.issue)
+    const saveIssue = t.issueId ? t.issueService.update(t.issue) : t.issueService.create(t.issue);
+    await saveIssue
       .then(async (resp: any) => {
         if (!!resp && !!resp.data) {
           t.activeModal.close(t.issue);

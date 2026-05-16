@@ -23,8 +23,13 @@ export class IssueService {
     return await lastValueFrom(res);
   }
 
-  public async createOrEdit(postRequest: CreateOrEditIssuePR): Promise<IResponse<boolean>> {
-    var res = this.api.post<boolean>(serviceApiUrl + 'add', postRequest);
+  public async create(postRequest: CreateOrEditIssuePR): Promise<IResponse<boolean>> {
+    var res = this.api.post<boolean>(serviceApiUrl + 'create', postRequest);
+    return await lastValueFrom(res);
+  }
+
+  public async update(postRequest: CreateOrEditIssuePR): Promise<IResponse<boolean>> {
+    var res = this.api.post<boolean>(serviceApiUrl + 'update', postRequest);
     return await lastValueFrom(res);
   }
 

@@ -174,4 +174,7 @@
   <data name="EstimateZeroOrLess" xml:space="preserve">
     <value>System error: the estimate is less than or equal to zero. Please contact technical support.</value>
   </data>
+  <data name="CannotUpdateIssue" xml:space="preserve">
+    <value>Failed to update issue. Please contact support</value>
+  </data>
 </root>

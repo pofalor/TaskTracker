@@ -117,6 +117,12 @@ namespace TaskTracker.Core.src.Enums.ErrorCodes
         /// Не удается создать задачу, т.к. оценка меньше нуля
         /// </summary>
         [ErrorMessage(typeof(IssueErrorCodeResources), nameof(EstimateZeroOrLess))]
-        EstimateZeroOrLess = TrackDateInFuture + 1
+        EstimateZeroOrLess = TrackDateInFuture + 1,
+
+        /// <summary>
+        /// Не удаётся обновить задачу
+        /// </summary>
+        [ErrorMessage(typeof(IssueErrorCodeResources), nameof(CannotUpdateIssue))]
+        CannotUpdateIssue = EstimateZeroOrLess + 1,
     }
 }
