@@ -2,6 +2,8 @@
 using Microsoft.Extensions.Hosting;
 using System.Net.NetworkInformation;
 using TaskTracker.Core.src.BackgroundJobs;
+using TaskTracker.Core.src.Repositories;
+using TaskTracker.Core.src.Repositories.Impl;
 using TaskTracker.Core.src.Services;
 using TaskTracker.Core.src.Services.Impl;
 
@@ -30,6 +32,15 @@ namespace TaskTracker.Core.src.Installers
             services.AddScoped<IProjectService, ProjectService>();
             services.AddScoped<IIssueService, IssueService>();
             services.AddScoped<IAutoTimeTrackService, AutoTimeTrackService>();
+
+            services.AddRepositories();
+
+            return services;
+        }
+
+        public static IServiceCollection AddRepositories(this IServiceCollection services)
+        {
+            services.AddScoped<ITimeTrackingRepository, TimeTrackingRepository>();
 
             return services;
         }

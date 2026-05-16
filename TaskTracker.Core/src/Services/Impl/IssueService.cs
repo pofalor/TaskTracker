@@ -13,6 +13,7 @@ using TaskTracker.Core.src.Enums.ErrorCodes;
 using TaskTracker.Core.src.Models.Filters;
 using TaskTracker.Core.src.Models.PostRequests;
 using TaskTracker.Core.src.Models.ResponseModels;
+using TaskTracker.Core.src.Repositories;
 using TaskTracker.Utils.src.Extensions;
 
 namespace TaskTracker.Core.src.Services.Impl
@@ -23,14 +24,20 @@ namespace TaskTracker.Core.src.Services.Impl
         private readonly ILogger<IssueService> _logger;
         private readonly IWorkspaceService _workSpaceService;
         private readonly ILogNotificatorService _logNotificatorService;
+        private readonly ITimeTrackingRepository _timeTrackingRepository;
 
-        public IssueService(ApplicationDbContext dbContext, ILogger<IssueService> logger, IWorkspaceService workSpaceService, 
-            ILogNotificatorService logNotificatorService)
+        public IssueService(
+            ApplicationDbContext dbContext,
+            ILogger<IssueService> logger,
+            IWorkspaceService workSpaceService,
+            ILogNotificatorService logNotificatorService,
+            ITimeTrackingRepository timeTrackingRepository)
         {
             _dbContext = dbContext;
             _logger = logger;
             _workSpaceService = workSpaceService;
             _logNotificatorService = logNotificatorService;
+            _timeTrackingRepository = timeTrackingRepository;
         }
 
         public async Task<IDataResult<List<IssueModel>>> GetProjectIssues(IssueFilter filter)
@@ -186,6 +193,12 @@ namespace TaskTracker.Core.src.Services.Impl
                     return result.WithError(assigneeError.Value);
                 }
 
+                var statusChangeError = await ValidateStatusChangeAsync(existingIssue, request);
+                if (statusChangeError.HasValue)
+                {
+                    return result.WithError(statusChangeError.Value);
+                }
+
                 existingIssue.Name = request.Name;
                 existingIssue.Description = request.Description;
                 existingIssue.Type = request.Type;
@@ -290,6 +303,22 @@ namespace TaskTracker.Core.src.Services.Impl
                 $"Assignee id: {request.AssigneeId}.");
 
             return IssueErrorCodes.AssigneeNotMemberWsp;
+        }
+
+        private async Task<IssueErrorCodes?> ValidateStatusChangeAsync(Issue existingIssue, Issue request)
+        {
+            if (existingIssue.Status == request.Status)
+            {
+                return null;
+            }
+
+            var hasActiveAutoTrack = await _timeTrackingRepository.HasActiveAutoTrackOnIssueAsync(existingIssue.Id);
+            if (hasActiveAutoTrack)
+            {
+                return IssueErrorCodes.IssueStatusLockedByAutoTrack;
+            }
+
+            return null;
         }
 
         public async Task<IDataResult<bool>> TrackTime(TimeTracking request)

@@ -124,5 +124,11 @@ namespace TaskTracker.Core.src.Enums.ErrorCodes
         /// </summary>
         [ErrorMessage(typeof(IssueErrorCodeResources), nameof(CannotUpdateIssue))]
         CannotUpdateIssue = EstimateZeroOrLess + 1,
+
+        /// <summary>
+        /// Нельзя изменить статус задачи при активном автоматическом трекинге времени
+        /// </summary>
+        [ErrorMessage(typeof(IssueErrorCodeResources), nameof(IssueStatusLockedByAutoTrack))]
+        IssueStatusLockedByAutoTrack = CannotUpdateIssue + 1,
     }
 }

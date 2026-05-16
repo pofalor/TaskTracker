@@ -124,6 +124,15 @@ namespace TaskTracker.Core.src.Resources.ErrorCodes {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Cannot change issue status while automatic time tracking is active on this issue. Stop or finish the timer first.
+        /// </summary>
+        internal static string IssueStatusLockedByAutoTrack {
+            get {
+                return ResourceManager.GetString("IssueStatusLockedByAutoTrack", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Fill in the issue description.
         /// </summary>
         internal static string EmptyDescr {
