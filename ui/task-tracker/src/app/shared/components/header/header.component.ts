@@ -12,7 +12,7 @@ import { TranslateService } from '@ngx-translate/core';
   styleUrl: './header.component.scss'
 })
 export class HeaderComponent {
-  public currentLang = localStorage?.getItem('localization') ?? 'en';
+  public currentLang = 'en';
   public languages = [
     { code: 'en', label: 'English' },
     { code: 'ru', label: 'Русский' }
@@ -23,7 +23,10 @@ export class HeaderComponent {
     private location: Location,
     private router: Router,
     private translate: TranslateService
-  ) {}
+  ) {
+    const hasBrowserStorage = typeof window !== 'undefined' && typeof window.localStorage !== 'undefined';
+    this.currentLang = hasBrowserStorage ? window.localStorage.getItem('localization') ?? 'en' : 'en';
+  }
 
   changeLanguage(target: Event | null) {
     let lang = target ? (target.target as HTMLSelectElement).value : null;
@@ -33,7 +36,9 @@ export class HeaderComponent {
 
     this.currentLang = lang;
     this.translate.use(lang);
-    localStorage?.setItem('localization', lang);
+    if (typeof window !== 'undefined' && typeof window.localStorage !== 'undefined') {
+      window.localStorage.setItem('localization', lang);
+    }
     if (typeof document !== 'undefined') {
       document.documentElement.lang = lang;
     }
