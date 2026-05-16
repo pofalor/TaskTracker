@@ -73,13 +73,13 @@ export class CreateIssueComponent extends BaseComponent {
     var t = this;
     this.issueForm = t.fb.group({
       formIssueName: [t.issueName, [Validators.required, Validators.maxLength(50)]],
-      formIssueType: [t.issueType, [Validators.required]],
-      formIssueStatus: [t.issueStatus, [Validators.required]],
-      formIssuePriority: [t.issuePriority, [Validators.required]],
+      formIssueType: [t.issueType],
+      formIssueStatus: [t.issueStatus],
+      formIssuePriority: [t.issuePriority],
       formIssueEstimate: [formatTimeSpentForInput(t.issueEstimate), [Validators.pattern(t.timeTrackPattern)]],
-      formIssueDescr: [t.issueDescr, [Validators.required, Validators.maxLength(500)]],
+      formIssueDescr: [t.issueDescr, [Validators.maxLength(500)]],
       formIssueParentId: [t.issueParentId, []],
-      formIssueAssigneeId: [t.issueAssigneeId, [Validators.required, Validators.min(1)]],
+      formIssueAssigneeId: [t.issueAssigneeId],
     });
 
     await Promise.all([
@@ -160,13 +160,13 @@ export class CreateIssueComponent extends BaseComponent {
     t.issue.id = t.issueId;
     t.issue.name = t.formIssueName?.value;
     t.issue.description = t.formIssueDescr?.value;
-    t.issue.type = t.formIssueType?.value;
-    t.issue.status = t.formIssueStatus?.value;
-    t.issue.priority = t.formIssuePriority?.value;
+    t.issue.type = t.formIssueType?.value ?? IssueType.Task;
+    t.issue.status = t.formIssueStatus?.value ?? IssueStatus.Backlog;
+    t.issue.priority = t.formIssuePriority?.value ?? IssuePriority.Medium;
     t.issue.estimate = t.formIssueEstimate?.value?.trim() || undefined;
     t.issue.authorId = t.userService.get()?.id;
     t.issue.parentId = t.formIssueParentId?.value ?? undefined;
-    t.issue.assigneeId = t.formIssueAssigneeId?.value;
+    t.issue.assigneeId = t.formIssueAssigneeId?.value ?? t.userService.get()?.id;
     t.issue.projectId = t.issueProjectId;
 
     const saveIssue = t.issueId ? t.issueService.update(t.issue) : t.issueService.create(t.issue);
