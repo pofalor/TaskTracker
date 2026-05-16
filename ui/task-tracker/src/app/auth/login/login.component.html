@@ -2,7 +2,7 @@
   <div class="authentication-box">
     <div class="card" style="max-width: 500px;">
       <div class="card-body">
-        <h1 class="text-center">{{"Log In"}}</h1>
+        <h1 class="text-center">{{"Log In" | lang}}</h1>
         <form class="custom-form" [formGroup]="loginForm">
           <div class="form-group pt-5">
             <input id="email-input-field" type="email" class="form-control" formControlName="email" placeholder="Email"
@@ -19,16 +19,16 @@
               </div>
           </div>
           <div *ngIf="!!errorText" class="text text-danger">
-            {{ errorText }}
+            {{ errorText | lang }}
           </div>
           <div class="form-group pt-3">
             <button id="login-button" class="btn btn-primary w-100" (click)="login()">
-              {{"Sign in"}}
+              {{"Sign in" | lang}}
             </button>
           </div>
           <div class="pt-3 text-center">
-            {{"Don't have an account yet"}}?
-            <a href="javascript:void(0)" routerLink="/register">{{"Sign Up"}}</a>
+            {{"Don't have an account yet" | lang}}?
+            <a href="javascript:void(0)" routerLink="/register">{{"Sign Up" | lang}}</a>
           </div>
         </form>
       </div>
