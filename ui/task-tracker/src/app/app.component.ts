@@ -26,7 +26,11 @@ export class AppComponent {
     private applicationRef: ApplicationRef) {
     this.translate.addLangs(['ru', 'en']);
     this.translate.setDefaultLang('en');
-    this.translate.use('en');
+    const defaultLang = localStorage?.getItem('localization') ?? 'en';
+    this.translate.use(defaultLang);
+    if (typeof document !== 'undefined') {
+      document.documentElement.lang = defaultLang;
+    }
     var t = this;
     t.router.events.subscribe((event) => {
       let intervals: Promise<any>[] = [];

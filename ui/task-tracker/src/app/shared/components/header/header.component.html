@@ -7,6 +7,11 @@
                 </a>
             </li> -->
             <li class="pr-3" style="padding-right: 1rem;">
+                <select class="form-select form-select-sm" [value]="currentLang" (change)="changeLanguage($event)">
+                    <option *ngFor="let lang of languages" [value]="lang.code">{{ lang.label }}</option>
+                </select>
+            </li>
+            <li class="pr-3" style="padding-right: 1rem;">
                 <a (click)="logout()" href="#">
                     <img src="/assets/icons/sign_out_icon.png" width="50" height="50" alt="">
                 </a>

@@ -3,6 +3,7 @@ import { AuthService } from '../../services/onlyFrontServices/auth.service';
 import { CommonModule } from '@angular/common';
 import {Location} from '@angular/common';
 import { Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-header',
@@ -11,11 +12,32 @@ import { Router } from '@angular/router';
   styleUrl: './header.component.scss'
 })
 export class HeaderComponent {
+  public currentLang = localStorage?.getItem('localization') ?? 'en';
+  public languages = [
+    { code: 'en', label: 'English' },
+    { code: 'ru', label: 'Русский' }
+  ];
+
   constructor(
     private authService: AuthService,
     private location: Location,
-    private router: Router
+    private router: Router,
+    private translate: TranslateService
   ) {}
+
+  changeLanguage(target: Event | null) {
+    let lang = target ? (target.target as HTMLSelectElement).value : null;
+    if (!lang || this.currentLang === lang) {
+      return;
+    }
+
+    this.currentLang = lang;
+    this.translate.use(lang);
+    localStorage?.setItem('localization', lang);
+    if (typeof document !== 'undefined') {
+      document.documentElement.lang = lang;
+    }
+  }
 
   logout(){
     this.authService.SignOut();
