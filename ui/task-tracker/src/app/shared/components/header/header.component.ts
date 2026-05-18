@@ -14,8 +14,8 @@ import { TranslateService } from '@ngx-translate/core';
 export class HeaderComponent {
   public currentLang = 'en';
   public languages = [
-    { code: 'en', label: 'English' },
-    { code: 'ru', label: 'Русский' }
+    { code: 'en', label: 'EN' },
+    { code: 'ru', label: 'RU' }
   ];
 
   constructor(

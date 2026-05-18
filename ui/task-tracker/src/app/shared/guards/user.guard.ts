@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, GuardResult, MaybeAsync, Router, RouterStateSnapshot } from '@angular/router';
 import { AuthService } from '../services/onlyFrontServices/auth.service';
 import { UserService } from '../services/user.service';
+import { LoaderComponent } from '../components/loader/loader.component';
 
 @Injectable({
   providedIn: 'root'
@@ -23,6 +24,7 @@ export class UserGuard implements CanActivate {
       if (!accessRoles) return true;
       if (!t.userService.getRole() || t.userService.getRole().length == 0) {
         const promise = new Promise<boolean>((resolve, reject) => {
+          LoaderComponent.setLoading(true);
           t.userService.refresh()
             .then((resp) => {
               resolve(t.verifyRole(accessRoles));
@@ -30,6 +32,9 @@ export class UserGuard implements CanActivate {
             .catch((error) => {
               resolve(t.goAway());
             })
+            .finally(() => {
+              LoaderComponent.setLoading(false);
+            });
         });
         return promise;
       }
