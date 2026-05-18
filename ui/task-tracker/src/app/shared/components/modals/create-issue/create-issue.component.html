@@ -73,6 +73,41 @@
                     <div *ngIf="elemIsInvalid(issueForm.get('formIssueEstimate'))" class="text text-danger mt-1">
                         {{textErrorStr(issueForm.get('formIssueEstimate'), timeTrackPattern) | lang}}
                     </div>
+                    <div *ngIf="estimatePrediction || estimatePredictionLoading" class="estimate-prediction mt-2">
+                        <div class="estimate-prediction__summary">
+                            <div class="estimate-prediction__main">
+                                <div class="estimate-prediction__label">{{ "Forecasted task time" | lang }}</div>
+                                <div *ngIf="estimatePrediction && !estimatePredictionLoading" class="estimate-prediction__value">
+                                    {{ formatPredictionTime(estimatePrediction.estimateSeconds) }}
+                                </div>
+                                <div *ngIf="estimatePredictionLoading" class="estimate-prediction__loading">
+                                    {{ "Calculating forecast" | lang }}
+                                </div>
+                            </div>
+                            <button class="btn btn-sm btn-primary btn-soft estimate-prediction__apply" type="button"
+                                [disabled]="!estimatePrediction || estimatePredictionLoading" (click)="applyPredictedEstimate()">
+                                {{ "Use forecast" | lang }}
+                            </button>
+                        </div>
+                        <div *ngIf="estimatePrediction && !estimatePredictionLoading" class="estimate-prediction__meta">
+                            <span>{{ estimatePrediction.usedMlModel ? 'ML.NET FastTree' : ('Historical heuristic' | lang) }}</span>
+                            <span>{{ "Confidence" | lang }}: {{ formatPredictionConfidence(estimatePrediction.confidence) }}</span>
+                        </div>
+                        <button *ngIf="estimatePrediction && !estimatePredictionLoading" class="estimate-prediction__details-btn"
+                            type="button" (click)="toggleEstimatePredictionDetails()">
+                            {{ (showEstimatePredictionDetails ? "Hide explanation" : "Show explanation") | lang }}
+                        </button>
+                        <div *ngIf="showEstimatePredictionDetails && estimatePrediction && !estimatePredictionLoading"
+                            class="estimate-prediction__details">
+                            <div *ngFor="let factor of estimatePrediction.factors" class="estimate-prediction__factor">
+                                <div class="estimate-prediction__factor-title">
+                                    <span>{{ factor.name | lang }}</span>
+                                    <strong>{{ factor.value | lang }}</strong>
+                                </div>
+                                <div class="estimate-prediction__factor-description">{{ factor.description | lang }}</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="col-12 pb-3">
                     <label class="mb-1">{{ "Issue priority" | lang }}</label>

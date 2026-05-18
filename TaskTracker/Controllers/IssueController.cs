@@ -23,17 +23,20 @@ namespace TaskTracker.Web.Api.Controllers
         private readonly ILogger<IssueController> _logger;
         private readonly IWorkspaceService _workSpaceService;
         private readonly IIssueService _issueService;
+        private readonly IIssueEstimatePredictionService _issueEstimatePredictionService;
         private readonly IMapper _mapper;
         private readonly ILogNotificatorService _logNotificatorService;
 
         public IssueController(ILogger<IssueController> logger, IWorkspaceService workSpaceService,
-            IMapper mapper, IUserService userService, ILogNotificatorService logNotificatorService, IIssueService issueService)
+            IMapper mapper, IUserService userService, ILogNotificatorService logNotificatorService,
+            IIssueService issueService, IIssueEstimatePredictionService issueEstimatePredictionService)
         {
             _logger = logger;
             _workSpaceService = workSpaceService;
             _mapper = mapper;
             _logNotificatorService = logNotificatorService;
             _issueService = issueService;
+            _issueEstimatePredictionService = issueEstimatePredictionService;
         }
 
         [Route("getProjectIssues")]
@@ -131,6 +134,30 @@ namespace TaskTracker.Web.Api.Controllers
                 _logger.LogError(ex, "Error while sending request to update issue.{NewLine}{Parameter}:{Request}{NewLine2}",
                    Environment.NewLine, nameof(request), request?.ToJson(), Environment.NewLine);
                 return response.WithError(IssueErrorCodes.CannotCreateIssue);
+            }
+        }
+
+        [Route("predictEstimate")]
+        [HttpPost]
+        [WorkspaceMemberFilter(WorkspaceMemberResourceType.Project)]
+        public async Task<DataResponse<IssueEstimatePredictionModel>> PredictEstimate(IssueEstimatePredictionPR request)
+        {
+            var response = new DataResponse<IssueEstimatePredictionModel>();
+
+            try
+            {
+                var result = await _issueEstimatePredictionService.PredictEstimateAsync(request);
+
+                if (result.Success)
+                    return response.WithData(result.Data);
+                else
+                    return response.WithError(result.Errors[0]);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while sending request to predict issue estimate.{NewLine}{Parameter}:{Request}{NewLine2}",
+                   Environment.NewLine, nameof(request), request?.ToJson(), Environment.NewLine);
+                return response.WithError(IssueErrorCodes.CannotGetIssues);
             }
         }
 
