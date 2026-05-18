@@ -7,12 +7,16 @@ import { Component } from '@angular/core';
     styleUrl: './loader.component.scss'
 })
 export class LoaderComponent {
-  private static activeLoaders = 0;
+  private static activeLoaders = 1;
 
   public static setLoading(isLoading: boolean) {
     LoaderComponent.activeLoaders = isLoading
       ? LoaderComponent.activeLoaders + 1
       : Math.max(LoaderComponent.activeLoaders - 1, 0);
+
+    if (typeof document === 'undefined') {
+      return;
+    }
 
     var preloader = document.getElementById("preloader");
     if(!!preloader){
@@ -26,6 +30,10 @@ export class LoaderComponent {
 
   public static reset() {
     LoaderComponent.activeLoaders = 0;
+    if (typeof document === 'undefined') {
+      return;
+    }
+
     var preloader = document.getElementById("preloader");
     if(!!preloader){
       preloader.style.display = 'none';

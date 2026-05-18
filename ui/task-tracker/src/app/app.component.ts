@@ -1,5 +1,5 @@
 import { ApplicationRef, Component } from '@angular/core';
-import { RouterOutlet, RouterLink, RouterLinkActive, Router } from '@angular/router';
+import { NavigationEnd, RouterOutlet, RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { LoaderComponent } from './shared/components/loader/loader.component';
 import { TranslateModule } from '@ngx-translate/core';
 import {TranslateService} from "@ngx-translate/core";
@@ -35,6 +35,10 @@ export class AppComponent {
     var t = this;
     t.router.events.subscribe((event) => {
       let intervals: Promise<any>[] = [];
+      if (event instanceof NavigationEnd) {
+        LoaderComponent.setLoading(false);
+      }
+
       if (t.authService.isLoggedIn && t.applicationRef.isStable) {
         if (!t.userService.get() && !t.requestSent) {
           //костыль, чтобы не летела куча запросов на бек

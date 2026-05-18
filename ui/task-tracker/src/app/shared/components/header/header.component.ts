@@ -1,9 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AuthService } from '../../services/onlyFrontServices/auth.service';
 import { CommonModule } from '@angular/common';
 import {Location} from '@angular/common';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-header',
@@ -11,12 +12,13 @@ import { TranslateService } from '@ngx-translate/core';
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'
 })
-export class HeaderComponent {
+export class HeaderComponent implements OnInit, OnDestroy {
   public currentLang = 'en';
   public languages = [
     { code: 'en', label: 'EN' },
     { code: 'ru', label: 'RU' }
   ];
+  private langChangeSubscription: Subscription | undefined;
 
   constructor(
     private authService: AuthService,
@@ -24,8 +26,17 @@ export class HeaderComponent {
     private router: Router,
     private translate: TranslateService
   ) {
-    const hasBrowserStorage = typeof window !== 'undefined' && typeof window.localStorage !== 'undefined';
-    this.currentLang = hasBrowserStorage ? window.localStorage.getItem('localization') ?? 'en' : 'en';
+    this.syncCurrentLanguage();
+  }
+
+  ngOnInit() {
+    this.langChangeSubscription = this.translate.onLangChange.subscribe((event) => {
+      this.currentLang = event.lang;
+    });
+  }
+
+  ngOnDestroy() {
+    this.langChangeSubscription?.unsubscribe();
   }
 
   changeLanguage(target: Event | null) {
@@ -49,6 +60,7 @@ export class HeaderComponent {
   }
 
   isLoggedIn(){
+    this.syncCurrentLanguage();
     return this.authService.isLoggedIn;
   }
 
@@ -58,5 +70,11 @@ export class HeaderComponent {
       this.location.back();
     else 
       this.router.navigate(['/login']);
+  }
+
+  private syncCurrentLanguage() {
+    const hasBrowserStorage = typeof window !== 'undefined' && typeof window.localStorage !== 'undefined';
+    const storedLang = hasBrowserStorage ? window.localStorage.getItem('localization') : null;
+    this.currentLang = storedLang || this.translate.currentLang || 'en';
   }
 }
