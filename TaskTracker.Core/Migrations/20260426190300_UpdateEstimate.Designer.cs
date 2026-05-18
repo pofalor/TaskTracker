@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TaskTracker.Core.src.DataAccess;
@@ -11,9 +12,11 @@ using TaskTracker.Core.src.DataAccess;
 namespace TaskTracker.Core.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260426190300_UpdateEstimate")]
+    partial class UpdateEstimate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -42,6 +45,9 @@ namespace TaskTracker.Core.Migrations
                         .HasColumnType("text")
                         .HasColumnName("description");
 
+                    b.Property<int?>("EpicId")
+                        .HasColumnType("integer");
+
                     b.Property<TimeSpan?>("Estimate")
                         .HasColumnType("interval")
                         .HasColumnName("estimate");
@@ -67,9 +73,6 @@ namespace TaskTracker.Core.Migrations
                     b.Property<DateTime>("ObjectEditDate")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("object_edit_date");
-
-                    b.Property<int?>("ParentId")
-                        .HasColumnType("integer");
 
                     b.Property<int>("Priority")
                         .ValueGeneratedOnAdd()
@@ -106,73 +109,15 @@ namespace TaskTracker.Core.Migrations
 
                     b.HasIndex("AuthorId");
 
+                    b.HasIndex("EpicId");
+
                     b.HasIndex("Index")
                         .HasDatabaseName("index");
-
-                    b.HasIndex("ParentId");
 
                     b.HasIndex("ProjectId", "Index")
                         .IsUnique();
 
                     b.ToTable("Issue", (string)null);
-                });
-
-            modelBuilder.Entity("TaskTracker.Core.src.Entities.IssueStatusHistory", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("ChangedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("changed_at");
-
-                    b.Property<int>("ChangedByUserId")
-                        .HasColumnType("integer");
-
-                    b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(false)
-                        .HasColumnName("is_deleted");
-
-                    b.Property<int>("IssueId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("NewStatus")
-                        .HasColumnType("integer")
-                        .HasColumnName("new_status");
-
-                    b.Property<DateTime>("ObjectCreateDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("object_create_date");
-
-                    b.Property<DateTime>("ObjectEditDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("object_edit_date");
-
-                    b.Property<int?>("OldStatus")
-                        .HasColumnType("integer")
-                        .HasColumnName("old_status");
-
-                    b.Property<byte[]>("Version")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("bytea")
-                        .HasColumnName("version")
-                        .HasDefaultValueSql("gen_random_bytes(8)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ChangedByUserId");
-
-                    b.HasIndex("IssueId");
-
-                    b.ToTable("IssueStatusHistory", (string)null);
                 });
 
             modelBuilder.Entity("TaskTracker.Core.src.Entities.Project", b =>
@@ -600,9 +545,9 @@ namespace TaskTracker.Core.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TaskTracker.Core.src.Entities.Issue", "Parent")
-                        .WithMany("Children")
-                        .HasForeignKey("ParentId");
+                    b.HasOne("TaskTracker.Core.src.Entities.Issue", "Epic")
+                        .WithMany()
+                        .HasForeignKey("EpicId");
 
                     b.HasOne("TaskTracker.Core.src.Entities.Project", "Project")
                         .WithMany()
@@ -614,28 +559,9 @@ namespace TaskTracker.Core.Migrations
 
                     b.Navigation("Author");
 
-                    b.Navigation("Parent");
+                    b.Navigation("Epic");
 
                     b.Navigation("Project");
-                });
-
-            modelBuilder.Entity("TaskTracker.Core.src.Entities.IssueStatusHistory", b =>
-                {
-                    b.HasOne("TaskTracker.Core.src.Entities.User", "ChangedByUser")
-                        .WithMany()
-                        .HasForeignKey("ChangedByUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("TaskTracker.Core.src.Entities.Issue", "Issue")
-                        .WithMany()
-                        .HasForeignKey("IssueId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ChangedByUser");
-
-                    b.Navigation("Issue");
                 });
 
             modelBuilder.Entity("TaskTracker.Core.src.Entities.Project", b =>
@@ -739,11 +665,6 @@ namespace TaskTracker.Core.Migrations
                     b.Navigation("User");
 
                     b.Navigation("Workspace");
-                });
-
-            modelBuilder.Entity("TaskTracker.Core.src.Entities.Issue", b =>
-                {
-                    b.Navigation("Children");
                 });
 #pragma warning restore 612, 618
         }

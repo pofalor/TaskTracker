@@ -115,6 +115,60 @@ namespace TaskTracker.Core.src.Resources.ErrorCodes {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Failed to update issue. Please contact support.
+        /// </summary>
+        internal static string CannotUpdateIssue {
+            get {
+                return ResourceManager.GetString("CannotUpdateIssue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Cannot change issue status while automatic time tracking is active on this issue. Stop or finish the timer first.
+        /// </summary>
+        internal static string IssueStatusLockedByAutoTrack {
+            get {
+                return ResourceManager.GetString("IssueStatusLockedByAutoTrack", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на An issue cannot be its own parent.
+        /// </summary>
+        internal static string ParentCannotBeSelf {
+            get {
+                return ResourceManager.GetString("ParentCannotBeSelf", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Parent issue is specified incorrectly. Please select another parent issue or contact support.
+        /// </summary>
+        internal static string ParentIssueInvalid {
+            get {
+                return ResourceManager.GetString("ParentIssueInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Parent issue was not found. Please select another parent issue.
+        /// </summary>
+        internal static string ParentIssueNotSet {
+            get {
+                return ResourceManager.GetString("ParentIssueNotSet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Parent issue must belong to the same project.
+        /// </summary>
+        internal static string ParentIssueWrongProject {
+            get {
+                return ResourceManager.GetString("ParentIssueWrongProject", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Fill in the issue description.
         /// </summary>
         internal static string EmptyDescr {
@@ -129,6 +183,15 @@ namespace TaskTracker.Core.src.Resources.ErrorCodes {
         internal static string EmptyName {
             get {
                 return ResourceManager.GetString("EmptyName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на System error: the estimate is less than or equal to zero. Please contact technical support..
+        /// </summary>
+        internal static string EstimateZeroOrLess {
+            get {
+                return ResourceManager.GetString("EstimateZeroOrLess", resourceCulture);
             }
         }
         

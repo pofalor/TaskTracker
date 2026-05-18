@@ -24,15 +24,16 @@ namespace TaskTracker.Core.src.Entities
         /// <summary>
         /// Оценка задачи
         /// </summary>
-        public TimeSpan Estimate { get; set; }
+        public TimeSpan? Estimate { get; set; }
 
         /// <summary>
         /// Порядковый номер задачи внутри проекта
         /// </summary>
         public int Index { get; set; }
 
-        public Issue? Epic { get; set; }
-        public int? EpicId { get; set; }
+        public Issue? Parent { get; set; }
+        public int? ParentId { get; set; }
+        public ICollection<Issue> Children { get; set; } = new List<Issue>();
 
         public User Author { get; set; } = null!;
         public int AuthorId { get; set; }

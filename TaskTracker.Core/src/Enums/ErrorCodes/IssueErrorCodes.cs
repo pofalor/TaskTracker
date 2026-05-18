@@ -111,6 +111,48 @@ namespace TaskTracker.Core.src.Enums.ErrorCodes
         /// Не удаётся списать часы, т.к. дата начала в будущем
         /// </summary>
         [ErrorMessage(typeof(IssueErrorCodeResources), nameof(TrackDateInFuture))]
-        TrackDateInFuture = TrackDateNotSet + 1
+        TrackDateInFuture = TrackDateNotSet + 1,
+
+        /// <summary>
+        /// Не удается создать задачу, т.к. оценка меньше нуля
+        /// </summary>
+        [ErrorMessage(typeof(IssueErrorCodeResources), nameof(EstimateZeroOrLess))]
+        EstimateZeroOrLess = TrackDateInFuture + 1,
+
+        /// <summary>
+        /// Не удаётся обновить задачу
+        /// </summary>
+        [ErrorMessage(typeof(IssueErrorCodeResources), nameof(CannotUpdateIssue))]
+        CannotUpdateIssue = EstimateZeroOrLess + 1,
+
+        /// <summary>
+        /// Нельзя изменить статус задачи при активном автоматическом трекинге времени
+        /// </summary>
+        [ErrorMessage(typeof(IssueErrorCodeResources), nameof(IssueStatusLockedByAutoTrack))]
+        IssueStatusLockedByAutoTrack = CannotUpdateIssue + 1,
+
+        /// <summary>
+        /// Родительская задача указана некорректно
+        /// </summary>
+        [ErrorMessage(typeof(IssueErrorCodeResources), nameof(ParentIssueInvalid))]
+        ParentIssueInvalid = IssueStatusLockedByAutoTrack + 1,
+
+        /// <summary>
+        /// Родительская задача не найдена
+        /// </summary>
+        [ErrorMessage(typeof(IssueErrorCodeResources), nameof(ParentIssueNotSet))]
+        ParentIssueNotSet = ParentIssueInvalid + 1,
+
+        /// <summary>
+        /// Родительская задача из другого проекта
+        /// </summary>
+        [ErrorMessage(typeof(IssueErrorCodeResources), nameof(ParentIssueWrongProject))]
+        ParentIssueWrongProject = ParentIssueNotSet + 1,
+
+        /// <summary>
+        /// Задача не может быть родителем самой себе
+        /// </summary>
+        [ErrorMessage(typeof(IssueErrorCodeResources), nameof(ParentCannotBeSelf))]
+        ParentCannotBeSelf = ParentIssueWrongProject + 1,
     }
 }

@@ -7,6 +7,7 @@ import { firstValueFrom, map } from 'rxjs';
 import { AuthenticatePostRequest } from '../../model/postRequests/authenticatePostRequest';
 import { UserService } from '../user.service';
 import { EventService } from './event.service';
+import { LoaderComponent } from '../../components/loader/loader.component';
 
 
 @Injectable({
@@ -76,10 +77,15 @@ export class AuthService implements OnInit {
 
   // Sign out
   SignOut() {
+    const localization = localStorage?.getItem("localization");
     window.stop();
     this.authData = null;
     this.eventService.logout();
-    localStorage.clear(); //сбрасывает язык в localStorage (по дефолту 'en')
+    localStorage.clear();
+    if (!!localization) {
+      localStorage.setItem("localization", localization);
+    }
+    LoaderComponent.reset();
     this.router.navigate(['/login']);
   }
 

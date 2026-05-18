@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using NLog.Filters;
 using TaskTracker.Controllers.BaseControllers;
+using TaskTracker.Web.Api.Attributes;
 using TaskTracker.Core.src.Constants;
 using TaskTracker.Core.src.Entities;
 using TaskTracker.Core.src.Enums.ErrorCodes;
@@ -68,15 +69,15 @@ namespace TaskTracker.Web.Api.Controllers
             }
         }
 
-        [Route("add")]
+        [Route("create")]
         [HttpPost]
-        public async Task<DataResponse<bool>> CreateOrEdit(CreateOrEditIssuePR request)
+        [WorkspaceMemberFilter(WorkspaceMemberResourceType.Project)]
+        public async Task<DataResponse<bool>> CreateIssue(CreateOrEditIssuePR request)
         {
             var response = new DataResponse<bool>();
 
             try
             {
-
                 if (!request.AuthorId.HasValue)
                     request.AuthorId = UserId;
 
@@ -90,7 +91,7 @@ namespace TaskTracker.Web.Api.Controllers
                 }
 
                 var mapRes = _mapper.Map<Issue>(request);
-                var result = await _issueService.CreateOrEdit(mapRes);
+                var result = await _issueService.CreateIssue(mapRes);
 
                 if (result.Success)
                     return response.WithData(result.Data);
@@ -99,7 +100,35 @@ namespace TaskTracker.Web.Api.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error while sending request to add or change issue.{NewLine}{Parameter}:{Request}{NewLine2}",
+                _logger.LogError(ex, "Error while sending request to create issue.{NewLine}{Parameter}:{Request}{NewLine2}",
+                   Environment.NewLine, nameof(request), request?.ToJson(), Environment.NewLine);
+                return response.WithError(IssueErrorCodes.CannotCreateIssue);
+            }
+        }
+
+        [Route("update")]
+        [HttpPost]
+        [WorkspaceMemberFilter(WorkspaceMemberResourceType.Issue)]
+        public async Task<DataResponse<bool>> UpdateIssue(CreateOrEditIssuePR request)
+        {
+            var response = new DataResponse<bool>();
+
+            try
+            {
+                if (!request.AuthorId.HasValue)
+                    request.AuthorId = UserId;
+
+                var mapRes = _mapper.Map<Issue>(request);
+                var result = await _issueService.UpdateIssue(mapRes, UserId);
+
+                if (result.Success)
+                    return response.WithData(result.Data);
+                else
+                    return response.WithError(result.Errors[0]);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while sending request to update issue.{NewLine}{Parameter}:{Request}{NewLine2}",
                    Environment.NewLine, nameof(request), request?.ToJson(), Environment.NewLine);
                 return response.WithError(IssueErrorCodes.CannotCreateIssue);
             }

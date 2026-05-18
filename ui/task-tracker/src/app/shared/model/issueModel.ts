@@ -12,7 +12,9 @@ export class IssueModel {
     priority!: IssuePriority;
     estimate!: string;
     index!: number;
-    epicId: number | undefined;
+    parentId: number | undefined;
+    parentKey: string | undefined;
+    childIssueKeys: string[] = [];
     authorId!: number;
     assigneeId!: number;
     projectId!: number;

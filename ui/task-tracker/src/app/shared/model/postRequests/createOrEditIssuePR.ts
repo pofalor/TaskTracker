@@ -11,7 +11,7 @@ export class CreateOrEditIssuePR {
     priority!: IssuePriority;
     estimate: string | undefined;
     index!: number;
-    epicId: number | undefined;
+    parentId: number | undefined;
     authorId: number | undefined;
     assigneeId: number | undefined;
     projectId!: number;

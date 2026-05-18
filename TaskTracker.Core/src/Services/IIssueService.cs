@@ -11,6 +11,8 @@ namespace TaskTracker.Core.src.Services
 
         Task<IDataResult<bool>> TrackTime(TimeTracking request);
 
-        Task<IDataResult<bool>> CreateOrEdit(Issue request);
+        Task<IDataResult<bool>> CreateIssue(Issue request);
+
+        Task<IDataResult<bool>> UpdateIssue(Issue request, int userId);
     }
 }

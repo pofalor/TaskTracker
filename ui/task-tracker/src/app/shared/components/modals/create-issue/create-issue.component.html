@@ -40,7 +40,7 @@
                     <label class="mb-1">{{ "Issue type" | lang }}</label>
                     <ng-select appearance="outline" class="br-10" id="mgr-input-field" formControlName="formIssueType">
                         <ng-option *ngFor="let type of issueTypeArray" class="br-10" [value]="type.value">
-                            {{ type.label }}
+                            {{ 'issueType.' + type.value | lang }}
                         </ng-option>
                     </ng-select>
                     <div *ngIf="elemIsInvalid(issueForm.get('formIssueType'))" class="text text-danger mt-1">
@@ -51,7 +51,7 @@
                     <label class="mb-1">{{ "Issue status" | lang }}</label>
                     <ng-select appearance="outline" class="br-10" id="mgr-input-field" formControlName="formIssueStatus">
                         <ng-option *ngFor="let status of IssueStatuses" class="br-10" [value]="status.key">
-                            {{ status.value }}
+                            {{ 'issueStatus.' + status.key | lang }}
                         </ng-option>
                     </ng-select>
                     <div *ngIf="elemIsInvalid(issueForm.get('formIssueStatus'))" class="text text-danger mt-1">
@@ -59,28 +59,32 @@
                     </div>
                 </div>
                 <div class="col-12 pb-3">
+                    <label class="mb-1">{{ "Parent issue" | lang }}</label>
+                    <ng-select appearance="outline" class="br-10" formControlName="formIssueParentId" [clearable]="true">
+                        <ng-option *ngFor="let parentIssue of parentIssueCandidates" class="br-10" [value]="parentIssue.id">
+                            {{ getIssueKey(parentIssue) }} — {{ parentIssue.name }}
+                        </ng-option>
+                    </ng-select>
+                </div>
+                <div class="col-12 pb-3">
+                    <label class="mb-1">{{ "Estimate" | lang }}</label>
+                    <input type="text" class="form-control" formControlName="formIssueEstimate"
+                        placeholder="{{'Use the format: 2h 3m 11s' | lang}}" />
+                    <div *ngIf="elemIsInvalid(issueForm.get('formIssueEstimate'))" class="text text-danger mt-1">
+                        {{textErrorStr(issueForm.get('formIssueEstimate'), timeTrackPattern) | lang}}
+                    </div>
+                </div>
+                <div class="col-12 pb-3">
                     <label class="mb-1">{{ "Issue priority" | lang }}</label>
                     <ng-select appearance="outline" class="br-10" id="mgr-input-field" formControlName="formIssuePriority">
                         <ng-option *ngFor="let priority of issuePriorityArray" class="br-10" [value]="priority.value">
-                            {{ priority.label }}
+                            {{ 'issuePriority.' + priority.value | lang }}
                         </ng-option>
                     </ng-select>
                     <div *ngIf="elemIsInvalid(issueForm.get('formIssuePriority'))" class="text text-danger mt-1">
                         {{textErrorStr(issueForm.get('formIssuePriority')) | lang}}
                     </div>
                 </div>
-                <!-- Оценки пока нету -->
-                <!-- <div class="col-12 pb-3">
-                    <label>{{ "Project manager" | lang }}</label>
-                    <ng-select appearance="outline" class="br-10" id="mgr-input-field" formControlName="formIssueEstimate">
-                        <ng-option *ngFor="let mgr of projectMgrCandidates" class="br-10" [value]="mgr.id">
-                            {{ mgr.name }}
-                        </ng-option>
-                    </ng-select>
-                    <div *ngIf="elemIsInvalid(issueForm.get('formIssueEstimate'))" class="text text-danger mt-1">
-                        {{textErrorStr(issueForm.get('formIssueEstimate')) | lang}}
-                    </div>
-                </div> -->
             </div>
         </form>
         <div class="row">

@@ -24,14 +24,14 @@ namespace TaskTracker.Core.src.Models.PostRequests
         /// <summary>
         /// Оценка задачи
         /// </summary>
-        public string Estimate { get; set; } = string.Empty;
+        public string? Estimate { get; set; } = string.Empty;
 
         /// <summary>
         /// Порядковый номер задачи внутри проекта
         /// </summary>
         public int Index { get; set; }
 
-        public int? EpicId { get; set; }
+        public int? ParentId { get; set; }
 
         public int? AuthorId { get; set; }
 

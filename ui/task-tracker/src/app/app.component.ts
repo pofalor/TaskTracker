@@ -1,5 +1,5 @@
 import { ApplicationRef, Component } from '@angular/core';
-import { RouterOutlet, RouterLink, RouterLinkActive, Router } from '@angular/router';
+import { NavigationEnd, RouterOutlet, RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { LoaderComponent } from './shared/components/loader/loader.component';
 import { TranslateModule } from '@ngx-translate/core';
 import {TranslateService} from "@ngx-translate/core";
@@ -26,10 +26,19 @@ export class AppComponent {
     private applicationRef: ApplicationRef) {
     this.translate.addLangs(['ru', 'en']);
     this.translate.setDefaultLang('en');
-    this.translate.use('en');
+    const hasBrowserStorage = typeof window !== 'undefined' && typeof window.localStorage !== 'undefined';
+    const defaultLang = hasBrowserStorage ? window.localStorage.getItem('localization') ?? 'en' : 'en';
+    this.translate.use(defaultLang);
+    if (typeof document !== 'undefined') {
+      document.documentElement.lang = defaultLang;
+    }
     var t = this;
     t.router.events.subscribe((event) => {
       let intervals: Promise<any>[] = [];
+      if (event instanceof NavigationEnd) {
+        LoaderComponent.setLoading(false);
+      }
+
       if (t.authService.isLoggedIn && t.applicationRef.isStable) {
         if (!t.userService.get() && !t.requestSent) {
           //костыль, чтобы не летела куча запросов на бек
