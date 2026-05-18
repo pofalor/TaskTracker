@@ -133,12 +133,12 @@ export abstract class BaseComponent {
   protected showSuccess(message: string, titleMes: string = 'System'): Promise<any> {
     var t = this;
 
-    var mes =  message;
-    var title = titleMes;
+    var mes = t.translateService.instant(message);
+    var title = t.translateService.instant(titleMes);
 
     var modalInfo = new ModalInfoModel();
-    modalInfo.title = !!title ? title : mes;
-    modalInfo.description = !!title ? mes : '';
+    modalInfo.title = !!titleMes ? title : mes;
+    modalInfo.description = !!titleMes ? mes : '';
     modalInfo.showDeclineButton = false;
 
     return t.showModal(modalInfo);
@@ -155,8 +155,8 @@ export abstract class BaseComponent {
 
     var modalInfo = new ModalInfoModel();
     //информативный блок
-    modalInfo.title = title;
-    modalInfo.description = message;
+    modalInfo.title = t.translateService.instant(title);
+    modalInfo.description = t.translateService.instant(message);
     modalInfo.showDeclineButton = showDeclineButton;
     modalInfo.buttonConfirm = confirmButtonText;
     return t.showModal(modalInfo);

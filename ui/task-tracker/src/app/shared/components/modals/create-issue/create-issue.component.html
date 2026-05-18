@@ -40,7 +40,7 @@
                     <label class="mb-1">{{ "Issue type" | lang }}</label>
                     <ng-select appearance="outline" class="br-10" id="mgr-input-field" formControlName="formIssueType">
                         <ng-option *ngFor="let type of issueTypeArray" class="br-10" [value]="type.value">
-                            {{ type.label }}
+                            {{ 'issueType.' + type.value | lang }}
                         </ng-option>
                     </ng-select>
                     <div *ngIf="elemIsInvalid(issueForm.get('formIssueType'))" class="text text-danger mt-1">
@@ -51,7 +51,7 @@
                     <label class="mb-1">{{ "Issue status" | lang }}</label>
                     <ng-select appearance="outline" class="br-10" id="mgr-input-field" formControlName="formIssueStatus">
                         <ng-option *ngFor="let status of IssueStatuses" class="br-10" [value]="status.key">
-                            {{ status.value }}
+                            {{ 'issueStatus.' + status.key | lang }}
                         </ng-option>
                     </ng-select>
                     <div *ngIf="elemIsInvalid(issueForm.get('formIssueStatus'))" class="text text-danger mt-1">
@@ -78,7 +78,7 @@
                     <label class="mb-1">{{ "Issue priority" | lang }}</label>
                     <ng-select appearance="outline" class="br-10" id="mgr-input-field" formControlName="formIssuePriority">
                         <ng-option *ngFor="let priority of issuePriorityArray" class="br-10" [value]="priority.value">
-                            {{ priority.label }}
+                            {{ 'issuePriority.' + priority.value | lang }}
                         </ng-option>
                     </ng-select>
                     <div *ngIf="elemIsInvalid(issueForm.get('formIssuePriority'))" class="text text-danger mt-1">

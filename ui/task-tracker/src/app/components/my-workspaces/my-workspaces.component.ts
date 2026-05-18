@@ -149,8 +149,10 @@ export class MyWorkspacesComponent extends BaseComponent {
 
   public async changeReviewStatus(newStatus: WorkspaceReviewStatus, workspace: WorkspaceModel, needLoader: boolean = true) {
     var t = this;
-    var action = newStatus == WorkspaceReviewStatus.Approved ? "approve" : "decline";
-    t.showConfirm(`Are you sure you want to ${action} workspace?`, "Confirm the action", true, "Yes")
+    var confirmMessage = newStatus == WorkspaceReviewStatus.Approved
+      ? "Are you sure you want to approve workspace?"
+      : "Are you sure you want to decline workspace?";
+    t.showConfirm(confirmMessage, "Confirm the action", true, "Yes")
           .then(async (result) => {
             if (result) {
               t.setLoading(true);
@@ -161,8 +163,10 @@ export class MyWorkspacesComponent extends BaseComponent {
               await t.workspaceService.changeWorkspaceReviewStatus(request)
                 .then(async (resp: any) => {
                   if(resp){
-                    var newAction = newStatus == WorkspaceReviewStatus.Approved ? "approved" : "declined";
-                    t.showSuccess("Workspace successfully " + newAction);
+                    var successMessage = newStatus == WorkspaceReviewStatus.Approved
+                      ? "Workspace successfully approved"
+                      : "Workspace successfully declined";
+                    t.showSuccess(successMessage, "Success");
                     await t.getWorkspacesForCheck(false);
                   }
                 })
@@ -232,8 +236,9 @@ export class MyWorkspacesComponent extends BaseComponent {
   setRequestStatus(accept: boolean, inviteId: number) {
     var t = this;
     var modalInfo = new ModalInfoModel();
-    var result = accept ? "accept" : "decline";
-    modalInfo.title = `Are you sure you want to ${result} the request to join the workspace?`;
+    modalInfo.title = accept
+      ? "Are you sure you want to accept the request to join the workspace?"
+      : "Are you sure you want to decline the request to join the workspace?";
     modalInfo.showDescription = false;
     modalInfo.buttonConfirm = "Yes";
     modalInfo.buttonDecline = "No";
@@ -257,8 +262,10 @@ export class MyWorkspacesComponent extends BaseComponent {
         if (resp) {
           await t.getMyWorkspaces(t, false);
           await t.getMyInvitations(false);
-          var result = accept ? "accepted" : "declined";
-          t.showSuccess(`Request successfully ${result}`, "Success");
+          var successMessage = accept
+            ? "Request successfully accepted"
+            : "Request successfully declined";
+          t.showSuccess(successMessage, "Success");
         }
       })
       .catch((e) => {

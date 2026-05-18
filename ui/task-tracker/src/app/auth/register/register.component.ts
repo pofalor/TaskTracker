@@ -52,7 +52,7 @@ export class RegisterComponent extends BaseComponent {
   ngOnInit() {
     var t = this;
     if(t.authService.isLoggedIn){
-      t.authService.SignOut();
+      t.router.navigateByUrl('/my-workspaces');
     }
   }
 

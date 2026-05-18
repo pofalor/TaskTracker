@@ -1,16 +1,18 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-light" style="justify-content: right;" *ngIf="isLoggedIn()">
-    <div class="navbar navbar-light bg-light">
-        <ul class="navbar-nav">
-            <!-- <li class="px-3 py-1">
-                <a (click)="back()" href="#">
-                    <img src="/assets/icons/chevron_left_icon.png" width="45" height="45" alt="">
-                </a>
-            </li> -->
-            <li class="pr-3" style="padding-right: 1rem;">
-                <a (click)="logout()" href="#">
-                    <img src="/assets/icons/sign_out_icon.png" width="50" height="50" alt="">
-                </a>
-            </li>
-        </ul>
+<nav class="app-header navbar navbar-expand-lg navbar-light bg-light" *ngIf="isLoggedIn()">
+    <div class="header-actions">
+        <!-- <button class="header-icon-button" type="button" (click)="back()" aria-label="Back">
+            <img src="/assets/icons/chevron_left_icon.png" width="28" height="28" alt="">
+        </button> -->
+
+        <label class="language-control" aria-label="Language">
+            <span class="language-control__label">Lang</span>
+            <select class="language-control__select" [value]="currentLang" (change)="changeLanguage($event)">
+                <option *ngFor="let lang of languages" [value]="lang.code">{{ lang.label }}</option>
+            </select>
+        </label>
+
+        <button class="header-icon-button sign-out-button" type="button" (click)="logout()" aria-label="Sign out">
+            <img src="/assets/icons/sign_out_icon.png" width="38" height="38" alt="">
+        </button>
     </div>
 </nav>

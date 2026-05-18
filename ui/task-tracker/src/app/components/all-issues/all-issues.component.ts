@@ -51,7 +51,7 @@ export class AllIssuesComponent extends BaseComponent {
   timerSubscription: Subscription | null = null;
   activeIssue: IssueModel | undefined;
   AutoTrackTimeStatus = AutoTrackTimeStatus;
-  isKanbanView: boolean = false;
+  isKanbanView: boolean = true;
   kanbanStatuses: IssueStatus[] = [
     IssueStatus.Backlog,
     IssueStatus.SelectedForDevelopment,

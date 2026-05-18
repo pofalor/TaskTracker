@@ -39,7 +39,7 @@ export class LoginComponent extends BaseComponent implements OnInit {
   ngOnInit() {
     var t = this;
     if(t.authService.isLoggedIn){
-      t.authService.SignOut();
+      t.router.navigateByUrl('/my-workspaces');
     }
   }
 
@@ -57,9 +57,9 @@ export class LoginComponent extends BaseComponent implements OnInit {
     }
     
     await t.authService.SignIn(loginCred)
-      .then(() => {
-        t.userService.init();
-        t.router.navigateByUrl('/my-workspaces');
+      .then(async () => {
+        await t.userService.init();
+        await t.router.navigateByUrl('/my-workspaces');
       })
       .catch((e) => {
         if (!!e.error && !!e.error.errors && !!e.error.errors[0].message) {
