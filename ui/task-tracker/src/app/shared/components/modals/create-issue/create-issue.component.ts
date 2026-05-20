@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnDestroy } from '@angular/core';
 import { CreateOrEditIssuePR } from '../../../model/postRequests/createOrEditIssuePR';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -18,6 +18,9 @@ import { IssueStatuses } from '../../../constants/issue-statuses';
 import { IssueModel } from '../../../model/issueModel';
 import { IssueFilter } from '../../../model/filters/issueFilter';
 import { formatTimeSpentForInput } from '../../../utils/timeTrackUtils';
+import { IssueEstimatePredictionModel } from '../../../model/issueEstimatePredictionModel';
+import { IssueEstimatePredictionPR } from '../../../model/postRequests/issueEstimatePredictionPR';
+import { Subject, debounceTime, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-create-issue',
@@ -26,7 +29,7 @@ import { formatTimeSpentForInput } from '../../../utils/timeTrackUtils';
   templateUrl: './create-issue.component.html',
   styleUrl: './create-issue.component.scss'
 })
-export class CreateIssueComponent extends BaseComponent {
+export class CreateIssueComponent extends BaseComponent implements OnDestroy {
   @Input() issueId: number | undefined;
   @Input() issueName: string | undefined = '';
   @Input() issueDescr: string | undefined = '';
@@ -47,6 +50,11 @@ export class CreateIssueComponent extends BaseComponent {
   issueTypeArray: { label: string; value: string }[] = [];
   IssueStatuses = IssueStatuses;
   issuePriorityArray: { label: string; value: string }[] = [];
+  estimatePrediction: IssueEstimatePredictionModel | undefined;
+  estimatePredictionLoading = false;
+  showEstimatePredictionDetails = false;
+  private estimatePredictionRequestId = 0;
+  private destroy$ = new Subject<void>();
 
   get formIssueName() { return this.issueForm.get('formIssueName'); }
   get formIssueType() { return this.issueForm.get('formIssueType'); }
@@ -88,6 +96,19 @@ export class CreateIssueComponent extends BaseComponent {
     ]);
     t.convertEnumToArr(IssueType, t.issueTypeArray);
     t.convertEnumToArr(IssuePriority, t.issuePriorityArray);
+
+    t.issueForm.valueChanges
+      .pipe(debounceTime(600), takeUntil(t.destroy$))
+      .subscribe(() => {
+        void t.loadEstimatePrediction();
+      });
+
+    void t.loadEstimatePrediction();
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   getIssueKey(issue: IssueModel): string {
@@ -147,6 +168,124 @@ export class CreateIssueComponent extends BaseComponent {
 
   back(result: boolean = false) {
     this.activeModal.close(result);
+  }
+
+  async loadEstimatePrediction() {
+    var t = this;
+    const request = t.buildEstimatePredictionRequest();
+
+    if (!request) {
+      t.estimatePrediction = undefined;
+      return;
+    }
+
+    const requestId = ++t.estimatePredictionRequestId;
+    t.estimatePredictionLoading = true;
+
+    await t.issueService.predictEstimate(request)
+      .then((resp: any) => {
+        if (requestId !== t.estimatePredictionRequestId) {
+          return;
+        }
+
+        t.estimatePrediction = resp.data;
+      })
+      .catch(() => {
+        if (requestId === t.estimatePredictionRequestId) {
+          t.estimatePrediction = undefined;
+        }
+      })
+      .finally(() => {
+        if (requestId === t.estimatePredictionRequestId) {
+          t.estimatePredictionLoading = false;
+        }
+      });
+  }
+
+  buildEstimatePredictionRequest(): IssueEstimatePredictionPR | undefined {
+    var t = this;
+    const projectId = +t.issueProjectId;
+
+    if (!projectId) {
+      return undefined;
+    }
+
+    const request = new IssueEstimatePredictionPR();
+    request.id = t.issueId;
+    request.name = t.formIssueName?.value ?? '';
+    request.description = t.formIssueDescr?.value ?? '';
+    request.type = t.formIssueType?.value ?? IssueType.Task;
+    request.status = t.formIssueStatus?.value ?? IssueStatus.Backlog;
+    request.priority = t.formIssuePriority?.value ?? IssuePriority.Medium;
+    request.parentId = t.formIssueParentId?.value ?? undefined;
+    request.assigneeId = t.formIssueAssigneeId?.value ?? t.userService.get()?.id;
+    request.projectId = projectId;
+
+    return request;
+  }
+
+  applyPredictedEstimate() {
+    var t = this;
+    if (!t.estimatePrediction?.estimate) {
+      return;
+    }
+
+    t.formIssueEstimate?.setValue(t.estimatePrediction.estimate, { emitEvent: false });
+    t.formIssueEstimate?.markAsDirty();
+    t.formIssueEstimate?.markAsTouched();
+  }
+
+  toggleEstimatePredictionDetails() {
+    this.showEstimatePredictionDetails = !this.showEstimatePredictionDetails;
+  }
+
+  formatPredictionTime(totalSeconds: number | undefined): string {
+    if (!totalSeconds || totalSeconds <= 0) {
+      return '';
+    }
+
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    const useRu = this.getCurrentLocalization() === 'ru';
+    const parts: string[] = [];
+
+    if (hours > 0) {
+      parts.push(useRu ? `${hours} ${this.pluralRu(hours, ['час', 'часа', 'часов'])}` : `${hours} ${hours === 1 ? 'hour' : 'hours'}`);
+    }
+
+    if (minutes > 0) {
+      parts.push(useRu ? `${minutes} ${this.pluralRu(minutes, ['минута', 'минуты', 'минут'])}` : `${minutes} ${minutes === 1 ? 'minute' : 'minutes'}`);
+    }
+
+    if (seconds > 0) {
+      parts.push(useRu ? `${seconds} ${this.pluralRu(seconds, ['секунда', 'секунды', 'секунд'])}` : `${seconds} ${seconds === 1 ? 'second' : 'seconds'}`);
+    }
+
+    return parts.join(' ');
+  }
+
+  formatPredictionConfidence(confidence: number | undefined): string {
+    return `${Math.round((confidence ?? 0) * 100)}%`;
+  }
+
+  private pluralRu(value: number, forms: [string, string, string]): string {
+    const absValue = Math.abs(value) % 100;
+    const lastDigit = absValue % 10;
+
+    if (absValue > 10 && absValue < 20) {
+      return forms[2];
+    }
+
+    if (lastDigit > 1 && lastDigit < 5) {
+      return forms[1];
+    }
+
+    if (lastDigit === 1) {
+      return forms[0];
+    }
+
+    return forms[2];
   }
 
   async createOrEditIssue() {

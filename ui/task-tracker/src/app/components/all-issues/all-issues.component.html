@@ -53,16 +53,16 @@
         </div>
         <div class="col-auto">
             <div class="btn-group my-3 me-2" role="group">
-                <button type="button" class="btn" [ngClass]="isKanbanView ? 'btn-outline-primary' : 'btn-primary'"
+            <button type="button" data-testid="table-view-button" class="btn" [ngClass]="isKanbanView ? 'btn-outline-primary' : 'btn-primary'"
                     (click)="setViewMode(false)">
                     {{'Table view' | lang}}
                 </button>
-                <button type="button" class="btn" [ngClass]="isKanbanView ? 'btn-primary' : 'btn-outline-primary'"
+                <button type="button" data-testid="kanban-view-button" class="btn" [ngClass]="isKanbanView ? 'btn-primary' : 'btn-outline-primary'"
                     (click)="setViewMode(true)">
                     {{'Kanban view' | lang}}
                 </button>
             </div>
-            <button type="button" class="btn btn-primary my-3" (click)="createIssue()">
+            <button type="button" data-testid="create-issue-button" class="btn btn-primary my-3" (click)="createIssue()">
                 {{'Create issue'| lang}}
             </button>
         </div>
@@ -89,7 +89,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let issue of allIssues let i = index">
+                    <tr *ngFor="let issue of allIssues let i = index" [attr.data-testid]="'issue-row-' + issue.id">
                         <th scope="row">{{issue.projectCode + '-' + issue.index}}</th>
                         <td>{{issue.name}}</td>
                         <td>{{issue.description}}</td>
@@ -107,15 +107,15 @@
                                 <i class="fa fa-edit p-2" (click)="editIssue(issue)"></i>
                             </a>
                             <a class="cursor-pointer">
-                                <i class="fa fa-calendar p-2" (click)="trackTime(issue.id)"></i>
+                                <i class="fa fa-calendar p-2" [attr.data-testid]="'track-time-' + issue.id" (click)="trackTime(issue.id)"></i>
                             </a>
                             <a class="cursor-pointer"
                                 *ngIf="!activeTimeTrack && issue.assigneeId == getUser().id && issue.status == IssueStatus.InProgress">
-                                <i class="fa fa-unlock p-2" (click)="startAutoTracking(issue.id)"></i>
+                                <i class="fa fa-unlock p-2" [attr.data-testid]="'start-auto-track-' + issue.id" (click)="startAutoTracking(issue.id)"></i>
                             </a>
                             <a class="cursor-pointer" *ngIf="!!activeTimeTrack && activeTimeTrack.issueId == issue.id 
                                 && issue.assigneeId == getUser().id && issue.status == IssueStatus.InProgress && activeTimeTrack.autoTrackStatus == AutoTrackTimeStatus.Active">
-                                <i class="fa fa-lock p-2" (click)="stopAutoTracking(issue.id)"></i>
+                                <i class="fa fa-lock p-2" [attr.data-testid]="'stop-auto-track-' + issue.id" (click)="stopAutoTracking(issue.id)"></i>
                             </a>
                         </td>
                     </tr>
@@ -124,7 +124,7 @@
         </div>
 
         <div class="col-12" *ngIf="!!allIssues && allIssues.length > 0 && isKanbanView">
-            <div class="kanban-board">
+            <div class="kanban-board" data-testid="kanban-board">
                 <div class="kanban-column" *ngFor="let status of kanbanStatuses">
                     <div class="kanban-column-header">
                         <span>{{'issueStatus.' + status | lang}}</span>
@@ -135,7 +135,7 @@
                         <div cdkDropList [id]="getDropListId(status)" [cdkDropListData]="getIssuesByStatus(status)"
                             [cdkDropListConnectedTo]="kanbanDropListIds" (cdkDropListDropped)="onDrop($event, status)"
                             class="kanban-drop-zone">
-                            <div class="kanban-card" *ngFor="let issue of getIssuesByStatus(status)" cdkDrag>
+                            <div class="kanban-card" *ngFor="let issue of getIssuesByStatus(status)" [attr.data-testid]="'kanban-card-' + issue.id" cdkDrag>
                             <div class="kanban-card-key">{{issue.projectCode + '-' + issue.index}}</div>
                             <div class="kanban-card-title">{{issue.name}}</div>
                             <div class="kanban-card-description">{{issue.description}}</div>
@@ -161,17 +161,17 @@
                                 <button type="button" class="btn btn-outline-primary btn-sm" (click)="editIssue(issue)">
                                     <i class="fa fa-edit"></i>
                                 </button>
-                                <button type="button" class="btn btn-outline-primary btn-sm" (click)="trackTime(issue.id)">
+                                <button type="button" class="btn btn-outline-primary btn-sm" [attr.data-testid]="'kanban-track-time-' + issue.id" (click)="trackTime(issue.id)">
                                     <i class="fa fa-calendar"></i>
                                 </button>
                                 <button type="button" class="btn btn-outline-success btn-sm"
                                     *ngIf="!activeTimeTrack && issue.assigneeId == getUser().id && issue.status == IssueStatus.InProgress"
-                                    (click)="startAutoTracking(issue.id)">
+                                    [attr.data-testid]="'kanban-start-auto-track-' + issue.id" (click)="startAutoTracking(issue.id)">
                                     <i class="fa fa-unlock"></i>
                                 </button>
                                 <button type="button" class="btn btn-outline-warning btn-sm" *ngIf="!!activeTimeTrack && activeTimeTrack.issueId == issue.id 
                                     && issue.assigneeId == getUser().id && issue.status == IssueStatus.InProgress && activeTimeTrack.autoTrackStatus == AutoTrackTimeStatus.Active"
-                                    (click)="stopAutoTracking(issue.id)">
+                                    [attr.data-testid]="'kanban-stop-auto-track-' + issue.id" (click)="stopAutoTracking(issue.id)">
                                     <i class="fa fa-lock"></i>
                                 </button>
                             </div>

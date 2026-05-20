@@ -8,6 +8,8 @@ import { CreateOrEditIssuePR } from '../model/postRequests/createOrEditIssuePR';
 import { TimeTrackPR } from '../model/postRequests/timeTrackPR';
 import { UserModel } from '../model/userModel';
 import { TimeTrackingModel } from '../model/timeTrackingModel';
+import { IssueEstimatePredictionPR } from '../model/postRequests/issueEstimatePredictionPR';
+import { IssueEstimatePredictionModel } from '../model/issueEstimatePredictionModel';
 
 const serviceApiUrl = 'api/issue/';
 
@@ -30,6 +32,11 @@ export class IssueService {
 
   public async update(postRequest: CreateOrEditIssuePR): Promise<IResponse<boolean>> {
     var res = this.api.post<boolean>(serviceApiUrl + 'update', postRequest);
+    return await lastValueFrom(res);
+  }
+
+  public async predictEstimate(postRequest: IssueEstimatePredictionPR): Promise<IResponse<IssueEstimatePredictionModel>> {
+    var res = this.api.post<IssueEstimatePredictionModel>(serviceApiUrl + 'predictEstimate', postRequest);
     return await lastValueFrom(res);
   }
 
