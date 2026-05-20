@@ -15,6 +15,7 @@
               data-toggle="modal"
               class="btn btn-outline-info button-width"
               type="button"
+              data-testid="confirm-decline"
               (click)="isConfirm(false)"
             >
               {{ buttonDecline | lang }}
@@ -26,6 +27,7 @@
               data-toggle="modal"
               class="btn btn-primary button-width"
               type="button"
+              data-testid="confirm-accept"
               (click)="isConfirm(true)"
             >
               {{ buttonConfirm | lang }}
@@ -37,6 +39,7 @@
               data-toggle="modal"
               class="btn btn-danger button-width"
               type="button"
+              data-testid="confirm-error"
               (click)="isConfirm(true)"
             >
               {{ buttonError | lang }}

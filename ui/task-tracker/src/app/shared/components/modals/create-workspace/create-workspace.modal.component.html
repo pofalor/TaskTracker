@@ -11,7 +11,7 @@
             <div class="row">
                 <div class="col-12 pb-3">
                     <label class="mb-1">{{ "Workspace name" | lang }}</label>
-                    <input type="text" class="form-control" formControlName="name"
+                    <input type="text" data-testid="workspace-name" class="form-control" formControlName="name"
                         placeholder="{{'Workspace name' | lang}}"/>
                     <div *ngIf="elemIsInvalid(workspaceForm.get('name'))" class="text text-danger mt-1">
                         {{textErrorStr(workspaceForm.get('name'), namePattern) | lang}}
@@ -86,13 +86,13 @@
         <div class="row">
             <div class="col">
                 <button data-target="#modal-confirm" data-toggle="modal" class="btn btn-outline-info btn-soft w-100"
-                    type="button" (click)="back()">
+                    type="button" data-testid="modal-cancel" (click)="back()">
                     {{ "buttons.cancel" | lang }}
                 </button>
             </div>
             <div class="col">
                 <button data-target="#modal-confirm" data-toggle="modal" class="btn btn-primary btn-soft w-100"
-                    type="button" (click)="createOrEditWorkspace()">
+                    type="button" data-testid="workspace-save" (click)="createOrEditWorkspace()">
                     {{ "buttons.save" | lang }}
                 </button>
             </div>

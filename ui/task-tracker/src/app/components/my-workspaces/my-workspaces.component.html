@@ -10,7 +10,7 @@
         <ng-container *ngFor="let workspace of allMyWorkspaces">
             <div *ngIf="!!allMyWorkspaces && allMyWorkspaces.length > 0 && needShowWorkspace(workspace)"
                 class="col-auto col-xxl-3 mb-4">
-                <div class="card h-100 mb-0">
+                <div class="card h-100 mb-0" [attr.data-testid]="'workspace-card-' + workspace.id">
                     <div class="card-body pb-0 pr-0 flex-card">
                         <div class="row">
                             <div class="col-auto d-flex flex-column">
@@ -58,7 +58,7 @@
                                 </p>
                             </div>
                             <div class="col-12 pb-3" style="align-content: end;">
-                                <button class="btn btn-primary" (click)="viewWorkspace(workspace)"
+                                <button class="btn btn-primary" [attr.data-testid]="'workspace-view-' + workspace.id" (click)="viewWorkspace(workspace)"
                                     [disabled]="!!workspace.reviewStatus && workspace.reviewStatus != WorkspaceReviewStatus.Approved">
                                     {{'buttons.view' | lang}}
                                 </button>
@@ -74,7 +74,7 @@
                 <div class="card-body h-100 pb-0 pr-0">
                     <div class="row h-100">
                         <div class="col d-flex flex-column flex-center">
-                            <img style="width: 60px; user-select: none;" src="/assets/icons/plus_icon.png" type="button"
+                            <img data-testid="create-workspace-button" style="width: 60px; user-select: none;" src="/assets/icons/plus_icon.png" type="button"
                                 class="cursor-pointer" (click)="createWorkspace()" draggable="false" class="mb-2">
                         </div>
                     </div>

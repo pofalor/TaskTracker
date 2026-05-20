@@ -6,7 +6,7 @@
             </div>
         </div>
         <div class="col-auto" *ngIf="isWorkspaceOwner">
-            <button type="button" class="btn btn-primary" (click)="createProject()">
+            <button type="button" data-testid="create-project-button" class="btn btn-primary" (click)="createProject()">
                 {{'Create project'| lang}}
             </button>
         </div>
@@ -27,7 +27,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let project of allProjects let i = index">
+                    <tr *ngFor="let project of allProjects let i = index" [attr.data-testid]="'project-row-' + project.id">
                         <th scope="row">{{i + 1}}</th>
                         <td>{{project.name}}</td>
                         <td>{{project.description}}</td>
@@ -40,7 +40,7 @@
                                 <i class="fa fa-edit p-2" (click)="editProject(project)"></i>
                             </a>
                             <a class="cursor-pointer">
-                                <i class="fa fa-info p-2" (click)="goToIssues(project.id)"></i>
+                                <i class="fa fa-info p-2" [attr.data-testid]="'project-open-issues-' + project.id" (click)="goToIssues(project.id)"></i>
                             </a>
                         </td>
                     </tr>
