@@ -18,6 +18,16 @@ namespace TaskTracker.Core.src.Services.Impl
         private const int MinMlTrainingSamples = 10;
         private const int MinEstimateSeconds = 60;
         private const int MaxEstimateSeconds = 30 * 24 * 60 * 60;
+        private const int ProductivityRecentWindowDays = 90;
+        private const double MinEstimateAccuracyRatio = 0.25;
+        private const double MaxEstimateAccuracyRatio = 4;
+
+        private static readonly HashSet<IssueStatus> TerminalIssueStatuses =
+        [
+            IssueStatus.Done,
+            IssueStatus.Declined,
+            IssueStatus.Deferred,
+        ];
 
         private readonly ApplicationDbContext _dbContext;
         private readonly ILogger<IssueEstimatePredictionService> _logger;
@@ -60,9 +70,10 @@ namespace TaskTracker.Core.src.Services.Impl
                 }
 
                 var issueRows = await LoadIssueRowsAsync(project.WorkspaceId);
-                var trackedSecondsByIssue = await LoadTrackedSecondsByIssueAsync(project.WorkspaceId);
-                var samples = BuildSamples(issueRows, trackedSecondsByIssue, request.Id);
-                var metrics = BuildMetrics(samples);
+                var trackedTimeByIssue = await LoadTrackedTimeByIssueAsync(project.WorkspaceId);
+                var completionDatesByIssue = await LoadCompletionDatesByIssueAsync(project.WorkspaceId);
+                var samples = BuildSamples(issueRows, trackedTimeByIssue, request.Id, completionDatesByIssue);
+                var metrics = BuildMetrics(samples, issueRows, request.Id);
                 var heuristic = PredictByHeuristic(request, metrics);
 
                 var predictedSeconds = heuristic.Seconds;
@@ -140,11 +151,14 @@ namespace TaskTracker.Core.src.Services.Impl
                 .Select(x => new IssueHistoryRow
                 {
                     Id = x.Id,
+                    ObjectCreateDate = x.ObjectCreateDate,
+                    ObjectEditDate = x.ObjectEditDate,
                     NameLength = x.Name.Length,
                     DescriptionLength = x.Description.Length,
                     Type = x.Type,
                     Status = x.Status,
                     Priority = x.Priority,
+                    Estimate = x.Estimate,
                     ParentId = x.ParentId,
                     AssigneeId = x.AssigneeId,
                     ProjectId = x.ProjectId,
@@ -152,7 +166,7 @@ namespace TaskTracker.Core.src.Services.Impl
                 .ToListAsync();
         }
 
-        private async Task<Dictionary<int, double>> LoadTrackedSecondsByIssueAsync(int workspaceId)
+        private async Task<Dictionary<int, TrackedTimeSummary>> LoadTrackedTimeByIssueAsync(int workspaceId)
         {
             var timeRows = await _dbContext.Set<TimeTracking>()
                 .AsNoTracking()
@@ -166,6 +180,7 @@ namespace TaskTracker.Core.src.Services.Impl
                 {
                     IssueId = x.IssueId,
                     TimeSpent = x.TimeSpent,
+                    DateBegin = x.DateBegin,
                 })
                 .ToListAsync();
 
@@ -173,26 +188,88 @@ namespace TaskTracker.Core.src.Services.Impl
                 .GroupBy(x => x.IssueId)
                 .ToDictionary(
                     x => x.Key,
-                    x => x.Sum(y => y.TimeSpent.TotalSeconds));
+                    x => new TrackedTimeSummary
+                    {
+                        Seconds = x.Sum(y => y.TimeSpent.TotalSeconds),
+                        LastTrackedAt = x.Max(y => y.DateBegin),
+                    });
+        }
+
+        private async Task<Dictionary<int, DateTime>> LoadCompletionDatesByIssueAsync(int workspaceId)
+        {
+            var completionRows = await _dbContext.Set<IssueStatusHistory>()
+                .AsNoTracking()
+                .Where(x => !x.IsDeleted)
+                .Where(x => x.NewStatus == IssueStatus.Done)
+                .Where(x => !x.Issue.IsDeleted)
+                .Where(x => !x.Issue.Project.IsDeleted)
+                .Where(x => !x.Issue.Project.Workspace.IsDeleted)
+                .Where(x => x.Issue.Project.WorkspaceId == workspaceId)
+                .Select(x => new IssueCompletionRow
+                {
+                    IssueId = x.IssueId,
+                    ChangedAt = x.ChangedAt,
+                })
+                .ToListAsync();
+
+            return completionRows
+                .GroupBy(x => x.IssueId)
+                .ToDictionary(
+                    x => x.Key,
+                    x => x.Min(y => y.ChangedAt));
         }
 
         private static List<IssueSample> BuildSamples(
             IEnumerable<IssueHistoryRow> issueRows,
-            IReadOnlyDictionary<int, double> trackedSecondsByIssue,
-            int? currentIssueId)
+            IReadOnlyDictionary<int, TrackedTimeSummary> trackedTimeByIssue,
+            int? currentIssueId,
+            IReadOnlyDictionary<int, DateTime> completionDatesByIssue)
         {
             return issueRows
                 .Where(x => !currentIssueId.HasValue || x.Id != currentIssueId.Value)
-                .Select(x => trackedSecondsByIssue.TryGetValue(x.Id, out var seconds)
-                    ? new IssueSample(x, seconds)
+                .Select(x => trackedTimeByIssue.TryGetValue(x.Id, out var trackedTime)
+                    ? new IssueSample(x, trackedTime, GetCompletedAt(x, completionDatesByIssue))
                     : null)
                 .Where(x => x is { ActualSeconds: > 0 })
                 .Select(x => x!)
                 .ToList();
         }
 
-        private static PredictionMetrics BuildMetrics(List<IssueSample> samples)
+        private static DateTime? GetCompletedAt(
+            IssueHistoryRow issue,
+            IReadOnlyDictionary<int, DateTime> completionDatesByIssue)
         {
+            if (completionDatesByIssue.TryGetValue(issue.Id, out var completedAt))
+            {
+                return completedAt;
+            }
+
+            return issue.Status == IssueStatus.Done
+                ? issue.ObjectEditDate
+                : null;
+        }
+
+        private static PredictionMetrics BuildMetrics(
+            List<IssueSample> samples,
+            IReadOnlyCollection<IssueHistoryRow> issueRows,
+            int? currentIssueId)
+        {
+            var referenceDate = GetReferenceDate(samples);
+            var recentThreshold = referenceDate.AddDays(-ProductivityRecentWindowDays);
+            var recentSamples = samples
+                .Where(x => x.LastActivityAt >= recentThreshold)
+                .ToList();
+            var completedSamples = samples
+                .Where(x => x.CompletedAt.HasValue)
+                .ToList();
+            var recentCompletedSamples = completedSamples
+                .Where(x => x.CompletedAt >= recentThreshold)
+                .ToList();
+            var assigneeThroughputPerWeek = GroupThroughputPerWeek(
+                recentCompletedSamples.Where(x => x.AssigneeId.HasValue),
+                x => x.AssigneeId!.Value,
+                ProductivityRecentWindowDays);
+
             return new PredictionMetrics
             {
                 WorkspaceAverageSeconds = TrimmedAverage(samples.Select(x => x.ActualSeconds)),
@@ -204,6 +281,34 @@ namespace TaskTracker.Core.src.Services.Impl
                 AssigneeSampleCounts = GroupCount(
                     samples.Where(x => x.AssigneeId.HasValue),
                     x => x.AssigneeId!.Value),
+                AssigneeRecentAverageSeconds = GroupAverage(
+                    recentSamples.Where(x => x.AssigneeId.HasValue),
+                    x => x.AssigneeId!.Value),
+                AssigneeEstimateAccuracyRatio = GroupAverage(
+                    samples.Where(x => x.AssigneeId.HasValue && x.EstimateSeconds is > 0),
+                    x => x.AssigneeId!.Value,
+                    x => ClampEstimateAccuracyRatio(x.ActualSeconds / x.EstimateSeconds!.Value)),
+                WorkspaceEstimateAccuracyRatio = TrimmedAverage(
+                    samples
+                        .Where(x => x.EstimateSeconds is > 0)
+                        .Select(x => ClampEstimateAccuracyRatio(x.ActualSeconds / x.EstimateSeconds!.Value))),
+                AssigneeThroughputPerWeek = assigneeThroughputPerWeek,
+                WorkspaceThroughputPerWeek = assigneeThroughputPerWeek.Count > 0
+                    ? assigneeThroughputPerWeek.Values.Average()
+                    : 0,
+                AssigneeOpenIssueCounts = GroupOpenIssuesByAssignee(issueRows, currentIssueId),
+                AssigneeCycleTimeSeconds = GroupAverage(
+                    completedSamples.Where(x => x.AssigneeId.HasValue && x.CycleTimeSeconds is > 0),
+                    x => x.AssigneeId!.Value,
+                    x => x.CycleTimeSeconds!.Value),
+                ProjectCycleTimeSeconds = GroupAverage(
+                    completedSamples.Where(x => x.CycleTimeSeconds is > 0),
+                    x => x.ProjectId,
+                    x => x.CycleTimeSeconds!.Value),
+                WorkspaceCycleTimeSeconds = TrimmedAverage(
+                    completedSamples
+                        .Where(x => x.CycleTimeSeconds is > 0)
+                        .Select(x => x.CycleTimeSeconds!.Value)),
                 TypeAverageSeconds = GroupAverage(samples, x => x.Type),
                 PriorityAverageSeconds = GroupAverage(samples, x => x.Priority),
             };
@@ -243,6 +348,13 @@ namespace TaskTracker.Core.src.Services.Impl
                         nameof(IssueEstimateMlRow.HasAssignee),
                         nameof(IssueEstimateMlRow.ProjectAverageHours),
                         nameof(IssueEstimateMlRow.AssigneeAverageHours),
+                        nameof(IssueEstimateMlRow.AssigneeRecentAverageHours),
+                        nameof(IssueEstimateMlRow.AssigneeEstimateAccuracyRatio),
+                        nameof(IssueEstimateMlRow.AssigneeThroughputPerWeek),
+                        nameof(IssueEstimateMlRow.AssigneeOpenIssueCount),
+                        nameof(IssueEstimateMlRow.AssigneeCycleTimeHours),
+                        nameof(IssueEstimateMlRow.ProjectCycleTimeHours),
+                        nameof(IssueEstimateMlRow.WorkspaceThroughputPerWeek),
                         nameof(IssueEstimateMlRow.WorkspaceAverageHours),
                         nameof(IssueEstimateMlRow.TypeAverageHours),
                         nameof(IssueEstimateMlRow.PriorityAverageHours),
@@ -288,6 +400,25 @@ namespace TaskTracker.Core.src.Services.Impl
                 HasAssignee = sample.AssigneeId.HasValue ? 1 : 0,
                 ProjectAverageHours = SecondsToHours(GetAverage(metrics.ProjectAverageSeconds, sample.ProjectId, metrics.WorkspaceAverageSeconds)),
                 AssigneeAverageHours = SecondsToHours(GetAverage(metrics.AssigneeAverageSeconds, sample.AssigneeId, metrics.WorkspaceAverageSeconds)),
+                AssigneeRecentAverageHours = SecondsToHours(GetAverage(
+                    metrics.AssigneeRecentAverageSeconds,
+                    sample.AssigneeId,
+                    GetAverage(metrics.AssigneeAverageSeconds, sample.AssigneeId, metrics.WorkspaceAverageSeconds))),
+                AssigneeEstimateAccuracyRatio = RatioToFloat(GetAverage(
+                    metrics.AssigneeEstimateAccuracyRatio,
+                    sample.AssigneeId,
+                    GetWorkspaceEstimateAccuracyRatio(metrics))),
+                AssigneeThroughputPerWeek = ThroughputToFloat(GetAverage(metrics.AssigneeThroughputPerWeek, sample.AssigneeId, 0)),
+                AssigneeOpenIssueCount = OpenIssueCountToFloat(GetCount(metrics.AssigneeOpenIssueCounts, sample.AssigneeId)),
+                AssigneeCycleTimeHours = SecondsToHours(GetAverage(
+                    metrics.AssigneeCycleTimeSeconds,
+                    sample.AssigneeId,
+                    metrics.WorkspaceCycleTimeSeconds)),
+                ProjectCycleTimeHours = SecondsToHours(GetAverage(
+                    metrics.ProjectCycleTimeSeconds,
+                    sample.ProjectId,
+                    metrics.WorkspaceCycleTimeSeconds)),
+                WorkspaceThroughputPerWeek = ThroughputToFloat(metrics.WorkspaceThroughputPerWeek),
                 WorkspaceAverageHours = SecondsToHours(metrics.WorkspaceAverageSeconds),
                 TypeAverageHours = SecondsToHours(GetAverage(metrics.TypeAverageSeconds, sample.Type, metrics.WorkspaceAverageSeconds)),
                 PriorityAverageHours = SecondsToHours(GetAverage(metrics.PriorityAverageSeconds, sample.Priority, metrics.WorkspaceAverageSeconds)),
@@ -312,6 +443,25 @@ namespace TaskTracker.Core.src.Services.Impl
                 HasAssignee = request.AssigneeId.HasValue ? 1 : 0,
                 ProjectAverageHours = SecondsToHours(GetAverage(metrics.ProjectAverageSeconds, projectId, metrics.WorkspaceAverageSeconds)),
                 AssigneeAverageHours = SecondsToHours(GetAverage(metrics.AssigneeAverageSeconds, request.AssigneeId, metrics.WorkspaceAverageSeconds)),
+                AssigneeRecentAverageHours = SecondsToHours(GetAverage(
+                    metrics.AssigneeRecentAverageSeconds,
+                    request.AssigneeId,
+                    GetAverage(metrics.AssigneeAverageSeconds, request.AssigneeId, metrics.WorkspaceAverageSeconds))),
+                AssigneeEstimateAccuracyRatio = RatioToFloat(GetAverage(
+                    metrics.AssigneeEstimateAccuracyRatio,
+                    request.AssigneeId,
+                    GetWorkspaceEstimateAccuracyRatio(metrics))),
+                AssigneeThroughputPerWeek = ThroughputToFloat(GetAverage(metrics.AssigneeThroughputPerWeek, request.AssigneeId, 0)),
+                AssigneeOpenIssueCount = OpenIssueCountToFloat(GetCount(metrics.AssigneeOpenIssueCounts, request.AssigneeId)),
+                AssigneeCycleTimeHours = SecondsToHours(GetAverage(
+                    metrics.AssigneeCycleTimeSeconds,
+                    request.AssigneeId,
+                    metrics.WorkspaceCycleTimeSeconds)),
+                ProjectCycleTimeHours = SecondsToHours(GetAverage(
+                    metrics.ProjectCycleTimeSeconds,
+                    projectId,
+                    metrics.WorkspaceCycleTimeSeconds)),
+                WorkspaceThroughputPerWeek = ThroughputToFloat(metrics.WorkspaceThroughputPerWeek),
                 WorkspaceAverageHours = SecondsToHours(metrics.WorkspaceAverageSeconds),
                 TypeAverageHours = SecondsToHours(GetAverage(metrics.TypeAverageSeconds, request.Type, metrics.WorkspaceAverageSeconds)),
                 PriorityAverageHours = SecondsToHours(GetAverage(metrics.PriorityAverageSeconds, request.Priority, metrics.WorkspaceAverageSeconds)),
@@ -356,7 +506,18 @@ namespace TaskTracker.Core.src.Services.Impl
             var complexityMultiplier = 1 + Math.Min(0.35, Math.Sqrt(textLength) / 70);
             var hierarchyMultiplier = request.ParentId.HasValue ? 0.92 : 1;
             var assigneeMultiplier = request.AssigneeId.HasValue ? 1 : 1.08;
-            var seconds = baseSeconds * complexityMultiplier * hierarchyMultiplier * assigneeMultiplier;
+            var estimateAccuracyMultiplier = GetEstimateAccuracyMultiplier(request.AssigneeId, metrics);
+            var throughputMultiplier = GetThroughputMultiplier(request.AssigneeId, metrics);
+            var currentLoadMultiplier = GetCurrentLoadMultiplier(request.AssigneeId, metrics);
+            var cycleTimeMultiplier = GetCycleTimeMultiplier(request.AssigneeId, request.ProjectId, metrics);
+            var seconds = baseSeconds
+                * complexityMultiplier
+                * hierarchyMultiplier
+                * assigneeMultiplier
+                * estimateAccuracyMultiplier
+                * throughputMultiplier
+                * currentLoadMultiplier
+                * cycleTimeMultiplier;
 
             return new HeuristicPrediction
             {
@@ -365,8 +526,61 @@ namespace TaskTracker.Core.src.Services.Impl
                 ComplexityMultiplier = complexityMultiplier,
                 HierarchyMultiplier = hierarchyMultiplier,
                 AssigneeMultiplier = assigneeMultiplier,
+                EstimateAccuracyMultiplier = estimateAccuracyMultiplier,
+                ThroughputMultiplier = throughputMultiplier,
+                CurrentLoadMultiplier = currentLoadMultiplier,
+                CycleTimeMultiplier = cycleTimeMultiplier,
                 Candidates = candidates,
             };
+        }
+
+        private static double GetEstimateAccuracyMultiplier(int? assigneeId, PredictionMetrics metrics)
+        {
+            var ratio = GetAverage(
+                metrics.AssigneeEstimateAccuracyRatio,
+                assigneeId,
+                GetWorkspaceEstimateAccuracyRatio(metrics));
+
+            return ratio > 0
+                ? Math.Clamp(1 + (ratio - 1) * 0.12, 0.88, 1.18)
+                : 1;
+        }
+
+        private static double GetThroughputMultiplier(int? assigneeId, PredictionMetrics metrics)
+        {
+            if (!assigneeId.HasValue
+                || metrics.WorkspaceThroughputPerWeek <= 0
+                || !metrics.AssigneeThroughputPerWeek.TryGetValue(assigneeId.Value, out var assigneeThroughput)
+                || assigneeThroughput <= 0)
+            {
+                return 1;
+            }
+
+            var throughputRatio = assigneeThroughput / metrics.WorkspaceThroughputPerWeek;
+            return Math.Clamp(1 - (throughputRatio - 1) * 0.06, 0.9, 1.1);
+        }
+
+        private static double GetCurrentLoadMultiplier(int? assigneeId, PredictionMetrics metrics)
+        {
+            var openIssueCount = GetCount(metrics.AssigneeOpenIssueCounts, assigneeId);
+            return openIssueCount > 0
+                ? 1 + Math.Min(0.1, openIssueCount * 0.01)
+                : 1;
+        }
+
+        private static double GetCycleTimeMultiplier(int? assigneeId, int projectId, PredictionMetrics metrics)
+        {
+            if (!assigneeId.HasValue
+                || !metrics.AssigneeCycleTimeSeconds.TryGetValue(assigneeId.Value, out var assigneeCycleTime)
+                || !metrics.ProjectCycleTimeSeconds.TryGetValue(projectId, out var projectCycleTime)
+                || assigneeCycleTime <= 0
+                || projectCycleTime <= 0)
+            {
+                return 1;
+            }
+
+            var cycleTimeRatio = assigneeCycleTime / projectCycleTime;
+            return Math.Clamp(1 + (cycleTimeRatio - 1) * 0.04, 0.92, 1.08);
         }
 
         private static List<IssueEstimatePredictionFactorModel> BuildFactors(
@@ -411,6 +625,57 @@ namespace TaskTracker.Core.src.Services.Impl
                     Name = "Assignee productivity",
                     Value = "No personal history",
                     Description = "The prediction uses project and workspace history more strongly.",
+                });
+            }
+
+            var productivityDetails = new List<string>();
+            if (request.AssigneeId.HasValue
+                && metrics.AssigneeRecentAverageSeconds.TryGetValue(request.AssigneeId.Value, out var recentAverage))
+            {
+                productivityDetails.Add($"recent avg {FormatTimeTrackString(TimeSpan.FromSeconds(RoundEstimateSeconds(recentAverage)))}");
+            }
+
+            if (request.AssigneeId.HasValue
+                && metrics.AssigneeThroughputPerWeek.TryGetValue(request.AssigneeId.Value, out var throughput))
+            {
+                productivityDetails.Add($"{Math.Round(throughput, 1)} done/week");
+            }
+
+            var openIssueCount = GetCount(metrics.AssigneeOpenIssueCounts, request.AssigneeId);
+            if (openIssueCount > 0)
+            {
+                productivityDetails.Add($"{openIssueCount} open");
+            }
+
+            if (productivityDetails.Count > 0)
+            {
+                factors.Add(new IssueEstimatePredictionFactorModel
+                {
+                    Name = "Recent productivity",
+                    Value = string.Join(", ", productivityDetails),
+                    Description = "Recent completed work, throughput and current load slightly adjust the prediction.",
+                });
+            }
+
+            if (request.AssigneeId.HasValue
+                && metrics.AssigneeEstimateAccuracyRatio.TryGetValue(request.AssigneeId.Value, out var estimateAccuracyRatio))
+            {
+                factors.Add(new IssueEstimatePredictionFactorModel
+                {
+                    Name = "Estimate accuracy",
+                    Value = $"{Math.Round(estimateAccuracyRatio, 2)}x",
+                    Description = "Historical actual time divided by previous estimates for this assignee.",
+                });
+            }
+
+            if (request.AssigneeId.HasValue
+                && metrics.AssigneeCycleTimeSeconds.TryGetValue(request.AssigneeId.Value, out var assigneeCycleTime))
+            {
+                factors.Add(new IssueEstimatePredictionFactorModel
+                {
+                    Name = "Cycle time",
+                    Value = FormatTimeTrackString(TimeSpan.FromSeconds(RoundEstimateSeconds(assigneeCycleTime))),
+                    Description = "Average calendar time from creation to completion for this assignee.",
                 });
             }
 
@@ -472,6 +737,26 @@ namespace TaskTracker.Core.src.Services.Impl
                 confidence += Math.Min(0.15, assigneeSamples / 40.0);
             }
 
+            if (assigneeId.HasValue && metrics.AssigneeRecentAverageSeconds.ContainsKey(assigneeId.Value))
+            {
+                confidence += 0.04;
+            }
+
+            if (assigneeId.HasValue && metrics.AssigneeEstimateAccuracyRatio.ContainsKey(assigneeId.Value))
+            {
+                confidence += 0.03;
+            }
+
+            if (assigneeId.HasValue && metrics.AssigneeThroughputPerWeek.ContainsKey(assigneeId.Value))
+            {
+                confidence += 0.03;
+            }
+
+            if (assigneeId.HasValue && metrics.AssigneeCycleTimeSeconds.ContainsKey(assigneeId.Value))
+            {
+                confidence += 0.02;
+            }
+
             if (usedMlModel)
             {
                 confidence += 0.08;
@@ -488,6 +773,44 @@ namespace TaskTracker.Core.src.Services.Impl
             return samples
                 .GroupBy(keySelector)
                 .ToDictionary(x => x.Key, x => TrimmedAverage(x.Select(y => y.ActualSeconds)));
+        }
+
+        private static Dictionary<TKey, double> GroupAverage<TKey>(
+            IEnumerable<IssueSample> samples,
+            Func<IssueSample, TKey> keySelector,
+            Func<IssueSample, double> valueSelector)
+            where TKey : notnull
+        {
+            return samples
+                .GroupBy(keySelector)
+                .ToDictionary(x => x.Key, x => TrimmedAverage(x.Select(valueSelector)));
+        }
+
+        private static Dictionary<TKey, double> GroupThroughputPerWeek<TKey>(
+            IEnumerable<IssueSample> samples,
+            Func<IssueSample, TKey> keySelector,
+            int windowDays)
+            where TKey : notnull
+        {
+            var weeks = Math.Max(1, windowDays / 7.0);
+
+            return samples
+                .GroupBy(keySelector)
+                .ToDictionary(
+                    x => x.Key,
+                    x => x.Select(y => y.Id).Distinct().Count() / weeks);
+        }
+
+        private static Dictionary<int, int> GroupOpenIssuesByAssignee(
+            IEnumerable<IssueHistoryRow> issueRows,
+            int? currentIssueId)
+        {
+            return issueRows
+                .Where(x => !currentIssueId.HasValue || x.Id != currentIssueId.Value)
+                .Where(x => x.AssigneeId.HasValue)
+                .Where(x => !TerminalIssueStatuses.Contains(x.Status))
+                .GroupBy(x => x.AssigneeId!.Value)
+                .ToDictionary(x => x.Key, x => x.Count());
         }
 
         private static Dictionary<TKey, int> GroupCount<TKey>(
@@ -517,6 +840,19 @@ namespace TaskTracker.Core.src.Services.Impl
                 .Skip(skip)
                 .Take(Math.Max(1, ordered.Count - skip * 2))
                 .Average();
+        }
+
+        private static DateTime GetReferenceDate(IEnumerable<IssueSample> samples)
+        {
+            return samples
+                .Select(x => x.LastActivityAt)
+                .DefaultIfEmpty(DateTime.UtcNow)
+                .Max();
+        }
+
+        private static double ClampEstimateAccuracyRatio(double ratio)
+        {
+            return Math.Clamp(ratio, MinEstimateAccuracyRatio, MaxEstimateAccuracyRatio);
         }
 
         private static void AddWeightedAverage(
@@ -553,6 +889,23 @@ namespace TaskTracker.Core.src.Services.Impl
             return values.TryGetValue(key, out var value) && value > 0
                 ? value
                 : fallback;
+        }
+
+        private static int GetCount<TKey>(
+            IReadOnlyDictionary<TKey, int> values,
+            TKey? key)
+            where TKey : struct
+        {
+            return key.HasValue && values.TryGetValue(key.Value, out var value) && value > 0
+                ? value
+                : 0;
+        }
+
+        private static double GetWorkspaceEstimateAccuracyRatio(PredictionMetrics metrics)
+        {
+            return metrics.WorkspaceEstimateAccuracyRatio > 0
+                ? metrics.WorkspaceEstimateAccuracyRatio
+                : 1;
         }
 
         private static double GetDefaultSeconds(IssueType issueType)
@@ -594,6 +947,21 @@ namespace TaskTracker.Core.src.Services.Impl
             return (float)(Math.Max(0, seconds) / 3600);
         }
 
+        private static float RatioToFloat(double ratio)
+        {
+            return (float)ClampEstimateAccuracyRatio(ratio);
+        }
+
+        private static float ThroughputToFloat(double throughputPerWeek)
+        {
+            return (float)Math.Min(throughputPerWeek, 50);
+        }
+
+        private static float OpenIssueCountToFloat(int openIssueCount)
+        {
+            return Math.Min(openIssueCount, 50) / 10f;
+        }
+
         private static string FormatTimeTrackString(TimeSpan value)
         {
             var totalSeconds = (int)Math.Max(MinEstimateSeconds, value.TotalSeconds);
@@ -631,6 +999,10 @@ namespace TaskTracker.Core.src.Services.Impl
         {
             public int Id { get; set; }
 
+            public DateTime ObjectCreateDate { get; set; }
+
+            public DateTime ObjectEditDate { get; set; }
+
             public int NameLength { get; set; }
 
             public int DescriptionLength { get; set; }
@@ -640,6 +1012,8 @@ namespace TaskTracker.Core.src.Services.Impl
             public IssueStatus Status { get; set; }
 
             public IssuePriority Priority { get; set; }
+
+            public TimeSpan? Estimate { get; set; }
 
             public int? ParentId { get; set; }
 
@@ -653,25 +1027,58 @@ namespace TaskTracker.Core.src.Services.Impl
             public int IssueId { get; set; }
 
             public TimeSpan TimeSpent { get; set; }
+
+            public DateTime DateBegin { get; set; }
+        }
+
+        private sealed class TrackedTimeSummary
+        {
+            public double Seconds { get; init; }
+
+            public DateTime LastTrackedAt { get; init; }
+        }
+
+        private sealed class IssueCompletionRow
+        {
+            public int IssueId { get; set; }
+
+            public DateTime ChangedAt { get; set; }
         }
 
         private sealed class IssueSample
         {
-            public IssueSample(IssueHistoryRow issue, double actualSeconds)
+            public IssueSample(
+                IssueHistoryRow issue,
+                TrackedTimeSummary trackedTime,
+                DateTime? completedAt)
             {
                 Id = issue.Id;
+                ObjectCreateDate = issue.ObjectCreateDate;
+                ObjectEditDate = issue.ObjectEditDate;
                 NameLength = issue.NameLength;
                 DescriptionLength = issue.DescriptionLength;
                 Type = issue.Type;
                 Status = issue.Status;
                 Priority = issue.Priority;
+                EstimateSeconds = issue.Estimate?.TotalSeconds;
                 ParentId = issue.ParentId;
                 AssigneeId = issue.AssigneeId;
                 ProjectId = issue.ProjectId;
-                ActualSeconds = actualSeconds;
+                ActualSeconds = trackedTime.Seconds;
+                LastActivityAt = trackedTime.LastTrackedAt > issue.ObjectEditDate
+                    ? trackedTime.LastTrackedAt
+                    : issue.ObjectEditDate;
+                CompletedAt = completedAt;
+                CycleTimeSeconds = completedAt.HasValue && completedAt.Value > issue.ObjectCreateDate
+                    ? (completedAt.Value - issue.ObjectCreateDate).TotalSeconds
+                    : null;
             }
 
             public int Id { get; }
+
+            public DateTime ObjectCreateDate { get; }
+
+            public DateTime ObjectEditDate { get; }
 
             public int NameLength { get; }
 
@@ -683,6 +1090,8 @@ namespace TaskTracker.Core.src.Services.Impl
 
             public IssuePriority Priority { get; }
 
+            public double? EstimateSeconds { get; }
+
             public int? ParentId { get; }
 
             public int? AssigneeId { get; }
@@ -690,6 +1099,12 @@ namespace TaskTracker.Core.src.Services.Impl
             public int ProjectId { get; }
 
             public double ActualSeconds { get; }
+
+            public DateTime LastActivityAt { get; }
+
+            public DateTime? CompletedAt { get; }
+
+            public double? CycleTimeSeconds { get; }
         }
 
         private sealed class PredictionMetrics
@@ -703,6 +1118,24 @@ namespace TaskTracker.Core.src.Services.Impl
             public Dictionary<int, double> AssigneeAverageSeconds { get; init; } = [];
 
             public Dictionary<int, int> AssigneeSampleCounts { get; init; } = [];
+
+            public Dictionary<int, double> AssigneeRecentAverageSeconds { get; init; } = [];
+
+            public Dictionary<int, double> AssigneeEstimateAccuracyRatio { get; init; } = [];
+
+            public double WorkspaceEstimateAccuracyRatio { get; init; }
+
+            public Dictionary<int, double> AssigneeThroughputPerWeek { get; init; } = [];
+
+            public double WorkspaceThroughputPerWeek { get; init; }
+
+            public Dictionary<int, int> AssigneeOpenIssueCounts { get; init; } = [];
+
+            public Dictionary<int, double> AssigneeCycleTimeSeconds { get; init; } = [];
+
+            public Dictionary<int, double> ProjectCycleTimeSeconds { get; init; } = [];
+
+            public double WorkspaceCycleTimeSeconds { get; init; }
 
             public Dictionary<IssueType, double> TypeAverageSeconds { get; init; } = [];
 
@@ -720,6 +1153,14 @@ namespace TaskTracker.Core.src.Services.Impl
             public double HierarchyMultiplier { get; init; }
 
             public double AssigneeMultiplier { get; init; }
+
+            public double EstimateAccuracyMultiplier { get; init; }
+
+            public double ThroughputMultiplier { get; init; }
+
+            public double CurrentLoadMultiplier { get; init; }
+
+            public double CycleTimeMultiplier { get; init; }
 
             public List<WeightedEstimate> Candidates { get; init; } = [];
         }
@@ -751,6 +1192,20 @@ namespace TaskTracker.Core.src.Services.Impl
             public float ProjectAverageHours { get; set; }
 
             public float AssigneeAverageHours { get; set; }
+
+            public float AssigneeRecentAverageHours { get; set; }
+
+            public float AssigneeEstimateAccuracyRatio { get; set; }
+
+            public float AssigneeThroughputPerWeek { get; set; }
+
+            public float AssigneeOpenIssueCount { get; set; }
+
+            public float AssigneeCycleTimeHours { get; set; }
+
+            public float ProjectCycleTimeHours { get; set; }
+
+            public float WorkspaceThroughputPerWeek { get; set; }
 
             public float WorkspaceAverageHours { get; set; }
 
