@@ -127,6 +127,179 @@ public sealed class IssueEstimatePredictionServiceTests
         Assert.Contains(epicPrediction.Data.Factors, factor => factor.Name == "Text complexity");
     }
 
+    [Fact]
+    public async Task PredictEstimateAsync_UsesIssueTypeHistory()
+    {
+        await using var database = await PredictionTestDatabase.CreateAsync();
+        await using var dbContext = database.CreateContext();
+        var seed = await SeedIssueShapeWorkspaceAsync(dbContext);
+        var service = CreateService(dbContext);
+        var bugRequest = CreateRequest(seed.Project.Id, seed.User.Id);
+        bugRequest.Type = IssueType.Bug;
+        var epicRequest = CreateRequest(seed.Project.Id, seed.User.Id);
+        epicRequest.Type = IssueType.Epic;
+
+        var bugPrediction = await service.PredictEstimateAsync(bugRequest);
+        var epicPrediction = await service.PredictEstimateAsync(epicRequest);
+
+        Assert.True(bugPrediction.Success);
+        Assert.True(epicPrediction.Success);
+        Assert.True(epicPrediction.Data.EstimateSeconds > bugPrediction.Data.EstimateSeconds);
+        Assert.Contains(epicPrediction.Data.Factors, factor => factor.Name == "Task characteristics");
+    }
+
+    [Fact]
+    public async Task PredictEstimateAsync_UsesPriorityHistory()
+    {
+        await using var database = await PredictionTestDatabase.CreateAsync();
+        await using var dbContext = database.CreateContext();
+        var seed = await SeedPriorityWorkspaceAsync(dbContext);
+        var service = CreateService(dbContext);
+        var lowPriorityRequest = CreateRequest(seed.Project.Id, seed.User.Id);
+        lowPriorityRequest.Priority = IssuePriority.Low;
+        var highestPriorityRequest = CreateRequest(seed.Project.Id, seed.User.Id);
+        highestPriorityRequest.Priority = IssuePriority.Highest;
+
+        var lowPriorityPrediction = await service.PredictEstimateAsync(lowPriorityRequest);
+        var highestPriorityPrediction = await service.PredictEstimateAsync(highestPriorityRequest);
+
+        Assert.True(lowPriorityPrediction.Success);
+        Assert.True(highestPriorityPrediction.Success);
+        Assert.True(highestPriorityPrediction.Data.EstimateSeconds > lowPriorityPrediction.Data.EstimateSeconds);
+        Assert.Contains(highestPriorityPrediction.Data.Factors, factor => factor.Name == "Task characteristics");
+    }
+
+    [Fact]
+    public async Task PredictEstimateAsync_UsesTextComplexity()
+    {
+        await using var database = await PredictionTestDatabase.CreateAsync();
+        await using var dbContext = database.CreateContext();
+        var seed = await SeedColdStartWorkspaceAsync(dbContext);
+        var service = CreateService(dbContext);
+        var simpleRequest = CreateRequest(seed.Project.Id, seed.NewUser.Id);
+        simpleRequest.Name = "Fix typo";
+        simpleRequest.Description = "Small text update.";
+        var complexRequest = CreateRequest(seed.Project.Id, seed.NewUser.Id);
+        complexRequest.Name = "Build detailed reporting pipeline with import validation and audit trail";
+        complexRequest.Description = string.Join(" ", Enumerable.Repeat(
+            "The task touches data import, validation, permissions, audit logging, reporting, and UI behavior.",
+            12));
+
+        var simplePrediction = await service.PredictEstimateAsync(simpleRequest);
+        var complexPrediction = await service.PredictEstimateAsync(complexRequest);
+
+        Assert.True(simplePrediction.Success);
+        Assert.True(complexPrediction.Success);
+        Assert.True(complexPrediction.Data.EstimateSeconds > simplePrediction.Data.EstimateSeconds);
+        Assert.Contains(complexPrediction.Data.Factors, factor => factor.Name == "Text complexity");
+    }
+
+    [Fact]
+    public async Task PredictEstimateAsync_UsesParentIssueSignal()
+    {
+        await using var database = await PredictionTestDatabase.CreateAsync();
+        await using var dbContext = database.CreateContext();
+        var seed = await SeedColdStartWorkspaceAsync(dbContext);
+        var service = CreateService(dbContext);
+        var standaloneRequest = CreateRequest(seed.Project.Id, seed.NewUser.Id);
+        var childRequest = CreateRequest(seed.Project.Id, seed.NewUser.Id);
+        childRequest.ParentId = 42;
+
+        var standalonePrediction = await service.PredictEstimateAsync(standaloneRequest);
+        var childPrediction = await service.PredictEstimateAsync(childRequest);
+
+        Assert.True(standalonePrediction.Success);
+        Assert.True(childPrediction.Success);
+        Assert.True(childPrediction.Data.EstimateSeconds < standalonePrediction.Data.EstimateSeconds);
+    }
+
+    [Fact]
+    public async Task PredictEstimateAsync_UsesProjectHistory()
+    {
+        await using var database = await PredictionTestDatabase.CreateAsync();
+        await using var dbContext = database.CreateContext();
+        var seed = await SeedProjectBaselineWorkspaceAsync(dbContext);
+        var service = CreateService(dbContext);
+
+        var smallProjectPrediction = await service.PredictEstimateAsync(CreateRequest(seed.SmallProject.Id, seed.User.Id));
+        var largeProjectPrediction = await service.PredictEstimateAsync(CreateRequest(seed.LargeProject.Id, seed.User.Id));
+
+        Assert.True(smallProjectPrediction.Success);
+        Assert.True(largeProjectPrediction.Success);
+        Assert.True(largeProjectPrediction.Data.EstimateSeconds > smallProjectPrediction.Data.EstimateSeconds);
+        Assert.Contains(largeProjectPrediction.Data.Factors, factor => factor.Name == "Project baseline");
+    }
+
+    [Fact]
+    public async Task PredictEstimateAsync_UsesAssigneeProductivity()
+    {
+        await using var database = await PredictionTestDatabase.CreateAsync();
+        await using var dbContext = database.CreateContext();
+        var seed = await SeedPredictionWorkspaceAsync(dbContext);
+        var service = CreateService(dbContext);
+
+        var fastPrediction = await service.PredictEstimateAsync(CreateRequest(seed.Project.Id, seed.FastUser.Id));
+        var slowPrediction = await service.PredictEstimateAsync(CreateRequest(seed.Project.Id, seed.SlowUser.Id));
+
+        Assert.True(fastPrediction.Success);
+        Assert.True(slowPrediction.Success);
+        Assert.True(slowPrediction.Data.EstimateSeconds > fastPrediction.Data.EstimateSeconds);
+        Assert.Contains(fastPrediction.Data.Factors, factor => factor.Name == "Assignee productivity");
+    }
+
+    [Fact]
+    public async Task PredictEstimateAsync_UsesCurrentOpenIssueLoad()
+    {
+        await using var database = await PredictionTestDatabase.CreateAsync();
+        await using var dbContext = database.CreateContext();
+        var seed = await SeedCurrentLoadWorkspaceAsync(dbContext);
+        var service = CreateService(dbContext);
+
+        var freePrediction = await service.PredictEstimateAsync(CreateRequest(seed.Project.Id, seed.FreeUser.Id));
+        var loadedPrediction = await service.PredictEstimateAsync(CreateRequest(seed.Project.Id, seed.LoadedUser.Id));
+
+        Assert.True(freePrediction.Success);
+        Assert.True(loadedPrediction.Success);
+        Assert.True(loadedPrediction.Data.EstimateSeconds > freePrediction.Data.EstimateSeconds);
+        Assert.Contains(loadedPrediction.Data.Factors, factor =>
+            factor.Name == "Recent productivity" && factor.Value.Contains("open"));
+    }
+
+    [Fact]
+    public async Task PredictEstimateAsync_UsesRecentThroughput()
+    {
+        await using var database = await PredictionTestDatabase.CreateAsync();
+        await using var dbContext = database.CreateContext();
+        var seed = await SeedThroughputWorkspaceAsync(dbContext);
+        var service = CreateService(dbContext);
+
+        var highThroughputPrediction = await service.PredictEstimateAsync(CreateRequest(seed.Project.Id, seed.HighThroughputUser.Id));
+        var lowThroughputPrediction = await service.PredictEstimateAsync(CreateRequest(seed.Project.Id, seed.LowThroughputUser.Id));
+
+        Assert.True(highThroughputPrediction.Success);
+        Assert.True(lowThroughputPrediction.Success);
+        Assert.True(highThroughputPrediction.Data.EstimateSeconds < lowThroughputPrediction.Data.EstimateSeconds);
+        Assert.Contains(highThroughputPrediction.Data.Factors, factor =>
+            factor.Name == "Recent productivity" && factor.Value.Contains("done/week"));
+    }
+
+    [Fact]
+    public async Task PredictEstimateAsync_UsesCycleTime()
+    {
+        await using var database = await PredictionTestDatabase.CreateAsync();
+        await using var dbContext = database.CreateContext();
+        var seed = await SeedCycleTimeWorkspaceAsync(dbContext);
+        var service = CreateService(dbContext);
+
+        var shortCyclePrediction = await service.PredictEstimateAsync(CreateRequest(seed.Project.Id, seed.ShortCycleUser.Id));
+        var longCyclePrediction = await service.PredictEstimateAsync(CreateRequest(seed.Project.Id, seed.LongCycleUser.Id));
+
+        Assert.True(shortCyclePrediction.Success);
+        Assert.True(longCyclePrediction.Success);
+        Assert.True(longCyclePrediction.Data.EstimateSeconds > shortCyclePrediction.Data.EstimateSeconds);
+        Assert.Contains(longCyclePrediction.Data.Factors, factor => factor.Name == "Cycle time");
+    }
+
     private static IssueEstimatePredictionService CreateService(ApplicationDbContext dbContext)
     {
         return new IssueEstimatePredictionService(
@@ -312,6 +485,182 @@ public sealed class IssueEstimatePredictionServiceTests
         return new IssueShapeSeed(project, user);
     }
 
+    private static async Task<PrioritySeed> SeedPriorityWorkspaceAsync(ApplicationDbContext dbContext)
+    {
+        var owner = CreateUser("priority-owner");
+        var user = CreateUser("priority-user");
+        var workspace = new Workspace
+        {
+            Name = "Priority workspace",
+            WorkspaceType = WorkspaceType.Personal,
+            DirectorUser = owner,
+        };
+        var project = CreateProject("Priority", "PRIO", owner, workspace);
+
+        dbContext.AddRange(owner, user, workspace, project);
+        dbContext.AddRange(
+            CreateMember(owner, workspace, UserTeamRole.Owner),
+            CreateMember(user, workspace, UserTeamRole.Developer));
+
+        var issueIndex = 1;
+        AddCompletedIssues(
+            dbContext,
+            project,
+            owner,
+            user,
+            ref issueIndex,
+            sampleCount: 4,
+            actualHours: 2,
+            estimateHours: 2,
+            priority: IssuePriority.Low);
+        AddCompletedIssues(
+            dbContext,
+            project,
+            owner,
+            user,
+            ref issueIndex,
+            sampleCount: 4,
+            actualHours: 10,
+            estimateHours: 10,
+            priority: IssuePriority.Highest);
+
+        await dbContext.SaveChangesAsync();
+
+        return new PrioritySeed(project, user);
+    }
+
+    private static async Task<ProjectBaselineSeed> SeedProjectBaselineWorkspaceAsync(ApplicationDbContext dbContext)
+    {
+        var owner = CreateUser("project-owner");
+        var user = CreateUser("project-user");
+        var workspace = new Workspace
+        {
+            Name = "Project baseline workspace",
+            WorkspaceType = WorkspaceType.Personal,
+            DirectorUser = owner,
+        };
+        var smallProject = CreateProject("Small Project", "SMALL", owner, workspace);
+        var largeProject = CreateProject("Large Project", "LARGE", owner, workspace);
+
+        dbContext.AddRange(owner, user, workspace, smallProject, largeProject);
+        dbContext.AddRange(
+            CreateMember(owner, workspace, UserTeamRole.Owner),
+            CreateMember(user, workspace, UserTeamRole.Developer));
+
+        var issueIndex = 1;
+        AddCompletedIssues(dbContext, smallProject, owner, user, ref issueIndex, sampleCount: 8, actualHours: 2, estimateHours: 2);
+        AddCompletedIssues(dbContext, largeProject, owner, user, ref issueIndex, sampleCount: 8, actualHours: 12, estimateHours: 12);
+
+        await dbContext.SaveChangesAsync();
+
+        return new ProjectBaselineSeed(smallProject, largeProject, user);
+    }
+
+    private static async Task<CurrentLoadSeed> SeedCurrentLoadWorkspaceAsync(ApplicationDbContext dbContext)
+    {
+        var owner = CreateUser("load-owner");
+        var freeUser = CreateUser("free-load");
+        var loadedUser = CreateUser("heavy-load");
+        var workspace = new Workspace
+        {
+            Name = "Current load workspace",
+            WorkspaceType = WorkspaceType.Personal,
+            DirectorUser = owner,
+        };
+        var project = CreateProject("Current Load", "LOAD", owner, workspace);
+
+        dbContext.AddRange(owner, freeUser, loadedUser, workspace, project);
+        dbContext.AddRange(
+            CreateMember(owner, workspace, UserTeamRole.Owner),
+            CreateMember(freeUser, workspace, UserTeamRole.Developer),
+            CreateMember(loadedUser, workspace, UserTeamRole.Developer));
+
+        var issueIndex = 1;
+        AddCompletedIssues(dbContext, project, owner, freeUser, ref issueIndex, sampleCount: 6, actualHours: 4, estimateHours: 4);
+        AddCompletedIssues(dbContext, project, owner, loadedUser, ref issueIndex, sampleCount: 6, actualHours: 4, estimateHours: 4);
+        AddOpenIssues(dbContext, project, owner, loadedUser, ref issueIndex, count: 10);
+
+        await dbContext.SaveChangesAsync();
+
+        return new CurrentLoadSeed(project, freeUser, loadedUser);
+    }
+
+    private static async Task<ThroughputSeed> SeedThroughputWorkspaceAsync(ApplicationDbContext dbContext)
+    {
+        var owner = CreateUser("throughput-owner");
+        var highThroughputUser = CreateUser("high-throughput");
+        var lowThroughputUser = CreateUser("low-throughput");
+        var workspace = new Workspace
+        {
+            Name = "Throughput workspace",
+            WorkspaceType = WorkspaceType.Personal,
+            DirectorUser = owner,
+        };
+        var project = CreateProject("Throughput", "THRU", owner, workspace);
+
+        dbContext.AddRange(owner, highThroughputUser, lowThroughputUser, workspace, project);
+        dbContext.AddRange(
+            CreateMember(owner, workspace, UserTeamRole.Owner),
+            CreateMember(highThroughputUser, workspace, UserTeamRole.Developer),
+            CreateMember(lowThroughputUser, workspace, UserTeamRole.Developer));
+
+        var issueIndex = 1;
+        AddCompletedIssues(dbContext, project, owner, highThroughputUser, ref issueIndex, sampleCount: 12, actualHours: 4, estimateHours: 4);
+        AddCompletedIssues(dbContext, project, owner, lowThroughputUser, ref issueIndex, sampleCount: 2, actualHours: 4, estimateHours: 4);
+
+        await dbContext.SaveChangesAsync();
+
+        return new ThroughputSeed(project, highThroughputUser, lowThroughputUser);
+    }
+
+    private static async Task<CycleTimeSeed> SeedCycleTimeWorkspaceAsync(ApplicationDbContext dbContext)
+    {
+        var owner = CreateUser("cycle-owner");
+        var shortCycleUser = CreateUser("short-cycle");
+        var longCycleUser = CreateUser("long-cycle");
+        var workspace = new Workspace
+        {
+            Name = "Cycle time workspace",
+            WorkspaceType = WorkspaceType.Personal,
+            DirectorUser = owner,
+        };
+        var project = CreateProject("Cycle Time", "CYCLE", owner, workspace);
+
+        dbContext.AddRange(owner, shortCycleUser, longCycleUser, workspace, project);
+        dbContext.AddRange(
+            CreateMember(owner, workspace, UserTeamRole.Owner),
+            CreateMember(shortCycleUser, workspace, UserTeamRole.Developer),
+            CreateMember(longCycleUser, workspace, UserTeamRole.Developer));
+
+        var issueIndex = 1;
+        var shortCycleIssues = AddCompletedIssues(
+            dbContext,
+            project,
+            owner,
+            shortCycleUser,
+            ref issueIndex,
+            sampleCount: 6,
+            actualHours: 4,
+            estimateHours: 4);
+        var longCycleIssues = AddCompletedIssues(
+            dbContext,
+            project,
+            owner,
+            longCycleUser,
+            ref issueIndex,
+            sampleCount: 6,
+            actualHours: 4,
+            estimateHours: 4);
+
+        await dbContext.SaveChangesAsync();
+
+        ApplyCycleTime(shortCycleIssues, daysToComplete: 1);
+        ApplyCycleTime(longCycleIssues, daysToComplete: 30);
+        await dbContext.SaveChangesAsync();
+
+        return new CycleTimeSeed(project, shortCycleUser, longCycleUser);
+    }
+
     private static User CreateUser(string key)
     {
         return new User
@@ -349,7 +698,7 @@ public sealed class IssueEstimatePredictionServiceTests
         };
     }
 
-    private static void AddCompletedIssues(
+    private static List<CompletedIssueSeedItem> AddCompletedIssues(
         ApplicationDbContext dbContext,
         Project project,
         User author,
@@ -361,6 +710,8 @@ public sealed class IssueEstimatePredictionServiceTests
         IssueType type = IssueType.Task,
         IssuePriority priority = IssuePriority.Medium)
     {
+        var issues = new List<CompletedIssueSeedItem>();
+
         for (var i = 0; i < sampleCount; i++)
         {
             var issue = new Issue
@@ -378,6 +729,16 @@ public sealed class IssueEstimatePredictionServiceTests
             };
             var trackedAt = DateTime.UtcNow.AddDays(-(i + 1));
 
+            var statusHistory = new IssueStatusHistory
+            {
+                Issue = issue,
+                ChangedByUser = assignee,
+                OldStatus = IssueStatus.InProgress,
+                NewStatus = IssueStatus.Done,
+                ChangedAt = trackedAt.AddHours(actualHours),
+            };
+
+            issues.Add(new CompletedIssueSeedItem(issue, statusHistory));
             dbContext.Add(issue);
             dbContext.Add(new TimeTracking
             {
@@ -387,14 +748,19 @@ public sealed class IssueEstimatePredictionServiceTests
                 DateBegin = trackedAt,
                 Comment = "Prediction training sample",
             });
-            dbContext.Add(new IssueStatusHistory
-            {
-                Issue = issue,
-                ChangedByUser = assignee,
-                OldStatus = IssueStatus.InProgress,
-                NewStatus = IssueStatus.Done,
-                ChangedAt = trackedAt.AddHours(actualHours),
-            });
+            dbContext.Add(statusHistory);
+        }
+
+        return issues;
+    }
+
+    private static void ApplyCycleTime(IEnumerable<CompletedIssueSeedItem> issues, int daysToComplete)
+    {
+        foreach (var item in issues)
+        {
+            var completedAt = DateTime.UtcNow.AddDays(-1);
+            item.Issue.ObjectCreateDate = completedAt.AddDays(-daysToComplete);
+            item.StatusHistory.ChangedAt = completedAt;
         }
     }
 
@@ -476,4 +842,16 @@ public sealed class IssueEstimatePredictionServiceTests
     private sealed record CurrentIssueExclusionSeed(Project Project, User User, Issue CurrentIssue);
 
     private sealed record IssueShapeSeed(Project Project, User User);
+
+    private sealed record PrioritySeed(Project Project, User User);
+
+    private sealed record ProjectBaselineSeed(Project SmallProject, Project LargeProject, User User);
+
+    private sealed record CurrentLoadSeed(Project Project, User FreeUser, User LoadedUser);
+
+    private sealed record ThroughputSeed(Project Project, User HighThroughputUser, User LowThroughputUser);
+
+    private sealed record CycleTimeSeed(Project Project, User ShortCycleUser, User LongCycleUser);
+
+    private sealed record CompletedIssueSeedItem(Issue Issue, IssueStatusHistory StatusHistory);
 }
