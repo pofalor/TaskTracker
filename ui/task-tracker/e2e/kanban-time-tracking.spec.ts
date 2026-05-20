@@ -55,5 +55,12 @@ test.describe('Kanban and time tracking', () => {
     await page.waitForTimeout(1_200);
     expect(activeTrack?.issueId).toBe(scenario.issue.id);
     expect(activeTrack?.autoTrackStatus).toBe(AutoTrackTimeStatus.Stopped);
-  });
+    await expect.poll(async () => {
+      const activeTrack = await api.getActiveAutoTrack(scenario.token, scenario.project.id, scenario.workspace.id);
+      return activeTrack?.autoTrackStatus;
+    }).toBe(AutoTrackTimeStatus.Stopped);
+
+    const stoppedTrack = await api.getActiveAutoTrack(scenario.token, scenario.project.id, scenario.workspace.id);
+      expect(stoppedTrack?.issueId).toBe(scenario.issue.id);
+    });
 });

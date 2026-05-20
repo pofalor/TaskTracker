@@ -20,8 +20,8 @@ test.describe('Authentication', () => {
     await page.getByTestId('register-country').selectOption(String(user.country));
     await page.getByTestId('register-submit').click();
 
-    await expect(page).toHaveURL(/\/my-workspaces/);
     await dismissTopModal(page);
+    await expect(page).toHaveURL(/\/my-workspaces/);
     await expect(page.getByText(/My workspaces/i)).toBeVisible();
   });
 
