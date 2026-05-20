@@ -10,7 +10,7 @@
             <div class="row">
                 <div class="col-12 pb-3">
                     <label class="mb-1">{{ "Time spent" | lang }}</label>
-                    <input type="text" class="form-control" formControlName="formTimeSpent"
+                    <input type="text" data-testid="time-spent" class="form-control" formControlName="formTimeSpent"
                         placeholder="{{'Use the format: 2h 3m 11s' | lang}}"/>
                     <div *ngIf="elemIsInvalid(timeTrackForm.get('formTimeSpent'))" class="text text-danger mt-1">
                         {{textErrorStr(timeTrackForm.get('formTimeSpent'), timeTrackPattern) | lang}}
@@ -21,7 +21,7 @@
                     <label class="mb-1">{{ "Date start" | lang }}</label>
                     <div class="row">
                         <div class="col-11">
-                            <input class="form-control" formControlName="formDateBegin" placeholder="yyyy-mm-dd" name="dp"
+                            <input class="form-control" data-testid="time-date-begin" formControlName="formDateBegin" placeholder="yyyy-mm-dd" name="dp"
                             ngbDatepicker #d="ngbDatepicker" />
                         </div>
                         <div class="col-1">
@@ -35,7 +35,7 @@
                 </div>
                 <div class="col-12 pb-3">
                     <label class="mb-1">{{ "Comment" | lang }}</label>
-                    <input type="text" class="form-control" formControlName="formComment"
+                    <input type="text" data-testid="time-comment" class="form-control" formControlName="formComment"
                         placeholder="{{'Comment' | lang}}" />
                     <div *ngIf="elemIsInvalid(timeTrackForm.get('formComment'))" class="text text-danger mt-1">
                         {{textErrorStr(timeTrackForm.get('formComment')) | lang}}
@@ -46,13 +46,13 @@
         <div class="row">
             <div class="col">
                 <button data-target="#modal-confirm" data-toggle="modal" class="btn btn-outline-info btn-soft w-100"
-                    type="button" (click)="back()">
+                    type="button" data-testid="modal-cancel" (click)="back()">
                     {{ "buttons.cancel" | lang }}
                 </button>
             </div>
             <div class="col">
                 <button data-target="#modal-confirm" data-toggle="modal" class="btn btn-primary btn-soft w-100"
-                    type="button" (click)="createTimeTrack()">
+                    type="button" data-testid="time-save" (click)="createTimeTrack()">
                     {{ "buttons.save" | lang }}
                 </button>
             </div>

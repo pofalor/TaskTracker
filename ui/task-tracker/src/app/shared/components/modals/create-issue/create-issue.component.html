@@ -11,7 +11,7 @@
             <div class="row">
                 <div class="col-12 pb-3">
                     <label class="mb-1">{{ "Issue name" | lang }}</label>
-                    <input type="text" class="form-control" formControlName="formIssueName"
+                    <input type="text" data-testid="issue-name" class="form-control" formControlName="formIssueName"
                         placeholder="{{'Issue name' | lang}}" />
                     <div *ngIf="elemIsInvalid(issueForm.get('formIssueName'))" class="text text-danger mt-1">
                         {{textErrorStr(issueForm.get('formIssueName')) | lang}}
@@ -19,7 +19,7 @@
                 </div>
                 <div class="col-12 pb-3">
                     <label class="mb-1">{{ "Issue description" | lang }}</label>
-                    <input type="text" class="form-control" formControlName="formIssueDescr"
+                    <input type="text" data-testid="issue-description" class="form-control" formControlName="formIssueDescr"
                         placeholder="{{'Issue description' | lang}}"/>
                     <div *ngIf="elemIsInvalid(issueForm.get('formIssueDescr'))" class="text text-danger mt-1">
                         {{textErrorStr(issueForm.get('formIssueDescr')) | lang}}
@@ -27,7 +27,7 @@
                 </div>
                 <div class="col-12 pb-3">
                     <label class="mb-1">{{ "Assignee" | lang }}</label>
-                    <ng-select appearance="outline" class="br-10" id="mgr-input-field" formControlName="formIssueAssigneeId">
+                    <ng-select appearance="outline" data-testid="issue-assignee" class="br-10" id="mgr-input-field" formControlName="formIssueAssigneeId">
                         <ng-option *ngFor="let user of assigneeCandidates" class="br-10" [value]="user.id">
                             {{ user.name }}
                         </ng-option>
@@ -38,7 +38,7 @@
                 </div>
                 <div class="col-12 pb-3">
                     <label class="mb-1">{{ "Issue type" | lang }}</label>
-                    <ng-select appearance="outline" class="br-10" id="mgr-input-field" formControlName="formIssueType">
+                    <ng-select appearance="outline" data-testid="issue-type" class="br-10" id="mgr-input-field" formControlName="formIssueType">
                         <ng-option *ngFor="let type of issueTypeArray" class="br-10" [value]="type.value">
                             {{ 'issueType.' + type.value | lang }}
                         </ng-option>
@@ -49,7 +49,7 @@
                 </div>
                 <div class="col-12 pb-3">
                     <label class="mb-1">{{ "Issue status" | lang }}</label>
-                    <ng-select appearance="outline" class="br-10" id="mgr-input-field" formControlName="formIssueStatus">
+                    <ng-select appearance="outline" data-testid="issue-status" class="br-10" id="mgr-input-field" formControlName="formIssueStatus">
                         <ng-option *ngFor="let status of IssueStatuses" class="br-10" [value]="status.key">
                             {{ 'issueStatus.' + status.key | lang }}
                         </ng-option>
@@ -68,7 +68,7 @@
                 </div>
                 <div class="col-12 pb-3">
                     <label class="mb-1">{{ "Estimate" | lang }}</label>
-                    <input type="text" class="form-control" formControlName="formIssueEstimate"
+                    <input type="text" data-testid="issue-estimate" class="form-control" formControlName="formIssueEstimate"
                         placeholder="{{'Use the format: 2h 3m 11s' | lang}}" />
                     <div *ngIf="elemIsInvalid(issueForm.get('formIssueEstimate'))" class="text text-danger mt-1">
                         {{textErrorStr(issueForm.get('formIssueEstimate'), timeTrackPattern) | lang}}
@@ -111,7 +111,7 @@
                 </div>
                 <div class="col-12 pb-3">
                     <label class="mb-1">{{ "Issue priority" | lang }}</label>
-                    <ng-select appearance="outline" class="br-10" id="mgr-input-field" formControlName="formIssuePriority">
+                    <ng-select appearance="outline" data-testid="issue-priority" class="br-10" id="mgr-input-field" formControlName="formIssuePriority">
                         <ng-option *ngFor="let priority of issuePriorityArray" class="br-10" [value]="priority.value">
                             {{ 'issuePriority.' + priority.value | lang }}
                         </ng-option>
@@ -125,13 +125,13 @@
         <div class="row">
             <div class="col">
                 <button data-target="#modal-confirm" data-toggle="modal" class="btn btn-outline-info btn-soft w-100"
-                    type="button" (click)="back()">
+                    type="button" data-testid="modal-cancel" (click)="back()">
                     {{ "buttons.cancel" | lang }}
                 </button>
             </div>
             <div class="col">
                 <button data-target="#modal-confirm" data-toggle="modal" class="btn btn-primary btn-soft w-100"
-                    type="button" (click)="createOrEditIssue()">
+                    type="button" data-testid="issue-save" (click)="createOrEditIssue()">
                     {{ "buttons.save" | lang }}
                 </button>
             </div>
