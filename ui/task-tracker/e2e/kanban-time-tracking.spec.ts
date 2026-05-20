@@ -46,21 +46,19 @@ test.describe('Kanban and time tracking', () => {
     await page.getByTestId(`kanban-start-auto-track-${scenario.issue.id}`).click();
     await page.getByTestId('confirm-accept').click();
     await expect(page.getByText(/Active time track/i)).toBeVisible();
+    await expect(page.getByText(/Time spent:\s*00:00:(0[1-9]|[1-5][0-9])/i)).toBeVisible({ timeout: 10_000 });
 
-    await page.waitForTimeout(1_200);
-    await page.getByTestId(`kanban-stop-auto-track-${scenario.issue.id}`).click();
+    const stopButton = page.getByTestId(`kanban-stop-auto-track-${scenario.issue.id}`);
+    await expect(stopButton).toBeVisible();
+    await stopButton.click();
     await page.getByTestId('confirm-accept').click();
 
-    const activeTrack = await api.getActiveAutoTrack(scenario.token, scenario.project.id, scenario.workspace.id);
-    await page.waitForTimeout(1_200);
-    expect(activeTrack?.issueId).toBe(scenario.issue.id);
-    expect(activeTrack?.autoTrackStatus).toBe(AutoTrackTimeStatus.Stopped);
     await expect.poll(async () => {
       const activeTrack = await api.getActiveAutoTrack(scenario.token, scenario.project.id, scenario.workspace.id);
       return activeTrack?.autoTrackStatus;
-    }).toBe(AutoTrackTimeStatus.Stopped);
+    }, { timeout: 10_000 }).toBe(AutoTrackTimeStatus.Stopped);
 
     const stoppedTrack = await api.getActiveAutoTrack(scenario.token, scenario.project.id, scenario.workspace.id);
-      expect(stoppedTrack?.issueId).toBe(scenario.issue.id);
-    });
+    expect(stoppedTrack?.issueId).toBe(scenario.issue.id);
+  });
 });
