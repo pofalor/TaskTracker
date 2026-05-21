@@ -90,7 +90,6 @@
                             </button>
                         </div>
                         <div *ngIf="estimatePrediction && !estimatePredictionLoading" class="estimate-prediction__meta">
-                            <span>{{ estimatePrediction.usedMlModel ? 'ML.NET FastTree' : ('Historical heuristic' | lang) }}</span>
                             <span>{{ "Confidence" | lang }}: {{ formatPredictionConfidence(estimatePrediction.confidence) }}</span>
                         </div>
                         <button *ngIf="estimatePrediction && !estimatePredictionLoading" class="estimate-prediction__details-btn"
