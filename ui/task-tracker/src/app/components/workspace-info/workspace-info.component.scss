@@ -1,0 +1,22 @@
+:host {
+  display: block;
+}
+
+@media (max-width: 576px) {
+  [data-testid="create-project-button"] {
+    width: 100%;
+  }
+
+  .card .row {
+    --bs-gutter-x: 0.75rem;
+  }
+
+  .card p,
+  .card span {
+    line-height: 1.35;
+  }
+
+  table {
+    margin-bottom: 0;
+  }
+}

@@ -1,13 +1,47 @@
 .auth-bg {
-    background: center / 100% no-repeat url(../../../../public/assets/images/login-background.jpg);
+    background: center / cover no-repeat url(../../../../public/assets/images/login-background.jpg);
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 100vh;
-    padding: 50px 100px;
+    min-height: 100dvh;
+    padding: 3rem 6rem;
 }
 
 .authentication-box {
-    min-width: 400px;
     margin: auto;
+    max-width: 500px;
+    min-width: 0;
+    width: 100%;
+}
+
+.card {
+    width: 100%;
+}
+
+@media (max-width: 576px) {
+  .auth-bg {
+    align-items: stretch;
+    padding: 1rem;
+  }
+
+  .authentication-box {
+    display: flex;
+    align-items: center;
+  }
+
+  .card {
+    max-width: none !important;
+  }
+
+  .card-body {
+    padding: 1.25rem;
+  }
+
+  h1 {
+    font-size: 1.75rem;
+  }
+
+  .form-group.pt-5 {
+    padding-top: 1.5rem !important;
+  }
 }

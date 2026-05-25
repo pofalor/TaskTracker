@@ -1,0 +1,27 @@
+:host {
+  display: block;
+}
+
+@media (max-width: 576px) {
+  .card .row {
+    --bs-gutter-x: 0.75rem;
+  }
+
+  .card .btn {
+    width: 100%;
+  }
+
+  .card p,
+  .card span,
+  .card label {
+    line-height: 1.35;
+  }
+
+  .btn-group .btn {
+    min-height: 42px;
+  }
+
+  table {
+    margin-bottom: 0;
+  }
+}
