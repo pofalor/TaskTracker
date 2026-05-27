@@ -77,7 +77,26 @@
 
 @media (max-width: 576px) {
   .app-header {
-    padding: 0.65rem 1rem;
+    min-height: auto;
+    padding: 0.5rem 0.75rem;
+    position: sticky;
+    top: 0;
+    z-index: 1020;
+  }
+
+  .header-actions {
+    justify-content: flex-end;
+    width: 100%;
+  }
+
+  .header-icon-button,
+  .language-control {
+    min-height: 44px;
+  }
+
+  .header-icon-button {
+    height: 44px;
+    width: 44px;
   }
 
   .language-control__label {
@@ -90,5 +109,13 @@
 
   .language-control__select {
     border-left: 0;
+    height: 30px;
+    min-width: 62px;
+    padding-right: 1.3rem;
+  }
+
+  .sign-out-button img {
+    height: 30px;
+    width: 30px;
   }
 }

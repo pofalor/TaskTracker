@@ -1,4 +1,4 @@
-.modal-content{
+.modal-content {
     border-radius: 1.375rem;
 }
 
@@ -34,4 +34,181 @@
 .flex-card{
     display: flex;
     flex-direction: column;
+}
+
+html,
+body {
+    max-width: 100%;
+}
+
+img,
+svg {
+    max-width: 100%;
+}
+
+.container-fluid {
+    padding-left: clamp(0.75rem, 2vw, 1.5rem);
+    padding-right: clamp(0.75rem, 2vw, 1.5rem);
+}
+
+.card,
+.card-body,
+.modal-content {
+    overflow-wrap: anywhere;
+}
+
+.btn {
+    overflow-wrap: anywhere;
+    white-space: normal;
+}
+
+.form-control,
+.ng-select {
+    min-width: 0;
+}
+
+@media (max-width: 768px) {
+    .table {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .table th,
+    .table td {
+        vertical-align: middle;
+    }
+
+    .table td {
+        max-width: 240px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .modal-dialog {
+        margin: 0.75rem;
+    }
+
+    .modal-content {
+        max-height: calc(100dvh - 1.5rem);
+        overflow-y: auto;
+    }
+}
+
+@media (max-width: 576px) {
+    body {
+        overflow-x: hidden;
+    }
+
+    .container-fluid {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+    }
+
+    .container-fluid > .row {
+        --bs-gutter-x: 0.75rem;
+    }
+
+    .container-fluid .row > .col-auto,
+    .container-fluid .row > [class*="col-xxl-3"] {
+        flex: 0 0 100%;
+        max-width: 100%;
+        width: 100%;
+    }
+
+    .container-fluid .card {
+        min-width: 0 !important;
+        width: 100%;
+    }
+
+    .container-fluid .card-body {
+        padding: 1rem;
+    }
+
+    .container-fluid .card-body[style] {
+        align-items: center;
+        display: flex;
+        justify-content: center;
+        line-height: 1.45 !important;
+        min-height: 160px !important;
+        text-align: center;
+    }
+
+    .f-30 {
+        font-size: 1.5rem;
+        line-height: 1.2;
+    }
+
+    .f-28 {
+        font-size: 1.45rem;
+        line-height: 1.25;
+    }
+
+    .f-24 {
+        font-size: 1.25rem;
+    }
+
+    .f-22 {
+        font-size: 1.1rem;
+    }
+
+    .f-20 {
+        font-size: 1rem;
+    }
+
+    .btn-group {
+        display: flex;
+        flex-wrap: wrap;
+        width: 100%;
+    }
+
+    .btn-group > .btn {
+        flex: 1 1 0;
+        min-width: 0;
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+
+    .modal-content {
+        border-radius: 0.875rem;
+    }
+
+    .modal-content .card {
+        border-radius: 0.875rem;
+    }
+
+    .modal-content .card-body {
+        padding: 1rem;
+    }
+
+    .modal-content .row {
+        --bs-gutter-x: 0.75rem;
+    }
+
+    .modal-content .row > .col {
+        flex: 0 0 100%;
+        width: 100%;
+    }
+
+    .modal-content .row > .col-11 {
+        flex: 0 0 calc(100% - 52px);
+        width: calc(100% - 52px);
+    }
+
+    .modal-content .row > .col-1 {
+        flex: 0 0 52px;
+        padding-left: 0.25rem;
+        width: 52px;
+    }
+
+    .modal-content .row > .col-1 .btn {
+        min-width: 44px;
+        width: 100%;
+    }
+
+    .ng-dropdown-panel {
+        max-width: calc(100vw - 2rem);
+    }
 }
