@@ -310,5 +310,9 @@
   "Unable to get managers for your workspace. Please contact support": "Не удалось получить список менеджеров. Обратитесь в поддержку",
   "Failed to get user information. Please, contact to support": "Не удалось получить информацию о пользователе. Обратитесь в поддержку",
   "Recent productivity":"Недавняя производительность",
-  "Recent completed work, throughput and current load slightly adjust the prediction.":"Недавно завершенные работы, пропускная способность и текущая нагрузка незначительно изменяют прогноз."
+  "Recent completed work, throughput and current load slightly adjust the prediction.":"Недавно завершенные работы, пропускная способность и текущая нагрузка незначительно изменяют прогноз.",
+  "Lastname":"Фамилия",
+  "Firstname":"Имя",
+  "Password Confirmation": "Подтверждение пароля",
+  "Password":"Пароль"
 }

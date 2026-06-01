@@ -14,7 +14,7 @@
                     </div>
                     <!--ПАРОЛЬ-->
                     <div class="form-group pt-3">
-                        <input data-testid="register-password" placeholder="Password" [type]="'password'" class="form-control"
+                        <input data-testid="register-password" placeholder="{{ 'Password' | lang }}" [type]="'password'" class="form-control"
                             formControlName="password" />
                         <div *ngIf="elemIsInvalid(registerForm.get('password'))" class="text text-danger mt-1">
                         {{ textErrorStr(registerForm.get('password')) | lang }}
@@ -23,7 +23,7 @@
                     <!--ПОДТВЕРЖДЕНИЕ ПАРОЛЯ-->
                     <div class="form-group pt-3">
                         <input id="passwordConfirm-input-field" data-testid="register-password-confirm" class="form-control" type="password"
-                            formControlName="passwordConfirm" placeholder="Password Confirmation">
+                            formControlName="passwordConfirm" placeholder="{{ 'Password Confirmation' | lang }}">
                         <div *ngIf="elemIsInvalid(registerForm.get('passwordConfirm'))" class="text text-danger mt-1">
                             {{textErrorStr(registerForm.get('passwordConfirm')) | lang}}
                         </div>
@@ -31,7 +31,7 @@
                     <!--ФАМИЛИЯ-->
                     <div class="form-group pt-3">
                         <input id="lastname-input-field" data-testid="register-lastname" class="form-control" type="text" formControlName="lastname"
-                            placeholder="Lastname">
+                            placeholder="{{ 'Lastname' | lang }}">
                         <div *ngIf="elemIsInvalid(registerForm.get('lastname'))" class="text text-danger mt-1">
                             {{textErrorStr(lastname, namePattern) | lang}}
                         </div>
@@ -39,7 +39,7 @@
                     <!--ИМЯ-->
                     <div class="form-group pt-3">
                         <input id="firstname-input-field" data-testid="register-firstname" class="form-control" type="text" formControlName="firstname"
-                            placeholder="Firstname">
+                            placeholder="{{ 'Firstname' | lang }}">
                         <div *ngIf="elemIsInvalid(registerForm.get('firstname'))" class="text text-danger mt-1">
                             {{textErrorStr(firstname, namePattern) | lang}}
                         </div>
