@@ -7,7 +7,7 @@
         <label class="language-control" aria-label="Language">
             <span class="language-control__label">Lang</span>
             <select class="language-control__select" [value]="currentLang" (change)="changeLanguage($event)">
-                <option *ngFor="let lang of languages" [value]="lang.code">{{ lang.label }}</option>
+                <option *ngFor="let lang of languages" [value]="lang.code" [selected]="lang.code === currentLang">{{ lang.label }}</option>
             </select>
         </label>
 

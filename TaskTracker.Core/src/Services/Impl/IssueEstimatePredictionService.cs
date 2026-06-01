@@ -594,17 +594,17 @@ namespace TaskTracker.Core.src.Services.Impl
             {
                 new()
                 {
-                    Name = "Model",
-                    Value = usedMlModel ? "ML.NET FastTree" : "Heuristic fallback",
+                    Name = "Prediction basis",
+                    Value = usedMlModel ? "Completed task history" : "Limited task history",
                     Description = usedMlModel
-                        ? "The model was trained on completed time-tracking history in this workspace."
-                        : "There is not enough varied history for ML.NET, so the prediction uses weighted historical averages.",
+                        ? "The forecast is based on completed tasks with recorded time in this workspace."
+                        : "There is little completed history, so the forecast relies more on project and workspace averages.",
                 },
                 new()
                 {
-                    Name = "Training samples",
+                    Name = "Completed tasks analyzed",
                     Value = trainingSamples.ToString(),
-                    Description = "Only issues with recorded time are used as training examples.",
+                    Description = "Only issues with recorded time are included in the forecast.",
                 },
             };
 
