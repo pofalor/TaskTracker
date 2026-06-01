@@ -78,7 +78,6 @@ export class AuthService implements OnInit {
   // Sign out
   SignOut() {
     const localization = localStorage?.getItem("localization");
-    window.stop();
     this.authData = null;
     this.eventService.logout();
     localStorage.clear();

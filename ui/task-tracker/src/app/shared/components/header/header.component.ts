@@ -33,6 +33,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.langChangeSubscription = this.translate.onLangChange.subscribe((event) => {
       this.currentLang = event.lang;
     });
+    this.syncCurrentLanguage();
   }
 
   ngOnDestroy() {
@@ -75,6 +76,13 @@ export class HeaderComponent implements OnInit, OnDestroy {
   private syncCurrentLanguage() {
     const hasBrowserStorage = typeof window !== 'undefined' && typeof window.localStorage !== 'undefined';
     const storedLang = hasBrowserStorage ? window.localStorage.getItem('localization') : null;
-    this.currentLang = storedLang || this.translate.currentLang || 'en';
+    const lang = storedLang || this.translate.currentLang || 'en';
+    this.currentLang = lang;
+    if (this.translate.currentLang !== lang) {
+      this.translate.use(lang);
+      if (typeof document !== 'undefined') {
+        document.documentElement.lang = lang;
+      }
+    }
   }
 }
