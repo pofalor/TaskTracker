@@ -314,5 +314,7 @@
   "Lastname":"Фамилия",
   "Firstname":"Имя",
   "Password Confirmation": "Подтверждение пароля",
-  "Password":"Пароль"
+  "Password":"Пароль",
+  "Estimate accuracy":"Адекватность оценки",
+  "Historical actual time divided by previous estimates for this assignee.":"Фактическое время выполнения, разделённое на предыдущие оценки для этого исполнителя."
 }
