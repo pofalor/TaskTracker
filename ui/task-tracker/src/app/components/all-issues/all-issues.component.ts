@@ -378,6 +378,11 @@ export class AllIssuesComponent extends BaseComponent {
     return this.kanbanIssuesByStatus[status] ?? [];
   }
 
+  public isAssignedToCurrentUser(issue: IssueModel): boolean {
+    var currentUserId = this.getUser().id;
+    return !!issue?.assigneeId && !!currentUserId && issue.assigneeId == currentUserId;
+  }
+
   public canMoveLeft(status: IssueStatus): boolean {
     return this.kanbanStatuses.indexOf(status) > 0;
   }

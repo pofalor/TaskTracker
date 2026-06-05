@@ -44,6 +44,26 @@
   cursor: grab;
 }
 
+.issue-assigned-to-me {
+  --bs-table-bg: #fffbeb;
+  --bs-table-striped-bg: #fffbeb;
+}
+
+tr.issue-assigned-to-me > *:first-child {
+  border-left: 4px solid #f59e0b;
+}
+
+.kanban-card.issue-assigned-to-me {
+  background: #fffbeb;
+  border-color: #f59e0b;
+}
+
+.issue-key-with-marker {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+}
+
 .kanban-card-key {
   font-size: 0.85rem;
   font-weight: 700;
