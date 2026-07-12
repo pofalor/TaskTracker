@@ -14,7 +14,7 @@ import { LangPipe } from '../../shared/pipes/lang.pipe';
 import { WorkspaceService } from '../../shared/services/workspace.service';
 import { UserWspStatusChangeModel } from '../../shared/model/userWspStatusChangeModel';
 import { CreateWspInvitationModalComponent } from '../../shared/components/modals/create-wsp-invitation-modal/create-wsp-invitation.modal.component';
-import { WorkspaceModel } from '../../shared/model/workspaceModel';
+import { WorkspaceModel } from '../../shared/model/workSpaceModel';
 import { UserStatusChangeType } from '../../shared/enums/user-status-change-type';
 import { CreateProjectComponent } from '../../shared/components/modals/create-project/create-project.component';
 import { DatepickerUtils } from '../../shared/utils/ngbDatepickerUtils';

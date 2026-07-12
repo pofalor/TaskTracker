@@ -5,7 +5,7 @@ import { NgbModal, NgbActiveModal, NgbAlertModule, NgbDatepickerModule } from '@
 import { TranslateService } from '@ngx-translate/core';
 import { UserService } from '../../../services/user.service';
 import { WorkspaceService } from '../../../services/workspace.service';
-import { WorkspaceModel } from '../../../model/workspaceModel';
+import { WorkspaceModel } from '../../../model/workSpaceModel';
 import { WorkspaceType } from '../../../enums/work-space-type';
 import { CreateWspInvitePostRequest } from '../../../model/postRequests/сreateWspInvitePostRequest';
 import { SearchUserForInvitePR } from '../../../model/postRequests/searchUserForInvitePR';

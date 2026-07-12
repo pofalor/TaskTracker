@@ -3,7 +3,7 @@ import { BaseComponent } from '../../../base/base.component';
 import { NgbActiveModal, NgbAlertModule, NgbDatepickerModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { WorkspaceType } from '../../../enums/work-space-type';
-import { CreateOrEditWorkspacePostRequest } from '../../../model/postRequests/createOrEditWorkspacePostRequest';
+import { CreateOrEditWorkspacePostRequest } from '../../../model/postRequests/createOrEditWorkSpacePostRequest';
 import { LangPipe } from '../../../pipes/lang.pipe';
 import { CommonModule } from '@angular/common';
 import { ListCountry } from '../../../constants/country';

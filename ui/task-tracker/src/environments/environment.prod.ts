@@ -1,6 +1,6 @@
 export const environment = {
   envName: 'prod',
   production: true,
-  apiUrl: 'http://localhost:58575/',
+  apiUrl: '/',
   tokenUrl: 'api/auth/authenticate'
 };

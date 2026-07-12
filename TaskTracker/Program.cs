@@ -24,8 +24,8 @@ try
 
     var currentDir = Directory.GetCurrentDirectory();
     var configPath = Path.Combine(currentDir, "config");
-    var nlog_path = Path.Combine(configPath, "NLog.config");
-    NLog.LogManager.Configuration = new NLog.Config.XmlLoggingConfiguration(nlog_path);
+    var nlogPath = Path.Combine(configPath, "nlog.config");
+    NLog.LogManager.Configuration = new NLog.Config.XmlLoggingConfiguration(nlogPath);
 
     // Add services to the container.
     builder.Services.AddControllersWithViews();
@@ -108,6 +108,19 @@ try
     var app = builder.Build();
 
     AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
+    if (app.Configuration.GetValue<bool>("Database:ApplyMigrations"))
+    {
+        logger.Info("Applying database migrations.");
+
+        await using var scope = app.Services.CreateAsyncScope();
+
+        var identityDbContext = scope.ServiceProvider.GetRequiredService<ApplicationIdentityDbContext>();
+        await identityDbContext.Database.MigrateAsync();
+
+        var applicationDbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        await applicationDbContext.Database.MigrateAsync();
+    }
 
     // Configure the HTTP request pipeline.
     if (!app.Environment.IsDevelopment())

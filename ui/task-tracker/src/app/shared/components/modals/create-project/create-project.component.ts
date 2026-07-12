@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { BaseComponent } from '../../../base/base.component';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { CreateOrEditWorkspacePostRequest } from '../../../model/postRequests/createOrEditWorkspacePostRequest';
+import { CreateOrEditWorkspacePostRequest } from '../../../model/postRequests/createOrEditWorkSpacePostRequest';
 import { ProjectService } from '../../../services/project.service';
 import { NgbModal, NgbActiveModal, NgbDatepickerModule, NgbAlertModule } from '@ng-bootstrap/ng-bootstrap';
 import { TranslateService } from '@ngx-translate/core';

@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { CreateOrEditWorkspacePostRequest } from '../model/postRequests/createOrEditWorkspacePostRequest';
+import { CreateOrEditWorkspacePostRequest } from '../model/postRequests/createOrEditWorkSpacePostRequest';
 import { IResponse } from '../interfaces/response';
 import { ApiService } from './api.service';
 import { lastValueFrom, Observable } from 'rxjs';
-import { WorkspaceModel } from '../model/workspaceModel';
+import { WorkspaceModel } from '../model/workSpaceModel';
 import { UserWspStatusChangeModel } from '../model/userWspStatusChangeModel';
 import { CreateWspInvitePostRequest } from '../model/postRequests/сreateWspInvitePostRequest';
 import { SearchUserForInvitePR } from '../model/postRequests/searchUserForInvitePR';
