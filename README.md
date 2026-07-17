@@ -39,11 +39,10 @@
 
 ```
 TaskTracker/          — ASP.NET Core Web API (хост, контроллеры, конфигурация, Dockerfile)
-TaskTracker.Core/     — доменное ядро: сущности, EF-контексты, миграции, сервисы, ML-модуль
+TaskTracker.Core/     — ядро бизнес-логики: сущности, EF-контексты, миграции, сервисы, ML-модуль
 TaskTracker.Utils/    — вспомогательные расширения
 TaskTracker.Tests/    — xUnit-тесты прогнозирования оценок
 ui/task-tracker/      — фронтенд Angular + Playwright-тесты (e2e/)
-docs/                 — документация: testing.md, курсовая/ВКР, SQL-скрипты
 architecture.md       — техническое описание архитектуры
 ```
 
