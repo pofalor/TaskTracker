@@ -58,9 +58,19 @@ architecture.md       — техническое описание архитек
 
 ### Бэкенд
 
-1. Создайте БД PostgreSQL и укажите строку подключения в `TaskTracker/appsettings.Development.json` (`ConnectionStrings:DefaultConnection`).
-2. Заполните секции конфигурации `Identity` (issuer/audience/секрет JWT), `TelegramSettings` и `Security` (см. [architecture.md, §13](architecture.md)).
-3. Примените миграции — либо автоматически при старте (`"Database": { "ApplyMigrations": true }`), либо вручную:
+1. Создайте локальные файлы конфигурации из шаблона. Файлы `appsettings.json` и `appsettings.Development.json` содержат секреты (пароль БД, ключ подписи JWT, токен Telegram-бота), поэтому они добавлены в `.gitignore` и в репозитории их нет — в git хранится только шаблон `appsettings.example.json`. После клонирования репозитория его нужно скопировать под обоими именами и подставить свои значения:
+   ```powershell
+   cp TaskTracker/appsettings.example.json TaskTracker/appsettings.json
+   cp TaskTracker/appsettings.example.json TaskTracker/appsettings.Development.json
+   ```
+   `appsettings.json` — общие настройки (используются в том числе в проде), `appsettings.Development.json` — переопределения для локальной разработки (запуск через `dotnet run` идёт с `ASPNETCORE_ENVIRONMENT=Development`, поэтому значения из него перекрывают `appsettings.json`).
+2. Заполните в обоих файлах строку подключения `ConnectionStrings:DefaultConnection` и секции `Identity` (issuer/audience/секрет JWT), `TelegramSettings` и `Security` (см. [architecture.md, §13](architecture.md)).
+
+   > **Ключ подписи JWT (`Identity:TokenSecret`) должен быть длинным — не меньше 32 символов** (как значение-заглушка в `appsettings.example.json`). Токены подписываются алгоритмом HMAC-SHA256, которому нужен ключ от 256 бит; с более коротким секретом приложение стартует, но вход в систему падает с ошибкой `IDX10653`. Используйте длинную случайную строку, например:
+   > ```powershell
+   > [Convert]::ToBase64String([System.Security.Cryptography.RandomNumberGenerator]::GetBytes(48))
+   > ```
+3. Примените миграции — либо автоматически при старте (`"Database": { "ApplyMigrations": true }`, включено в шаблоне), либо вручную:
    ```powershell
    dotnet ef database update --project TaskTracker.Core --startup-project TaskTracker --context ApplicationIdentityDbContext
    dotnet ef database update --project TaskTracker.Core --startup-project TaskTracker --context ApplicationDbContext
@@ -70,6 +80,8 @@ architecture.md       — техническое описание архитек
    dotnet run --project TaskTracker
    ```
    В режиме разработки фронтенд ожидает API на `https://localhost:44336`.
+
+   При старте приложение само создаёт системные роли Identity — `User` (выдаётся каждому при регистрации) и `Master` (администратор системы, модерация корпоративных воркспейсов). Создание идемпотентно: если роли уже есть в БД, ничего не меняется. Заводить роль вручную запросом `api/sos/createnewrole` больше не нужно; эндпоинт остался только для нестандартных ролей.
 
 ### Фронтенд
 
@@ -87,6 +99,8 @@ npm start        # ng serve → http://localhost:4200
 cp .env.example .env    # заполните секреты (JWT-секрет, пароль БД, токен Telegram-бота и т.д.)
 docker compose up -d --build
 ```
+
+Здесь `appsettings.json` не нужен — вся конфигурация приходит в контейнер API переменными окружения из `.env`. Требование к длине `IDENTITY_TOKEN_SECRET` то же самое: **не меньше 32 символов**.
 
 По умолчанию UI будет доступен на `http://localhost:4200`, API — на `http://localhost:8080`, PostgreSQL — на `localhost:5434`. Порты и секреты настраиваются через `.env` (см. `.env.example`); при первом старте API сам применит миграции (`Database__ApplyMigrations=true`).
 

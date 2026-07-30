@@ -46,7 +46,8 @@
 6. CORS: политика `AllowAll` в Development, иначе `AllowFront` — только origin из `Identity:TokenAudience`, с credentials.
 7. `AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true)` — легаси-режим таймстампов Npgsql (даты хранятся без строгого требования `Kind=Utc`).
 8. Если `Database:ApplyMigrations = true` — на старте применяются миграции обоих контекстов (`Database.MigrateAsync()`). Флаг добавлен для запуска в Docker без ручного `dotnet ef database update`.
-9. Маршрут по умолчанию MVC (`{controller=Home}/{action=Index}`) — `HomeController` и `Views/` остались от шаблона, реальный API живёт на атрибутных маршрутах `api/*`.
+9. `IdentityDataSeeder.SeedIdentityRolesAsync()` (`Core/src/Installers`) — после миграций создаются системные роли `User` и `Master` (`Constants/Permissions.cs`), если их ещё нет. Проверка идёт по нормализованному имени (`RoleManager.RoleExistsAsync`), поэтому роли, заведённые раньше вручную в другом регистре, не дублируются. Если роль не удалось создать, старт прерывается с `InvalidOperationException` — без роли `User` не работает регистрация.
+10. Маршрут по умолчанию MVC (`{controller=Home}/{action=Index}`) — `HomeController` и `Views/` остались от шаблона, реальный API живёт на атрибутных маршрутах `api/*`.
 
 ## 3. Модель данных
 
@@ -101,10 +102,11 @@
 
 - **Регистрация** (`POST api/auth/register`): создаётся `IdentityUser` (Identity хранит пароль) и доменный `User`, связанный по `User.UserId = IdentityUser.Id`.
 - **Вход** (`POST api/auth/authenticate`): проверка пароля через `SignInManager`, выпуск **JWT** (`AuthenticationService`). В токен кладутся: кастомный клейм `UserId` (int-идентификатор доменного `User` — по нему работают все сервисы), роли (`ClaimTypes.Role`), клеймы Identity-пользователя, `sub`, `email`, `iat`, `auth_time`.
-- Параметры токена — секция конфигурации `Identity`: `TokenIssuer`, `TokenAudience` (совпадает с origin фронтенда и используется в CORS-политике), `TokenSecret` (симметричный ключ HMAC). Валидируются issuer, audience, lifetime и подпись; `ClockSkew = 0`.
+- Параметры токена — секция конфигурации `Identity`: `TokenIssuer`, `TokenAudience` (совпадает с origin фронтенда и используется в CORS-политике), `TokenSecret` (симметричный ключ HMAC). Валидируются issuer, audience, lifetime и подпись; `ClockSkew = 0`. `TokenSecret` должен быть **не короче 32 символов**: ключ берётся как UTF-8-байты строки, а `HmacSha256` требует минимум 256 бит — иначе выпуск токена падает с `IDX10653`.
+- **Системные роли** `User` и `Master` создаются автоматически при старте приложения (см. §2.2, п. 9), отдельного действия администратора не требуется.
 - **Уровни доступа контроллеров**: `BaseApiController` (аноним) → `ProtectedApiController` (`[Authorize]` c JWT-схемой) → отдельные экшены с `[Authorize(Roles = Permissions.Admin)]`. Роль администратора называется **`Master`** (`Constants/Permissions.cs`).
 - **Проверка членства в воркспейсе** — экшен-фильтр `WorkspaceMemberFilterAttribute`/`WorkspaceMemberAuthorizationFilter` (`TaskTracker/Attributes`). Из параметров запроса извлекается id ресурса (`WorkspaceMemberResourceType`: `Workspace`/`Project`/`Issue` или `Auto` — тип определяется по имени параметра), ресурс резолвится до воркспейса, затем проверяется, что `UserId` из токена — активный член этого воркспейса. При нарушении возвращается 401/400, а админам уходит уведомление в Telegram (потенциальная попытка обхода прав).
-- **Служебный `SosController`** (`api/sos/createnewrole`, `api/sos/settorole`) — анонимные эндпоинты для создания Identity-ролей и назначения их пользователям (например, выдача роли `Master`). Защищены сравнением query-параметра `securityToken` со значением `Security:AnonymousTokenRequest` из конфигурации. Это административный «чёрный ход» для первичной настройки — в проде значение токена должно быть секретным.
+- **Служебный `SosController`** (`api/sos/createnewrole`, `api/sos/settorole`) — анонимные эндпоинты для создания Identity-ролей и назначения их пользователям (например, выдача роли `Master` конкретному пользователю). Защищены сравнением query-параметра `securityToken` со значением `Security:AnonymousTokenRequest` из конфигурации. Это административный «чёрный ход» — в проде значение токена должно быть секретным. Для первичной настройки он больше не нужен: базовые роли заводятся автоматически на старте.
 
 ## 5. REST API
 
@@ -241,13 +243,13 @@ NLog (`NLog.Web.AspNetCore`), конфиг — `TaskTracker/config/nlog.config`,
 | Секция | Ключи | Назначение |
 |---|---|---|
 | `ConnectionStrings` | `DefaultConnection` | PostgreSQL (локально по умолчанию `localhost:5434`, БД `tasktracker`) |
-| `Identity` | `TokenIssuer`, `TokenAudience`, `TokenSecret` | Параметры JWT; `TokenAudience` = origin фронтенда (используется и в CORS) |
+| `Identity` | `TokenIssuer`, `TokenAudience`, `TokenSecret` | Параметры JWT; `TokenAudience` = origin фронтенда (используется и в CORS); `TokenSecret` — от 32 символов (см. §4) |
 | `TelegramSettings` | `TelegramBotToken`, `AdminTelegramIds` | Бот-уведомления администраторам |
 | `Security` | `AnonymousTokenRequest` | Секрет для служебных эндпоинтов `api/sos/*` |
 | `Database` | `ApplyMigrations` | Применять миграции при старте (для Docker) |
 | `Logging` | стандартные уровни | Плюс полный контроль через `config/nlog.config` |
 
-Секреты (строка подключения, `TokenSecret`, токен бота) в проде должны задаваться через переменные окружения/секрет-хранилище, а не коммититься в `appsettings.json`.
+`appsettings.json` и `appsettings.Development.json` в `.gitignore`; в репозитории лежит шаблон `TaskTracker/appsettings.example.json`, который копируется под обоими именами при разворачивании (см. README). Секреты (строка подключения, `TokenSecret`, токен бота) в проде должны задаваться через переменные окружения/секрет-хранилище, а не коммититься в `appsettings.json`.
 
 ## 14. Известные ограничения и незавершённый функционал
 

@@ -122,6 +122,11 @@ try
         await applicationDbContext.Database.MigrateAsync();
     }
 
+    // Системные роли (User, Master) создаются автоматически: без них не работает регистрация
+    // и модерация воркспейсов. Раньше их приходилось заводить вручную через api/sos/createnewrole.
+    logger.Info("Seeding system identity roles.");
+    await app.Services.SeedIdentityRolesAsync();
+
     // Configure the HTTP request pipeline.
     if (!app.Environment.IsDevelopment())
     {
