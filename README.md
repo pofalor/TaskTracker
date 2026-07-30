@@ -32,8 +32,8 @@
 |---|---|
 | Бэкенд | C# / ASP.NET Core 8, Entity Framework Core 8, PostgreSQL 16+, ASP.NET Identity + JWT, AutoMapper, NLog, ML.NET (FastTree) |
 | Фронтенд | Angular 19 (standalone-компоненты), Bootstrap 5.3 + ng-bootstrap, Angular CDK (drag-and-drop), ngx-translate |
-| Тесты | Playwright (e2e/API), xUnit (тесты ML-модуля) |
-| Инфраструктура | Docker (отдельные образы API и UI) |
+| Тесты | Playwright (e2e/API), Karma + Jasmine (юнит-тесты UI), xUnit (тесты ML-модуля) |
+| Инфраструктура | Docker + Docker Compose (PostgreSQL, API, UI) |
 
 ## Структура репозитория
 
@@ -42,7 +42,9 @@ TaskTracker/          — ASP.NET Core Web API (хост, контроллеры
 TaskTracker.Core/     — ядро бизнес-логики: сущности, EF-контексты, миграции, сервисы, ML-модуль
 TaskTracker.Utils/    — вспомогательные расширения
 TaskTracker.Tests/    — xUnit-тесты прогнозирования оценок
-ui/task-tracker/      — фронтенд Angular + Playwright-тесты (e2e/)
+ui/task-tracker/      — фронтенд Angular: src/ (приложение), e2e/ (Playwright), nginx.conf, Dockerfile
+docker-compose.yml    — запуск всей системы (PostgreSQL + API + UI)
+.env.example          — шаблон переменных окружения для docker compose
 architecture.md       — техническое описание архитектуры
 ```
 
@@ -55,6 +57,7 @@ architecture.md       — техническое описание архитек
 - .NET SDK 8.0
 - Node.js 20+ (в Docker-сборке используется Node 22) и Angular CLI
 - PostgreSQL 16+ (по умолчанию конфигурация ожидает `localhost:5434`, БД `tasktracker`)
+- Docker с Docker Compose — если поднимаете систему целиком в контейнерах (см. [Docker](#docker)); для локального запуска из исходников не нужен
 
 ### Бэкенд
 
@@ -75,11 +78,15 @@ architecture.md       — техническое описание архитек
    dotnet ef database update --project TaskTracker.Core --startup-project TaskTracker --context ApplicationIdentityDbContext
    dotnet ef database update --project TaskTracker.Core --startup-project TaskTracker --context ApplicationDbContext
    ```
-4. Запустите API:
+4. Один раз выпустите и доверьте сертификат для локального HTTPS (без него запуск по https падает с `Unable to configure HTTPS endpoint`):
    ```powershell
-   dotnet run --project TaskTracker
+   dotnet dev-certs https --trust
    ```
-   В режиме разработки фронтенд ожидает API на `https://localhost:44336`.
+5. Запустите API:
+   ```powershell
+   dotnet run --project TaskTracker --urls https://localhost:44336
+   ```
+   Порт указан не случайно: в dev-режиме фронтенд обращается к API по адресу `https://localhost:44336` (`ui/task-tracker/src/environments/environment.ts`). При запуске из Visual Studio через IIS Express этот адрес поднимается сам (`Properties/launchSettings.json`, `sslPort`), а вот профили `http`/`https`, которые использует `dotnet run` по умолчанию, слушают другие порты (5159 и 7077) — тогда фронтенд до API не достучится. Либо передавайте `--urls`, как выше, либо поправьте `apiUrl` в `environment.ts` под свой порт.
 
    При старте приложение само создаёт системные роли Identity — `User` (выдаётся каждому при регистрации) и `Master` (администратор системы, модерация корпоративных воркспейсов). Создание идемпотентно: если роли уже есть в БД, ничего не меняется. Заводить роль вручную запросом `api/sos/createnewrole` больше не нужно; эндпоинт остался только для нестандартных ролей.
 
@@ -119,19 +126,53 @@ docker build -t tasktracker-ui .
 
 ## Тестирование
 
-Полная инструкция — [docs/testing.md](docs/testing.md).
+### e2e и API-тесты (Playwright)
+
+Запускаются против уже поднятых фронтенда и API:
 
 ```powershell
-# e2e (Playwright) — против локально запущенных фронтенда и API
 cd ui/task-tracker
 npx playwright install chromium   # один раз
 npm run e2e
+```
 
-# тесты ML-модуля (создают/удаляют одноразовую БД PostgreSQL на каждый тест)
+Наборы в `ui/task-tracker/e2e/`:
+
+| Спека | Что проверяет |
+|---|---|
+| `auth.spec.ts` | регистрация и вход через интерфейс |
+| `kanban-time-tracking.spec.ts` | канбан-доска, ручное списание часов, автотрекинг |
+| `api-contract.spec.ts` | контракты REST API: auth, задачи проекта, трекинг, прогноз оценки |
+| `readonly-smoke.spec.ts` | безопасный смоук: логин и открытие доски, без создания данных |
+
+Мутационные тесты (первые три) создают реальных пользователей и данные, поэтому по умолчанию выполняются, только когда и API, и UI указывают на localhost. Для одноразового тестового стенда это можно снять через `E2E_ALLOW_MUTATION=1`. Против прода предназначен только `readonly-smoke.spec.ts`.
+
+Переменные окружения:
+
+| Переменная | По умолчанию | Назначение |
+|---|---|---|
+| `E2E_APP_URL` | `http://localhost:4200` | адрес фронтенда |
+| `E2E_API_URL` | `https://localhost:44336` | адрес API |
+| `E2E_START_APP` | — | `1` — Playwright сам поднимет `ng serve` перед прогоном |
+| `E2E_ALLOW_MUTATION` | — | `1` — разрешить мутационные тесты вне localhost |
+| `E2E_USER_EMAIL`, `E2E_USER_PASSWORD`, `E2E_WORKSPACE_ID`, `E2E_PROJECT_ID` | — | учётка и доска для `readonly-smoke.spec.ts` (без них он пропускается) |
+
+Полезно: `npm run e2e:headed` — прогон с видимым браузером, `npm run e2e:ui` — интерактивный режим, `npm run e2e:report` — открыть HTML-отчёт последнего прогона.
+
+### Юнит-тесты фронтенда (Karma + Jasmine)
+
+```powershell
+cd ui/task-tracker
+npm test
+```
+
+### Тесты ML-модуля (xUnit)
+
+```powershell
 dotnet test TaskTracker.Tests/TaskTracker.Tests.csproj
 ```
 
-Мутационные e2e-тесты создают реальных пользователей и данные, поэтому по умолчанию выполняются только против localhost. Для прода предназначен безопасный смоук `readonly-smoke.spec.ts`.
+Каждый тест создаёт собственную одноразовую БД PostgreSQL и удаляет её после прогона, поэтому нужен запущенный PostgreSQL с правом создавать/удалять базы. По умолчанию используется `localhost:5434` (пользователь `postgres`); другой сервер задаётся переменной `TASKTRACKER_TEST_DB_CONNECTION` со строкой подключения.
 
 ## Краткое руководство пользователя
 
@@ -144,9 +185,8 @@ dotnet test TaskTracker.Tests/TaskTracker.Tests.csproj
 
 ## Документация
 
-- [architecture.md](architecture.md) — архитектура и технические детали реализации.
-- [docs/testing.md](docs/testing.md) — запуск автотестов.
-- `docs/` — пояснительные записки курсовой работы и ВКР, SQL-скрипты.
+- [architecture.md](architecture.md) — архитектура и технические детали реализации: модель данных, REST API, бизнес-правила, устройство ML-прогноза, конфигурация.
+- `TaskTracker/appsettings.example.json` и `.env.example` — шаблоны конфигурации с комментариями по каждому ключу.
 
 ## Контакты
 

@@ -20,8 +20,8 @@
 | `TaskTracker.Core/` | Доменное ядро: сущности, EF Core-контексты и миграции, сервисы бизнес-логики, фоновые задачи, ML-модуль прогноза оценок, коды ошибок с ресурсами локализации |
 | `TaskTracker.Utils/` | Вспомогательные расширения (строки, коллекции и т.п.) |
 | `TaskTracker.Tests/` | xUnit-тесты модуля прогнозирования оценок (`IssueEstimatePrediction/`) |
-| `ui/task-tracker/` | Фронтенд Angular 19 + Playwright e2e-тесты (`e2e/`) |
-| `docs/` | Документация: `testing.md` (запуск тестов), пояснительные записки курсовой/ВКР (docx), SQL-скрипты |
+| `ui/task-tracker/` | Фронтенд Angular 19 (`src/`) + Playwright e2e-тесты (`e2e/`), `nginx.conf` и `Dockerfile` прод-образа |
+| `docker-compose.yml`, `.env.example` | Оркестрация всей системы (PostgreSQL + API + UI) и шаблон переменных окружения к ней |
 | `TaskTracker.DevTools/`, `TemplateEngineHost/` | Служебные артефакты IDE, в solution не входят и кода не содержат |
 
 В solution `TaskTracker.sln` входят четыре проекта: `TaskTracker.Web.Api`, `TaskTracker.Core`, `TaskTracker.Utils`, `TaskTracker.Tests`. Все на .NET 8 (`net8.0`).
@@ -226,17 +226,17 @@ NLog (`NLog.Web.AspNetCore`), конфиг — `TaskTracker/config/nlog.config`,
 
 ## 11. Тестирование
 
-Подробная инструкция — [docs/testing.md](docs/testing.md). Два слоя:
+Команды запуска — в [README](README.md#тестирование). Три слоя:
 
 1. **Playwright e2e/API** (`ui/task-tracker/e2e`): `auth.spec.ts` (регистрация/вход), `kanban-time-tracking.spec.ts` (доска + трекинг), `api-contract.spec.ts` (контракт API), `readonly-smoke.spec.ts` (безопасный смоук для прода). Управляются переменными окружения (`E2E_APP_URL`, `E2E_API_URL`, `E2E_START_APP`, `E2E_USER_EMAIL`…). **Мутационные тесты создают реальные данные** и потому запускаются только против localhost, если явно не разрешено `E2E_ALLOW_MUTATION=1`.
-2. **xUnit-тесты ML-модуля** (`TaskTracker.Tests`) — см. §7.4: изолированная одноразовая БД на каждый тест.
+2. **Юнит-тесты фронтенда** (Karma + Jasmine, `npm test`): спеки лежат рядом с компонентами в `ui/task-tracker/src`.
+3. **xUnit-тесты ML-модуля** (`TaskTracker.Tests`) — см. §7.4: изолированная одноразовая БД на каждый тест.
 
 ## 12. Docker
 
-Оба образа собираются из корня репозитория; docker-compose в репозитории нет — контейнеры и БД запускаются вручную.
-
-- **Бэкенд** (`TaskTracker/Dockerfile`): multi-stage — `dotnet/sdk:8.0` (restore по csproj → publish Release) → `dotnet/aspnet:8.0`. Слушает **8080**, работает от непривилегированного пользователя `app`, каталог `/app/logs` создаётся заранее под NLog. Строка подключения и секреты передаются через переменные окружения/конфигурацию; для автосоздания схемы включить `Database__ApplyMigrations=true`.
-- **Фронтенд** (`ui/task-tracker/Dockerfile`): `node:22-alpine` (`npm ci` + прод-сборка Angular) → `nginx:1.27-alpine`, статика из `dist/task-tracker/browser`, порт 80. Образ копирует `nginx.conf` из корня UI-проекта — **файла сейчас нет в репозитории**, перед сборкой его нужно добавить (конфиг должен отдавать SPA с fallback на `index.html` и проксировать `/api` на бэкенд, т.к. прод-окружение использует `apiUrl: '/'`).
+- **Бэкенд** (`TaskTracker/Dockerfile`, собирается из корня репозитория): multi-stage — `dotnet/sdk:8.0` (restore по csproj → publish Release) → `dotnet/aspnet:8.0`. Слушает **8080**, работает от непривилегированного пользователя `app`, каталог `/app/logs` создаётся заранее под NLog. Строка подключения и секреты передаются через переменные окружения/конфигурацию; для автосоздания схемы включить `Database__ApplyMigrations=true`.
+- **Фронтенд** (`ui/task-tracker/Dockerfile`, собирается из каталога UI-проекта): `node:22-alpine` (`npm ci` + прод-сборка Angular) → `nginx:1.27-alpine`, статика из `dist/task-tracker/browser`, порт 80. Образ копирует `ui/task-tracker/nginx.conf`: SPA с fallback на `index.html` плюс проксирование `/api/` на `http://api:8080/api/`, т.к. прод-окружение использует относительный `apiUrl: '/'`. Прод-сборка идёт с prerender/SSR, поэтому клиентский индекс называется `index.csr.html` — Dockerfile копирует его в `index.html`, если обычного индекса в выводе нет.
+- **Оркестрация** (`docker-compose.yml`): три сервиса — `postgres` (`postgres:16-alpine`, том `postgres-data`, healthcheck по `pg_isready`), `api` (стартует после healthy-postgres, `Database__ApplyMigrations=true`) и `ui`. Порты и секреты приходят из `.env` (шаблон — `.env.example`): `POSTGRES_PORT` (по умолчанию 5434), `API_PORT` (8080), `UI_PORT` (4200), `IDENTITY_TOKEN_*`, `SECURITY_ANONYMOUS_TOKEN_REQUEST`, `TELEGRAM_*`. Обязательные переменные объявлены через `${VAR:?}` — без них `docker compose` откажется стартовать.
 
 ## 13. Конфигурация (appsettings)
 
@@ -256,6 +256,6 @@ NLog (`NLog.Web.AspNetCore`), конфиг — `TaskTracker/config/nlog.config`,
 - **Отчёты** — не реализованы (планируется).
 - `RoleManagerBackgroundJob` — пустая заготовка: роли членам воркспейса автоматически не назначаются (`TeamRole = NotSet` после принятия инвайта).
 - `WorkspaceInvite.IsHidden` — поле зарезервировано, скрытие обработанных запросов на фронте не реализовано.
-- `ui/task-tracker/nginx.conf` отсутствует — сборка UI-образа Docker без него упадёт (см. §12).
-- docker-compose отсутствует; оркестрация (API + UI + PostgreSQL) — вручную.
+- Dev-адрес API (`https://localhost:44336`) в `environment.ts` — это sslPort профиля IIS Express. Профили `http`/`https`, которые использует `dotnet run` по умолчанию, слушают 5159 и 7077, поэтому при запуске не из Visual Studio порт нужно задавать явно (`--urls`) или править `environment.ts`.
+- SSR настроен в сборке (`server.ts`, `@angular/ssr`, `prerender: true`), но в эксплуатации не используется: прод-образ раздаёт статику через nginx.
 - `HomeController` + `Views/` — остатки MVC-шаблона, в работе SPA не участвуют.
