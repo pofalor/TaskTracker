@@ -190,4 +190,4 @@ dotnet test TaskTracker.Tests/TaskTracker.Tests.csproj
 
 ## Контакты
 
-Для вопросов и поддержки: Телеграм — @pofalor
+Для вопросов и поддержки: @pofalor
