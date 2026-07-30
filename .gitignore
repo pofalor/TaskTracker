@@ -398,3 +398,9 @@ FodyWeavers.xsd
 *.sln.iml
 
 Tawos.sql
+
+# Docker Compose secrets
+.env
+
+appsettings.json
+appsettings.Development.json

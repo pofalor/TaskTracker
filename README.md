@@ -81,7 +81,16 @@ npm start        # ng serve → http://localhost:4200
 
 ### Docker
 
-Compose-файла в репозитории нет — образы собираются и запускаются по отдельности, PostgreSQL поднимается отдельно.
+В репозитории есть `docker-compose.yml`, поднимающий все три компонента (PostgreSQL, API, UI):
+
+```powershell
+cp .env.example .env    # заполните секреты (JWT-секрет, пароль БД, токен Telegram-бота и т.д.)
+docker compose up -d --build
+```
+
+По умолчанию UI будет доступен на `http://localhost:4200`, API — на `http://localhost:8080`, PostgreSQL — на `localhost:5434`. Порты и секреты настраиваются через `.env` (см. `.env.example`); при первом старте API сам применит миграции (`Database__ApplyMigrations=true`).
+
+Собрать и запустить образы по отдельности:
 
 ```powershell
 # API (сборка из корня репозитория; контейнер слушает порт 8080)
@@ -92,7 +101,7 @@ cd ui/task-tracker
 docker build -t tasktracker-ui .
 ```
 
-Строка подключения и секреты передаются контейнеру API через переменные окружения (например, `ConnectionStrings__DefaultConnection`, `Database__ApplyMigrations=true`). Для образа UI требуется файл `ui/task-tracker/nginx.conf` (в репозитории пока отсутствует): он должен раздавать SPA с fallback на `index.html` и проксировать `/api` на контейнер API, так как продовая сборка использует относительный `apiUrl: '/'`.
+Строка подключения и секреты передаются контейнеру API через переменные окружения (например, `ConnectionStrings__DefaultConnection`, `Database__ApplyMigrations=true`). Образ UI раздаёт SPA с fallback на `index.html` и проксирует `/api` на контейнер API (`ui/task-tracker/nginx.conf`), так как продовая сборка использует относительный `apiUrl: '/'`.
 
 ## Тестирование
 
